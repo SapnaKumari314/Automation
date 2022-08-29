@@ -1,0 +1,1034 @@
+﻿
+
+
+function SearchRect AreaName
+	set screenPortions to {
+		ExportButtonArea:[844,672,1307,754],
+		//DailyProcessingArea:[1632,77,1913,173],
+		//ProcessingArea:[1593,79,1910,171],
+		DailyProcessingArea:[1640,93,1900,159],
+		
+		ExportToCSVDownload:[1347,48,1908,408],
+		ExportDataPrompt:[645,404,1270,762],
+	
+	}
+	return screenPortions.(AreaName)
+	
+end SearchRect
+
+//Description: Function to export to csv and convert current time to America/Newyork timestamp
+---Input: ExportCSVAndConvertTimeToAmericaNewyorkZone
+---Output: 
+---Created By/date: Himaja R (05-Jul-2022)
+
+function ExportCSVAndConvertTimeToAmericaNewyorkZone ExportAssetDataWith
+	try
+		Global  ConfigValues
+		
+		Click {Text:"Export to CSV", SearchRectangle:SearchRect("ExportToCSVDownload")}
+		wait 5
+		SelectAssetDataWithRadioBtn(ExportAssetDataWith)
+		set  the SearchRectangle to empty
+		set  the SearchRectangle to SearchRect("ExportButtonArea")
+		Click  {image:"bt_Export",waitfor:ConfigValues.BasicTimeOut}
+		set  the SearchRectangle to empty
+		put the long common time into DateAndTime
+		
+		log DateAndTime
+		
+		put formattedTime("%Y-%m-%d_%H-%M-%S",  DateAndTime) into timerVal
+		subtract 9 hours 30 minutes from timerVal
+		Add 10 seconds to timerVal
+		log "America\Newyork Time stamp:"&timerVal
+		
+		return timerVal
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,ExportCSVAndConvertTimeToAmericaNewyorkZone)
+	End try
+end ExportCSVAndConvertTimeToAmericaNewyorkZone
+
+
+//Description: Function to export to csv and convert current time to America/Newyork timestamp
+---Input: ExportCSVAndConvertTimeToAmericaNewyorkZone
+---Output: 
+---Created By/date: Himaja R (12-Jul-2022)
+
+(*typetext <<GET aggregated_data_pcan/_search
+{"size":10000,"query":{"bool":{"must":[{"query_string":{"query":"busName:(7JZTH13J2LS000303)","fields":[],"type":"best_fields","default_operator":"or","max_determinized_states":10000,"enable_position_increments":true,"fuzziness":"AUTO","fuzzy_prefix_length":0,"fuzzy_max_expansions":50,"phrase_slop":0,"escape":false,"auto_generate_synonyms_phrase_query":true,"fuzzy_transpositions":true,"boost":1.0}}],"filter":[{"range":{"reportStartDate":{"from":1654732800000,"to":1655423999000,"include_lower":true,"include_upper":true,"boost":1.0}}}],"adjust_pure_negative":true,"boost":1.0}}}>>*)
+
+
+
+//Description: Handler to create a vehicle daily query 
+---Input: 
+---Output: Returns vehicle daily query 
+---Created By/date: Himaja R (12-Jul-2022)
+
+to VehicleDailyIntervalsQuery BusVIN,From,To
+	(*set BusVIN to "7JZTH13J7KS000151"
+	set From to "1654732800000"
+	set To to "1655423999000"*)
+	try
+		Global  ConfigValues
+		
+		put <<GET aggregated_data_pcan/_search
+{"size":10000,"query":{"bool":{"must":[{"query_string":{"query":"busName:(>>&BusVIN&<<)","fields":[],"type":"best_fields","default_operator":"or","max_determinized_states":10000,"enable_position_increments":true,"fuzziness":"AUTO","fuzzy_prefix_length":0,"fuzzy_max_expansions":50,"phrase_slop":0,"escape":false,"auto_generate_synonyms_phrase_query":true,"fuzzy_transpositions":true,"boost":1.0}}],"filter":[{"range":{"reportStartDate":{"from":>>&From&<<,"to":>>&To&<<,"include_lower":true,"include_upper":true,"boost":1.0}}}],"adjust_pure_negative":true,"boost":1.0}}}>> into VehicleDailyQuery
+		
+		//OpenSearchDashboard.EnterQueryRunAndGetResponse VehicleDailyQuery
+		return VehicleDailyQuery
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,VehicleDailyIntervalsQuery)
+	End try
+	
+end VehicleDailyIntervalsQuery
+
+
+
+
+//Description: Function to read from and to date from excel sheet and return all the dates between them
+---Input: 
+---Output: Returns all the dates between the given dates
+---Created By/date: Himaja R (13-Jul-2022)
+to getAllTheDatesBtwFromAndToDate
+	try
+		Global  ConfigValues
+		put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "FromDateDay") into FromDateDay
+		put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "FromDateMon") into FromDateMon
+		put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "FromDateYear") into FromDateYear
+		
+		
+		put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "ToDateDay") into ToDateDay
+		put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "ToDateMon") into ToDateMon
+		put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "ToDateYear") into ToDateYear
+		
+		put FromDateDay&&FromDateMon&&FromDateYear into FromDateVal
+		put ToDateDay&&ToDateMon&&ToDateYear into ToDateVal
+		
+		put  (FromDateVal .. ToDateVal) into list
+		
+		repeat with each item of list
+			insert formattedTime("%Y-%m-%d",it) into DatesList
+		end repeat
+		log DatesList
+		return DatesList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getAllTheDatesBtwFromAndToDate)
+	End try
+end getAllTheDatesBtwFromAndToDate
+
+
+
+//Description: Function to get the customer name
+---Input: 
+---Output: 
+---Created By/date: Himaja R (18-Jul-2022)
+to getCustomerName BusVin,Response,DatesList
+	try 
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "BusVIN") into BusVin
+		//put "Handlers/FileOperations".getJSONValueFromJSONFile("ResponseData/TOUC_10672_Response.JSON") into response
+		put getAllTheDatesBtwFromAndToDate() into DatesList
+		
+		//put remoteclipboard() into response
+		//put jsonvalue (response) into response 
+		
+		put response.hits.(hits) into val
+		//log val
+		repeat with each item of DatesList
+			put it into Date
+			log BusVin&"_"&Date
+			repeat with each item of val
+				
+				if it.(_id) is BusVin&"_"&Date then
+					
+					put it.(_source).(busMetadata) into fleetName
+					if fleetName.keys contains "fleetName" then
+						//log sucess
+						
+						put it.(_source).(busMetadata).fleetName into fleetName
+						
+						log "Customer:fleetName:"&fleetName
+						LogSuccess "Index - fleetName found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&fleetName
+						insert fleetName into fleetNameList
+						set Flag to true
+					else
+						set odometerReading to "No Index"
+						LogWarning "Index filed - fleetName not found bus and time stamp"&BusVin&"_"&Date&":"&fleetName
+						
+						insert fleetName into fleetNameList
+					end if
+				end if
+			end repeat
+			
+		end repeat
+		log  "Open Search --> Customer Name  List --->"&fleetNameList
+		return fleetNameList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getCustomerName)
+	End try
+end getCustomerName
+
+
+//Description: Function to get the Customer Vehicle Name
+---Input: 
+---Output: 
+---Created By/date: Himaja R (18-Jul-2022)
+to getCustomerVehicleName BusVin,Response,DatesList
+	try 
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "BusVIN") into BusVin
+		//put "Handlers/FileOperations".getJSONValueFromJSONFile("ResponseData/TOUC_10672_Response.JSON") into response
+		
+		put getAllTheDatesBtwFromAndToDate() into DatesList
+		
+		put response.hits.(hits) into val
+		//log val
+		repeat with each item of DatesList
+			put it into Date
+			log BusVin&"_"&Date
+			repeat with each item of val
+				
+				if it.(_id) is BusVin&"_"&Date then
+					
+					put it.(_source).(busMetadata) into busAlias
+					if busAlias.keys contains "busAlias" then
+						//log sucess
+						
+						put it.(_source).(busMetadata).busAlias into busAlias
+						
+						log "Customer:busAlias:"&busAlias
+						LogSuccess "Index - busAlias found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&busAlias
+						insert busAlias into busAliasList
+						set Flag to true
+					else
+						set odometerReading to "No Index"
+						LogWarning "Index filed - busAlias not found bus and time stamp"&BusVin&"_"&Date&":"&busAlias
+						
+						insert busAlias into busAliasList
+					end if
+				end if
+			end repeat
+			
+		end repeat
+		log "Open Search --> Customer Vehicle Name  List --->"&busAliasList
+		
+		return busAliasList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getCustomerVehicleName)
+	End try
+end getCustomerVehicleName
+
+//Description: Function to get the Vehicle Identification Number
+---Input: 
+---Output: 
+---Created By/date: Himaja R (19-Jul-2022)
+to getVehicleIdentificationNumber BusVin,Response,DatesList
+	try 
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "BusVIN") into BusVin
+		//put "Handlers/FileOperations".getJSONValueFromJSONFile("ResponseData/TOUC_10672_Response.JSON") into response
+		put getAllTheDatesBtwFromAndToDate() into DatesList
+		
+		put response.hits.(hits) into val
+		//log val
+		repeat with each item of DatesList
+			put it into Date
+			log BusVin&"_"&Date
+			repeat with each item of val
+				
+				if it.(_id) is BusVin&"_"&Date then
+					
+					put it.(_source).(busMetadata) into vinNum
+					if vinNum.keys contains "vinNum" then
+						//log sucess
+						
+						put it.(_source).(busMetadata).vinNum into vinNum
+						
+						log "Customer:vinNum:"&vinNum
+						LogSuccess "Index - vinNum found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&vinNum
+						insert vinNum into vinNumList
+						set Flag to true
+					else
+						set odometerReading to "No Index"
+						LogWarning "Index filed - vinNum not found bus and time stamp"&BusVin&"_"&Date&":"&vinNum
+						
+						insert vinNum into vinNumList
+					end if
+				end if
+			end repeat
+			
+		end repeat
+		log  "Open Search --> Vehicle Identification Number List --->"&vinNumList
+		return vinNumList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getVehicleIdentificationNumber)
+	End try
+end getVehicleIdentificationNumber
+
+
+//Description: Function to get the Vehicle Model
+---Input: 
+---Output: 
+---Created By/date: Himaja R (18-Jul-2022)
+to getVehicleModel BusVin,Response,DatesList
+	try 
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "BusVIN") into BusVin
+		//put "Handlers/FileOperations".getJSONValueFromJSONFile("ResponseData/TOUC_10672_Response.JSON") into response
+		put getAllTheDatesBtwFromAndToDate() into DatesList
+		
+		//put remoteclipboard() into response
+		//put jsonvalue (response) into response 
+		
+		
+		put response.hits.(hits) into val
+		//log val
+		repeat with each item of DatesList
+			put it into Date
+			log BusVin&"_"&Date
+			repeat with each item of val
+				
+				if it.(_id) is BusVin&"_"&Date then
+					
+					put it.(_source).(busMetadata) into busModel
+					if busModel.keys contains "busModel" then
+						//log sucess
+						
+						put it.(_source).(busMetadata).busModel into busModel
+						
+						log "Customer:busModel:"&busModel
+						LogSuccess "Index - busModel found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&busModel
+						insert busModel into busModelList
+						set Flag to true
+					else
+						set odometerReading to "No Index"
+						LogWarning "Index filed - busModel not found bus and time stamp"&BusVin&"_"&Date&":"&busModel
+						
+						insert busModel into busModelList
+					end if
+				end if
+			end repeat
+			
+		end repeat
+		log  "Open Search --> Vehicle Model List --->"&busModelList
+		return busModelList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getVehicleModel)
+	End try
+end getVehicleModel
+
+
+
+
+//Description: Function to get Odometer value from Open search
+---Input: 
+---Output: 
+---Created By/date: Himaja R (13-Jul-2022)
+to getOdometerValue BusVin,Response,Metric,DatesList
+	try 
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "BusVIN") into BusVin
+		//	put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "Metric") into Metric
+		put getAllTheDatesBtwFromAndToDate() into DatesList
+		
+		
+		//put remoteclipboard() into response
+		//put jsonvalue (response) into response 
+		//set response to JSONValue (file ResourcePath("Response.JSON"))
+		
+		
+		put response.hits.(hits) into val
+		//log val
+		repeat with each item of DatesList
+			put it into Date
+			log BusVin&"_"&Date
+			repeat with each item of val
+				
+				if it.(_id) is BusVin&"_"&Date then
+					
+					put it.(_source).(endstates) into odometerReading
+					if odometerReading.keys contains "odometerReading" then
+						//log sucess
+						
+						put it.(_source).(endStates).odometerReading into odometerReading
+						if Metric is "Yes" then
+							put (1.6093)*odometerReading into odometerReading
+							//put odometerReading rounded to 4 places  into odometerReading
+						end if 
+						put odometerReading rounded to 4 places  into odometerReading
+						log "Odometer Value:odometerReading:"&odometerReading
+						LogSuccess "Index - odometerReading found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&odometerReading
+						insert odometerReading into odometerReadingList
+						set Flag to true
+					else
+						set odometerReading to "No Index"
+						LogWarning "Index filed - odometerReading not found bus and time stamp"&BusVin&"_"&Date&":"&odometerReading
+						
+						insert odometerReading into odometerReadingList
+					end if
+				end if
+			end repeat
+			(*	if Flag is  true then
+				LogSuccess "Index - odometerReading found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&odometerReading
+				
+			else 
+				Logwarning "Index filed - odometerReading not found bus and time stamp"&BusVin&"_"&Date
+				
+			end if*)
+		end repeat
+		
+		
+		log odometerReadingList
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(odometerReadingList) into odometerReadingList
+		
+		log  "Open Search -->Odometer Value List --->"&odometerReadingList
+		return odometerReadingList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getOdometerValue)
+	End try
+end getOdometerValue
+
+
+
+//Description: FUnction to getBatteryStateofCharge from open search response
+---Input: 
+---Output: 
+---Created By/date: Himaja R (15-Jul-2022)
+to getBatteryStateofCharge BusVin,Response,DatesList
+	try 
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "BusVIN") into BusVin
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "Metric") into Metric
+		
+		put getAllTheDatesBtwFromAndToDate() into DatesList
+		
+		put response.hits.(hits) into val
+		//log val
+		repeat with each item of DatesList
+			put it into Date
+			log BusVin&"_"&Date
+			repeat with each item of val
+				
+				if it.(_id) is BusVin&"_"&Date then
+					
+					put it.(_source).(endstates) into dashSOC
+					if dashSOC.keys contains "dashSOC" then
+						//log sucess
+						
+						put it.(_source).(endStates).dashSOC into dashSOC
+						
+						put dashSOC rounded to 4 places  into dashSOC
+						log "Battery State of Charge:dashSOC:"&dashSOC
+						LogSuccess "Index - dashSOC found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&dashSOC
+						insert dashSOC into dashSOCList
+						set Flag to true
+					else
+						set dashSOC to "No Index"
+						insert dashSOC into dashSOCList
+						LogWarning "Index filed - dashSOC not found bus and time stamp"&BusVin&"_"&Date&":"&dashSOC
+						
+						
+					end if
+				end if
+				
+			end repeat
+		end repeat
+		
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(dashSOCList) into dashSOCList
+		log  "Open Search -->Battery State of Charge List --->"&dashSOCList
+		return dashSOCList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getBatteryStateofCharge)
+	End try
+end getBatteryStateofCharge
+
+
+//Description: Function to 
+---Input: getTotalDistanceDriven
+---Output: 
+---Created By/date: Himaja R (13-Jul-2022)
+to getTotalDistanceDriven BusVin,Response,Metric,DatesList
+	try 
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "BusVIN") into BusVin
+		
+		//set Metric to "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "Metric") 
+		
+		put getAllTheDatesBtwFromAndToDate() into DatesList
+		
+		put response.hits.(hits) into val
+		//log val
+		repeat with each item of DatesList
+			put it into Date
+			log BusVin&"_"&Date
+			repeat with each item of val
+				if it.(_id) is BusVin&"_"&Date then
+					put it.(_source) into distanceInMiles
+					if distanceInMiles.keys contains "distanceInMiles" then
+						put it.(_source).distanceInMiles into distanceInMiles
+						if Metric is "Yes" then
+							put (1.6093)*distanceInMiles into distanceInMiles
+							//put distanceInMiles rounded to 4 places  into distanceInMiles
+						end if 
+						put distanceInMiles rounded to 4 places  into distanceInMiles
+						log "Total Distance Driven:distanceInMiles:"&distanceInMiles
+						LogSuccess  "Index - distanceInMiles found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&distanceInMiles
+						insert distanceInMiles into distanceInMilesList
+						set Flag to true
+					else
+						set distanceInMiles to "No Index"
+						LogWarning "Index filed - distanceInMiles not found bus and time stamp"&BusVin&"_"&Date&":"&distanceInMiles
+						
+					end if
+				end if
+			end repeat
+			
+		end repeat
+		log distanceInMilesList
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(distanceInMilesList) into distanceInMilesList
+		
+		log  "Open Search -->Total Distance Driven List --->"&distanceInMilesList
+		return distanceInMilesList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getTotalDistanceDriven)
+	End try
+end getTotalDistanceDriven
+
+
+
+//Description: Function to get Total Gross Energy Consumed (kWh) from open search response
+---Input: 
+---Output: 
+---Created By/date: Himaja R (19-Jul-2022)
+to getTotalGrossEnergyConsumedkWh BusVin,Response,Metric,DatesList
+	try 
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "BusVIN") into BusVin
+		
+		//set Metric to "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "Metric") 
+		
+		put getAllTheDatesBtwFromAndToDate() into DatesList
+		put response.hits.(hits) into val
+		//log val
+		repeat with each item of DatesList
+			put it into Date
+			log BusVin&"_"&Date
+			repeat with each item of val
+				if it.(_id) is BusVin&"_"&Date then
+					put it.(_source).(energyByComponents) into energyByComponentsVal
+					put it.(_source).(energyByComponents).(netEnergyConsumptionResult) into netEnergyConsumptionResultVal
+					if energyByComponentsVal.keys contains "netEnergyConsumptionResult" and netEnergyConsumptionResultVal.keys contains "grossEnergyConsumedKWH"
+						put it.(_source).(energyByComponents).(netEnergyConsumptionResult).grossEnergyConsumedKWH into grossEnergyConsumedKWH
+						
+						put grossEnergyConsumedKWH rounded to 4 places  into grossEnergyConsumedKWH
+						log "Total Gross Energy Consumed (kWh):energyByComponents:netEnergyConsumptionResult:grossEnergyConsumedKWH:"&grossEnergyConsumedKWH
+						LogSuccess  "Index - grossEnergyConsumedKWH found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&grossEnergyConsumedKWH
+						insert grossEnergyConsumedKWH into grossEnergyConsumedKWHList
+						set Flag to true
+					else
+						set grossEnergyConsumedKWH to "No Index"
+						LogWarning "Index filed - grossEnergyConsumedKWH not found bus and time stamp"&BusVin&"_"&Date&":"&grossEnergyConsumedKWH
+						
+					end if
+				end if
+			end repeat
+			
+		end repeat
+		log grossEnergyConsumedKWHList
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(grossEnergyConsumedKWHList) into grossEnergyConsumedKWHList
+		log  "Open Search -->Total Gross Energy Consumed kWh List --->"&grossEnergyConsumedKWHList
+		
+		return grossEnergyConsumedKWHList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getTotalGrossEnergyConsumedkWh)
+	End try
+end getTotalGrossEnergyConsumedkWh
+
+
+//Description: Function to get Total Energy Saved by Regenerative Braking (kWh) from open search response
+---Input: 
+---Output: 
+---Created By/date: Himaja R (19-Jul-2022)
+to getTotalEnergySavedbyRegenerativeBrakingkWh BusVin,Response,Metric,DatesList
+	try 
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "BusVIN") into BusVin
+		//set Metric to "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "Metric") 
+		put getAllTheDatesBtwFromAndToDate() into DatesList
+		
+		put response.hits.(hits) into val
+		//log val
+		repeat with each item of DatesList
+			put it into Date
+			log BusVin&"_"&Date
+			repeat with each item of val
+				if it.(_id) is BusVin&"_"&Date then
+					put it.(_source).(energyByComponents) into energyByComponentsVal
+					put it.(_source).(energyByComponents).(netEnergyConsumptionResult) into netEnergyConsumptionResultVal
+					if energyByComponentsVal.keys contains "netEnergyConsumptionResult" and netEnergyConsumptionResultVal.keys contains "energyRegeneratedKWH"
+						put it.(_source).(energyByComponents).(netEnergyConsumptionResult).energyRegeneratedKWH into energyRegeneratedKWH
+						
+						put energyRegeneratedKWH rounded to 4 places  into energyRegeneratedKWH
+						log "Total Energy Saved by Regenerative Braking (kWh):energyByComponents:netEnergyConsumptionResult:energyRegeneratedKWH:"&energyRegeneratedKWH
+						LogSuccess  "Index - energyRegeneratedKWH found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&energyRegeneratedKWH
+						insert energyRegeneratedKWH into energyRegeneratedKWHList
+						set Flag to true
+					else
+						set energyRegeneratedKWH to "No Index"
+						LogWarning "Index filed - energyRegeneratedKWH not found bus and time stamp"&BusVin&"_"&Date&":"&energyRegeneratedKWH
+						
+					end if
+				end if
+			end repeat
+			
+		end repeat
+		
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(energyRegeneratedKWHList) into energyRegeneratedKWHList
+		log energyRegeneratedKWHList
+		log  "Open Search -->Total Energy Saved by Regenerative Braking kWh List--->"&energyRegeneratedKWHList
+		return energyRegeneratedKWHList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getTotalEnergySavedbyRegenerativeBrakingkWh)
+	End try
+end getTotalEnergySavedbyRegenerativeBrakingkWh
+
+
+//Description: Function to get Net Energy Consumed (kWh) from open search response
+---Input: 
+---Output: 
+---Created By/date: Himaja R (19-Jul-2022)
+
+to getNetEnergyConsumedkWh BusVin,Response,Metric,DatesList
+	try 
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "BusVIN") into BusVin
+		//set Metric to "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "Metric") 
+		put getAllTheDatesBtwFromAndToDate() into DatesList
+		
+		put response.hits.(hits) into val
+		//log val
+		repeat with each item of DatesList
+			put it into Date
+			log BusVin&"_"&Date
+			repeat with each item of val
+				if it.(_id) is BusVin&"_"&Date then
+					put it.(_source).(energyByComponents) into energyByComponentsVal
+					put it.(_source).(energyByComponents).(netEnergyConsumptionResult) into netEnergyConsumptionResultVal
+					if energyByComponentsVal.keys contains "netEnergyConsumptionResult" and netEnergyConsumptionResultVal.keys contains "netEnergyConsumedKWH"
+						put it.(_source).(energyByComponents).(netEnergyConsumptionResult).netEnergyConsumedKWH into netEnergyConsumedKWH
+						
+						put netEnergyConsumedKWH rounded to 4 places  into netEnergyConsumedKWH
+						log "Net Energy Consumed (kWh):energyByComponents:netEnergyConsumptionResult:netEnergyConsumedKWH:"&netEnergyConsumedKWH
+						LogSuccess  "Index - netEnergyConsumedKWH found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&netEnergyConsumedKWH
+						insert netEnergyConsumedKWH into netEnergyConsumedKWHList
+						set Flag to true
+					else
+						set netEnergyConsumedKWH to "No Index"
+						LogWarning "Index filed - netEnergyConsumedKWH not found bus and time stamp"&BusVin&"_"&Date&":"&netEnergyConsumedKWH
+						
+					end if
+				end if
+			end repeat
+			
+		end repeat
+		log netEnergyConsumedKWHList
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(netEnergyConsumedKWHList) into netEnergyConsumedKWHList
+		
+		log  "Open Search -->Net EnergyConsumed kWh List--->"&netEnergyConsumedKWHList
+		return netEnergyConsumedKWHList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getNetEnergyConsumedkWh)
+	End try
+end getNetEnergyConsumedkWh
+
+
+//Description: FUnction to get MaximumAmbientTemperature from open search response
+---Input: 
+---Output: 
+---Created By/date: Himaja R (12-Jul-2022)
+to getMaximumAmbientTemperature BusVin,Response,Metric,DatesList
+	try 
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "BusVIN") into BusVin
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "Metric") into Metric
+		put getAllTheDatesBtwFromAndToDate() into DatesList
+		
+		put response.hits.(hits) into val
+		//log val
+		repeat with each item of DatesList
+			put it into Date
+			log BusVin&"_"&Date
+			repeat with each item of val
+				
+				if it.(_id) is BusVin&"_"&Date then
+					
+					put it.(_source).(statResults).(ambientTempInC) into ambientTempInCVal
+					if ambientTempInCVal.keys contains "max" then
+						put it.(_source).(statResults).(ambientTempInC).max into maxambientTempInC
+						
+						if Metric is "Yes" then
+							put maxambientTempInC  into maxambientTempInC
+							//put distanceInMiles rounded to 4 places  into distanceInMiles
+						else
+							put (maxambientTempInC*9/5) + 32 into maxambientTempInC
+						end if 
+						put maxambientTempInC rounded to 4 places  into maxambientTempInC
+						log "MaximumAmbientTemperature:statResults:ambientTempInC:max"&maxambientTempInC
+						LogSuccess "Index - ambientTempInC- maxfound for bus and time stamp "&BusVin&"_"&Date&&"value is:"&maxambientTempInC
+						
+						insert maxambientTempInC into maxambientTempInCList
+						set Flag to true
+					else 
+						
+						
+						set odometerReading to "No Index"
+						Logwarning "Index filed - ambientTempInC -max not found bus and time stamp"&BusVin&"_"&Date&":"&maxambientTempInC
+						
+						insert maxambientTempInC into maxambientTempInCList
+					end if
+				end if
+			end repeat
+			
+			
+		end repeat
+		log maxambientTempInCList
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(maxambientTempInCList) into maxambientTempInCList
+		log  "Open Search -->Maximum Ambient Temperature List--->"&maxambientTempInCList
+		
+		return maxambientTempInCList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getMaximumAmbientTemperature)
+	End try
+end getMaximumAmbientTemperature
+
+//Description: FUnction to get MinimumAmbientTemperature from open search response
+---Input: 
+---Output: 
+---Created By/date: Himaja R (20-Jul-2022)
+to getMinimumAmbientTemperature BusVin,Response,Metric,DatesList
+	try 
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "BusVIN") into BusVin
+		//		put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "Metric") into Metric
+		put getAllTheDatesBtwFromAndToDate() into DatesList
+		
+		put response.hits.(hits) into val
+		//log val
+		repeat with each item of DatesList
+			put it into Date
+			log BusVin&"_"&Date
+			repeat with each item of val
+				
+				if it.(_id) is BusVin&"_"&Date then
+					
+					put it.(_source).(statResults).(ambientTempInC) into ambientTempInCVal
+					if ambientTempInCVal.keys contains "min" then
+						put it.(_source).(statResults).(ambientTempInC).min into minambientTempInC
+						
+						if Metric is "Yes" then
+							put minambientTempInC  into minambientTempInC
+							//put distanceInMiles rounded to 4 places  into distanceInMiles
+						else
+							put (minambientTempInC*9/5) + 32 into minambientTempInC
+						end if 
+						put minambientTempInC rounded to 4 places  into minambientTempInC
+						log "minimumAmbientTemperature:statResults:ambientTempInC:min"&minambientTempInC
+						LogSuccess "Index - ambientTempInC-min found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&minambientTempInC
+						
+						insert minambientTempInC into minambientTempInCList
+						set Flag to true
+					else 
+						
+						
+						set odometerReading to "No Index"
+						Logwarning "Index filed - ambientTempInC -min not found bus and time stamp"&BusVin&"_"&Date&":"&minambientTempInC
+						
+						insert minambientTempInC into minambientTempInCList
+					end if
+				end if
+			end repeat
+			
+			
+		end repeat
+		log minambientTempInCList
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(minambientTempInCList) into minambientTempInCList
+		
+		log  "Open Search -->Minimum Ambient Temperature List--->"&minambientTempInCList
+		return minambientTempInCList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getMinimumAmbientTemperature)
+	End try
+end getMinimumAmbientTemperature
+
+
+
+
+//Description: Function to get Efficiency (Distance driven per kWh) from Open search
+---Input: 
+---Output: 
+---Created By/date: Himaja R (13-Jul-2022)
+to getEfficiencyDistancedrivenperkWh BusVin,Response,Metric,DatesList
+	try 
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "BusVIN") into BusVin
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "Metric") into Metric
+		
+		put getAllTheDatesBtwFromAndToDate() into DatesList
+		
+		put response.hits.(hits) into val
+		//log val
+		repeat with each item of DatesList
+			put it into Date
+			log BusVin&"_"&Date
+			repeat with each item of val
+				
+				if it.(_id) is BusVin&"_"&Date then
+					
+					put it.(_source) into efficiencyKWHPerMileV2
+					if efficiencyKWHPerMileV2.keys contains "efficiencyKWHPerMileV2" then
+						//log suces
+						
+						put it.(_source).efficiencyKWHPerMileV2 into efficiencyKWHPerMileV2
+						
+						put efficiencyKWHPerMileV2 rounded to 4 places  into efficiencyKWHPerMileV2
+						log "Efficiency (Distance driven per kWh):efficiencyKWHPerMileV2:"&efficiencyKWHPerMileV2
+						LogSuccess "Index - efficiencyKWHPerMileV2 found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&efficiencyKWHPerMileV2
+						insert efficiencyKWHPerMileV2 into efficiencyKWHPerMileV2List
+						set Flag to true
+					else
+						set efficiencyKWHPerMileV2 to "No Index"
+						LogWarning "Index filed - efficiencyKWHPerMileV2 not found bus and time stamp"&BusVin&"_"&Date&":"&efficiencyKWHPerMileV2
+						
+						insert efficiencyKWHPerMileV2 into efficiencyKWHPerMileV2List
+					end if
+				end if
+			end repeat
+			
+		end repeat
+		log efficiencyKWHPerMileV2List
+		//return efficiencyKWHPerMileV2
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(efficiencyKWHPerMileV2List) into efficiencyKWHPerMileV2List
+		
+		log  "Open Search -->Efficiency Distance driven per kWh List--->"&efficiencyKWHPerMileV2List
+		return efficiencyKWHPerMileV2List
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getEfficiencyDistancedrivenperkWh)
+	End try
+end getEfficiencyDistancedrivenperkWh
+
+//Description: FUnction to get CabinTemperature from open search response
+---Input: 
+---Output: 
+---Created By/date: Himaja R (20-Jul-2022)
+to getCabinTemperature BusVin,Response,Metric,DatesList
+	try 
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "BusVIN") into BusVin
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "Metric") into Metric
+		put getAllTheDatesBtwFromAndToDate() into DatesList
+		
+		put response.hits.(hits) into val
+		//log val
+		repeat with each item of DatesList
+			put it into Date
+			log BusVin&"_"&Date
+			repeat with each item of val
+				
+				if it.(_id) is BusVin&"_"&Date then
+					
+					put it.(_source).(statResults).(CabinTempInC) into CabinTempInCVal
+					if CabinTempInCVal.keys contains "avg" then
+						put it.(_source).(statResults).(CabinTempInC).avg into avgCabinTempInC
+						
+						if Metric is "Yes" then
+							put avgCabinTempInC  into avgCabinTempInC
+							
+						else
+							put (avgCabinTempInC*9/5) + 32 into avgCabinTempInC
+						end if 
+						put avgCabinTempInC rounded to 4 places  into avgCabinTempInC
+						log "Cabin Temperature:statResults:CabinTempInC:avg"&avgCabinTempInC
+						LogSuccess "Index - CabinTempInC -avg found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&avgCabinTempInC
+						
+						insert avgCabinTempInC into avgCabinTempInCList
+						set Flag to true
+					else 
+						
+						set avgCabinTempInC to "No Index"
+						Logwarning "Index filed - CabinTempInC -avg not found bus and time stamp"&BusVin&"_"&Date&":"&avgCabinTempInC
+						
+						insert avgCabinTempInC into avgCabinTempInCList
+					end if
+				end if
+			end repeat
+			
+			
+		end repeat
+		log avgCabinTempInCList
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(avgCabinTempInCList) into avgCabinTempInCList
+		log avgCabinTempInCList
+		log  "Open Search -->Cabin Temperature List--->"&avgCabinTempInCList
+		//return avgCabinTempInC
+		return avgCabinTempInCList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getCabinTemperature)
+	End try
+end getCabinTemperature
+
+
+//Description: Function to get the Vehicle Status
+---Input: 
+---Output: 
+---Created By/date: Himaja R (20-Jul-2022)
+to getVehicleStatus BusVin,Response,DatesList
+	try 
+		//put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "BusVIN") into BusVin
+		put getAllTheDatesBtwFromAndToDate() into DatesList
+		
+		//put remoteclipboard() into response
+		//put jsonvalue (response) into response 
+		
+		put response.hits.(hits) into val
+		//log val
+		repeat with each item of DatesList
+			put it into Date
+			log BusVin&"_"&Date
+			repeat with each item of val
+				
+				if it.(_id) is BusVin&"_"&Date then
+					
+					put it.(_source).(busMetadata) into inServiceFlag
+					if inServiceFlag.keys contains "inServiceFlag" then
+						//log sucess
+						
+						put it.(_source).(busMetadata).inServiceFlag into inServiceFlag
+						if inServiceFlag is "0"
+							Replace 0 with "Inactive" in inServiceFlag
+						else
+							if  inServiceFlag is "1"
+								Replace 1 with "Active" in inServiceFlag
+							else 
+								logerror "Invaid value"
+							end if
+						end if
+						log "Customer:inServiceFlag:"&inServiceFlag
+						LogSuccess "Index - inServiceFlag found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&inServiceFlag
+						insert inServiceFlag into inServiceFlagList
+						set Flag to true
+					else
+						set inServiceFlag to "No Index"
+						LogWarning "Index filed - inServiceFlag not found bus and time stamp"&BusVin&"_"&Date&":"&inServiceFlag
+						
+						insert inServiceFlag into inServiceFlagList
+					end if
+				end if
+			end repeat
+			
+		end repeat
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(inServiceFlagList) into inServiceFlagList
+		
+		log  "Open Search -->Vehicle Status List--->"&inServiceFlagList
+		return inServiceFlagList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getVehicleStatus)
+	End try
+end getVehicleStatus
+
+
+//Description: Function to 
+---Input: 
+---Output: 
+---Created By/date: Himaja R (21-Jul-2022)
+to validateFileDownloaded AssetType,TimeType,TimeStampList
+	try
+		Global  ConfigValues
+		log TimeStampList
+		//set TimeStampList to ["2022-07-26_18-12-05","2022-07-26_18-12-06","2022-07-26_18-12-07"]
+		Repeat with each item  of TimeStampList
+			put it into TimeStamp
+			replace "O" with "0" in it
+			delete  "_" in it
+			delete "-" in it
+			put characters 1 to 6 of it into Chars
+			delete characters 1 to 6 of it
+			Put Chars&newline&it into val
+			//----------------------------------------------------------------------------------------------------------------------------------
+			(*replace every  occurrence of <<_>> in   it by " "
+			replace every  occurrence of <<->> in   it by " "
+			split it by " "*)
+			//----------------------------------------------------------------------------------------------------------------------------------
+			//log val
+			Set DownloadedFileName to AssetType&"_"&TimeType&"_"&val&".csv"
+			log DownloadedFileName
+			
+			if ImageFound(Text:"Today", waitFor:ConfigValues.BasicTimeOut,Validwords:"Today",searchRectangle:SearchRect(DownloadsPanelArea))
+				put FoundImageLocation() into Loc
+				Put Loc+[-10,10] into Pos1
+				Put Loc+[370,100] into Pos2
+				put ReadText(Pos1,Pos2) into val1
+				replace "O" with "0" in val1
+				delete " " in val1
+				delete  "_" in val1
+				delete "-" in val1
+				delete "—" in val1
+				log val1
+				insert  "Vehicle" into list 
+				insert  "Daily" into list 
+				insert Chars into list 
+				insert it into list
+				
+				set flag to true
+				//set count to 0
+				repeat with each item of list
+					
+					if val1 contains it
+						//add 1 to count
+						logsuccess "Found it:"&it
+					else
+						logwarning "Couldnot find : "& it
+						Set flag to false
+					end if
+					
+				end repeat
+				put empty list into list
+				
+			else
+				LogError "Downloads screen is not shown"
+				
+			end if
+			
+			if flag is true  then
+				put repeatindex() into index
+				put  TimeStamp  into TimeStampval
+				set flag1 to true
+			end if
+			
+		End repeat
+		
+		if flag1 is true  then
+			LogSuccess " Downloaded file is available in the downloads pannel in the specified format"
+			log "TimeStamp:"&TimeStampval
+			Click {Text:"Download", waitFor:ConfigValues.BasicTimeOut,Validwords:"Download",searchRectangle:[Pos1,Pos2]}
+			"Utilities/GenericOperations".Success  "Clicked on Download successfully!!"
+		else
+			"Utilities/GenericOperations".Error " Downloaded file is not available in the specified format"
+		end if
+		return TimeStampval
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,validateFileDownloaded)
+	End try	
+end validateFileDownloaded
+
+
+//Description:To Validate  correctness
+---Input: 
+---Output: 
+---Created By/date: Himaja R (26-Jul-2022)
+
+to ValidateDataCorrectness BusVIN,CSVData,Response,RowNum,Metric,ResponseHandler,DataFieldColumnName
+
+	try
+		Global  ConfigValues
+		
+		put "Handlers/FileOperations".getColumnDataBasedOnHeaderLineFromCSV( DataFieldColumnName,RowNum,CSVData) into CSV_DataList
+		put "Handlers/ReportHandlers".getRoundTheDecimalValuesFromCSV(CSV_DataList) into CSV_DataList
+		put  "Handlers/VehicleDailyIntervals".(ResponseHandler)(BusVin,Response,Metric,DatesList) into OpenSearch_Data
+		put  "Handlers/ReportHandlers".compareLists(CSV_DataList,OpenSearch_Data) into ReturnVal
+		if ReturnVal is true
+			LogSuccess DataFieldColumnName&" --->  Column Values in the downloaded CSV matches with open search index response "
+			
+		else
+			LogError DataFieldColumnName&" --->  Column Values in the downloaded CSV DOESN'T MATCH with open search index response "
+		end if
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,ValidateDataCorrectness)
+	End try
+	
+end ValidateDataCorrectness

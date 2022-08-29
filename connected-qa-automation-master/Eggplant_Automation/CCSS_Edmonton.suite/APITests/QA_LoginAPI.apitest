@@ -1,0 +1,25 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = "";
+	    showCheckedNumber = <*BY>;
+	    value = "";
+	}
+    );
+    authenticationType = None;
+    httpVerb = POST;
+    oauth1Token = "";
+    password = "";
+    requestBody = "{
+    \"userName\": \"vnm66g+qa-launch2020_eadmin@gmail.com\",
+    \"userPassword\": \"Welcome@2022\"
+}";
+    requestBodyFormat = "JSON (application/json)";
+    requestHeaders = "<![CDATA[]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "https://exp-api.proterra.com/exp-ams-qa-launch2020/v1/cognitoLogin";
+    userName = "";
+}

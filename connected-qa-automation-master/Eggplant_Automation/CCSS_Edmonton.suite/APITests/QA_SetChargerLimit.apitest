@@ -1,0 +1,26 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = "";
+	    showCheckedNumber = <*BY>;
+	    value = "";
+	}
+    );
+    authenticationType = None;
+    httpVerb = POST;
+    oauth1Token = "";
+    password = "";
+    requestBody = "{
+    \"id\": \"[[API_SetChargerLimit_id]]\",
+    \"chargerLimit\": [[API_SetChargerLimit_chargerLimit]]
+}";
+    requestBodyFormat = "JSON (application/json)";
+    requestHeaders = "<![CDATA[Authorization:[[authToken]]
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "[[BaseURI]]/tenants/[[tenantId]]/garages/[[garageId]]/ecms/power";
+    userName = "";
+}

@@ -1,0 +1,5 @@
+
+chargerstationtype:fieldValue
+ChargerRate:N	I
+MinimumChargerRate:fieldValue
+ChargerStatus:fieldValue

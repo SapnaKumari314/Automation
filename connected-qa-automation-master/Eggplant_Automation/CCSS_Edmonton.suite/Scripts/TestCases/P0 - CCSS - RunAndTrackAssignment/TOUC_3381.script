@@ -1,0 +1,70 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 19/Aug/22
+@TC_ID: TOUC_3381
+@TC_Description: CCSS-RRT-Recommended Track Algorithm: Track Type assignment for a Bus with Ready/Topped Up Status
+***)
+
+BeginTestCase TOUC_3381
+
+Log "###########   Started execution of Test Case--> TOUC_3381   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+--Remove bus from the track
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P0_TestData", "RunAndTackAssignment", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+------------------------
+
+--Select a Bus from the Incoming Queue
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "BusID") into BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+--Uncheck the Needs Maintenance (if selected)
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+
+--Click Recommended Run and Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+
+--Click the Override Button from Run Details
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+
+--Click the Confirm button without selecting a Run
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickConfirmButtonWOSelectingARun "Please select a run"
+
+--Verify that all the Recommended Runs are marked with the Recommended label next to the Run ID
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyRecommededRunsAreMarkedWithRecommendedLabel
+
+--Verify that within each of the cluster by recommendations, Runs are sorted by Bookout Time with the Run with the earliest bookout time displayed first
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBookoutTimeInAscOrder
+
+--Verify that 10 runs are displayed per page and user can navigate through all the runs by pagination
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyTenRunsInOnePage
+
+--Verify that if a user selects a run from one page and navigates to another page and selects another run from that page, the previous selection is removed
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifySelectedRunIsDeselectedAfterPagination "RunAndTrackAssignmentPage\imgRunSelectionUncheckedRadioBtn", "RunAndTrackAssignmentPage\imgRunSelectionCheckedRadioBtn"
+
+--Select a run from the list
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickButtonByImg "RunAndTrackAssignmentPage\imgRunSelectionUncheckedRadioBtn",  "TracksArea"
+
+--Click the Confirm button
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickConfirmButton "nocomments"
+
+--Click Done without entering any comments
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "BlankCommentsInOverridePopup") into errMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyErrorMessages errMsg
+
+--Click Cancel from the Confirm Override Pop Up
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickButton "Cancel", "OverrideCommentsBoxArea"
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyElementIsNotPresent "Confirm Run Override", "OverrideCommentsBoxArea", "Correctly"
+--Click Cancel on the Run override screen
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickButton "Cancel", "TracksArea"
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyElementIsNotPresent "Confirm", "TracksArea", "Correctly"
+
+Log "#############  Finished execution of Test Case--> TOUC_3381 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3381
+

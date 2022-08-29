@@ -1,0 +1,59 @@
+﻿(***
+@Author: Vivek
+@Date: 17/March/22
+@TC_ID: TOUC_3388
+@TC_Description: CCSS-RRT-Drag and Drop: Drag and Drop Non Maintenance Bus whilst hovering over Bus or Charger icon
+***)
+
+BeginTestCase TOUC_3388
+
+Log "###########   Started execution of Test Case--> TOUC_3388   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "DragAndDrop", "BusID") into BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+--API Call
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetails BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+--API - Verify Run and Trackdetails
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedRunDetails
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton
+--Verify Toast msg
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "DragAndDrop", "ToastMsg") into ToastMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage ToastMsg
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "DragAndDrop", "NotificationMsg") into NotificationMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyNotificationMessage NotificationMsg
+
+
+
+------Automation Step-11, Drag the bus and hover over the Bus or Charger Icon
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "DragAndDrop", "TrackInfo") into TrackInformation
+"CCSS_Pages/RunAndAssignmentTrackPage".DragBusAndHoverOnAnyPosition "RunAndTrackAssignmentPage/bus_8027", "imgActiveCharger", TrackInformation
+put "CCSS_Pages/RunAndAssignmentTrackPage".DragBusAndDropToAnyPosition ("RunAndTrackAssignmentPage/bus_8027", "imgActiveCharger") into msgNewTrackAllocation
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedTracksAfterBusDragAndDropInTracks msgNewTrackAllocation
+
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedRunDetails
+
+Log "#############  Finished execution of Test Case--> TOUC_3388 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3388
+
+
+
+
+
+
+
+
+
+
+
+

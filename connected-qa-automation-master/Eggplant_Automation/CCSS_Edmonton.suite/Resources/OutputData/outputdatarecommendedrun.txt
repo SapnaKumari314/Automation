@@ -1,0 +1,7 @@
+
+RunID::11301
+RunStatus::Not Assigned
+EstimatedCharge::00:13
+BookOutDate::Jul 27,10:24
+RequiredEnergy::383
+Distance::232

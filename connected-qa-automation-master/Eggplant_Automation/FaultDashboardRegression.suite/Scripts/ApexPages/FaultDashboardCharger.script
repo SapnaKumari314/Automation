@@ -1,0 +1,1656 @@
+﻿
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		ApexPagesArea :[[0,0.12],[.15,0.95]],
+		CustomerSelection:[[.125,.125],[.5,.5]],
+		AssetSelection:[[0.45,.105],[.90,.30]],
+		FaultDashboard:[[0.12,.35],[1,0.95]],
+		GetData:[[.9,0.2],[1,.35]],
+		FaultPriority:[[.125,.1],[.5,.45]],
+		FaultStatus:[[.3,.15],[0.5,.40]],
+		VIN:[[.15,1],[0.5,10]],
+		IndividualPopup:[[.6,0],[1,0.85]],
+	}
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+End ScreenPart
+
+
+
+function SearchRect AreaName
+	set screenPortions to {
+		
+		GetDataButton:[1758,173,1904,349],
+		TimeofFault:[1647,404,1793,458],
+		VendorErrorCode:[955,403,1101,455],
+		TimeofFaultWithFilter:[1649,461,1790,510],
+		FilterPart:[278,376,1859,462],
+		VendorErrcodeWithFilter:[947,460,1101,511],
+	}
+	return screenPortions.(AreaName)
+	
+end SearchRect
+
+
+
+--set date1 to "07/12/2022"
+--set date2 to "07/16/2022"
+--set faultdate to "07/11/2022"
+--set faultdateTime to "2022-07-12 10:24 PM"
+//*****************************************************
+--Description: Handler to verify the time fault is in given date range
+---Input : FromDate,ToDate,FromTime,ToTime,faultdateTime (fetched from other function)
+---output: None
+---Created by:Shalini V
+--created on: 12 July 2022
+//*****************************************************
+
+to handle VerifyTimeofFaultRange FromDate,ToDate,FromTime,ToTime,faultdateTime
+	try
+		global ConfigValues
+		log "Start of function VerifyTimeofFaultRange"
+		If item 1 of faultdateTime is "Time of fault"
+			delete item 1 of faultdateTime --deletes the time of fault header
+		end if
+		set iTimeValidationFlag to True
+		repeat for each item of faultdateTime
+			If it is not ""
+				
+				Delete " " from it
+				Put " " after character 10 of it
+				If character 14 of it is not ":"
+					Put ":" after character 13 of it
+				End If
+				
+				put  " " after  character 16 of it
+				put  first 10 characters of it into faultdate
+				delete first 10 characters of it
+				put trim(it) into faulttime
+				If 3rd  character  of faulttime is not ":"
+					delete character 3 of faulttime
+					put ":" after character 2 of faulttime
+				end if
+				
+				put formattedTime("%m/%d/%Y",faultdate) into faultdate
+				(*	set faulttime to "6:00 PM"
+			set FromTime to "7:00 PM"
+			set ToTime to "8:00 PM"*)
+				//put the time
+				put formattedTime("%H-%M-%S",  FromTime) into FromTime
+				put formattedTime("%H-%M-%S",  ToTime) into ToTime
+				put formattedTime("%H-%M-%S",  faulttime) into faulttime
+				If FromDate is empty then
+					"Utilities/GenericOperations".Error("From date is not passed to the script")
+					Exit handler
+					
+				end if
+				
+				
+				if FromDate is equal to ToDate then
+					if ToDate is equal to faultdate
+						if  faulttime is between FromTime and ToTime
+							"Utilities/GenericOperations".Success("Fault time is within selected range")
+							else 
+							"Utilities/GenericOperations".Error("Fault time is not within selected range")
+							set iTimeValidationFlag to False
+						end if
+						
+						else
+						if faultdate is between FromDate and ToDate
+							"Utilities/GenericOperations".Success("Fault time is within selected range")
+						else 
+							"Utilities/GenericOperations".Error("Fault time is not within selected range")
+							set iTimeValidationFlag to False
+						end if    
+					end if
+					else
+					
+					if faultdate is between FromDate and ToDate
+						If ToDate is equal to faultdate then
+							--if  faulttime is between FromTime and ToTime
+							if  faulttime is less than ToTime
+								"Utilities/GenericOperations".Success("Fault time is within selected range")
+								else if faulttime is equal to  ToTime
+								"Utilities/GenericOperations".Success("Fault time is within selected range")
+								else
+								
+								"Utilities/GenericOperations".Error("Fault time is not within selected range")
+								set iTimeValidationFlag to False	
+							end if
+							else
+							If FromDate is equal to faultdate then
+								--if  faulttime is between FromTime and ToTime
+								if  faulttime is greater than FromTime then
+									"Utilities/GenericOperations".Success("Fault time is within selected range")
+								else if faulttime is equal to FromTime then
+									"Utilities/GenericOperations".Success("Fault time is within selected range")
+								else 
+									"Utilities/GenericOperations".Error("Fault time is not within selected range")
+									set iTimeValidationFlag to False
+								end if
+							End If
+							
+						end if
+						
+						else
+						"Utilities/GenericOperations".Error("Fault time is not within selected range")
+						set iTimeValidationFlag to False
+					end if
+				end if
+		End if
+		
+	end repeat
+	catch exception
+	get "Utilities/GenericOperations".LogException(exception,VerifyTimeofFaultRange)
+end try
+log "End of function VerifyTimeofFaultRange"
+return iTimeValidationFlag
+end VerifyTimeofFaultRange
+//*****************************************************
+--Description: Handler to extract datafield's row value with respect to value of reference datafield
+---Input : DatafieldcolumnSearchArea from SearchRect
+---output: None
+---Created by:Shalini V
+--created on: 13 July 2022
+//*****************************************************
+--Extract_ChargerFault_DatafieldRowSeries_WithReferenceValue"5000666317","Time of fault"--9985416562
+to handle Extract_ChargerFault_DatafieldRowSeries_WithReferenceValue ColValue, DatafieldColname
+	try
+		set the SearchRectangle to ScreenPart("FaultDashboard")
+		Global ConfigValues
+		
+		--Set StatusRectangles to EveryImageRectangle(text:datafieldValue) 
+		Set DatafieldArea to EveryImageLocation(text:ColValue)
+		
+		put [] into newRowDataList 
+		put 0 into iRowFlag
+		repeat with DatafieldArea
+			put iRowFlag+1 into iRowFlag
+			put it into referencearea
+			put imagelocation(text:DatafieldColname) into expectearea
+			
+			put referencearea.y into posy
+put expectearea.x into posx
+			
+			--	1079,481
+			--	log ImageLocation("eooi7JZTH13J9KSOOO152521500OGr")
+			log readtext(posx,posy)
+			--put readtext(posx,posy) into ColumnValue
+			put readtext(posx,posy) into DatacolomnValues
+			
+			put DatacolomnValues into item iRowFlag of newRowDataList
+		end repeat
+		set the SearchRectangle to empty
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,Extract_ChargerFault_DatafieldRowSeries_WithReferenceValue)
+	End try
+	set the SearchRectangle to empty
+	--log	ColumnValue
+	return newRowDataList
+end Extract_ChargerFault_DatafieldRowSeries_WithReferenceValue
+//*****************************************************
+--Description: Handler to extract Row values of time of fault datafield column
+---Input : 
+---output: Time of fault row values
+---Created by:Shalini V
+--created on: 12 August 2022
+//*****************************************************
+--Fetch_ChargerFault_TimeofFaultRowValues
+to handle Fetch_ChargerFault_TimeofFaultRowValues
+	log "start of function Fetch_ChargerFault_TimeofFaultRowValues"
+	try
+		
+		put [] into newRowDataList 
+		put 0 into iRowFlag
+		If imagefound(text:"Time of fault") is true
+			put imagelocation(text:"Time of fault") into valloc
+			
+			put valloc +[-50,27] into Pos1
+			put valloc +[100,-20] into Pos2
+			log readtext(Pos1,Pos2)
+			repeat until length of readtext( Pos1,Pos2,searchrectangle:[Pos1,Pos2]) < 2
+				
+				put Pos1+[0,50] into Pos1
+				put Pos2 +[0,50] into Pos2
+				put readtext(Pos1,Pos2,searchrectangle:[Pos1,Pos2]) into DashboardRowData
+				put iRowFlag+1 into iRowFlag
+				put DashboardRowData into item iRowFlag of newRowDataList
+				set the searchrectangle to [Pos1,Pos2]
+			end repeat
+			log newRowDataList
+		Else
+			"Utilities/GenericOperations".Error "The given datafield column is not found inthe dashboard"
+			put "" into newRowDataList
+		End if
+		
+		log "end of function Fetch_ChargerFault_TimeofFaultRowValues"
+		set the searchrectangle to empty
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,Fetch_ChargerFault_TimeofFaultRowValues)
+	End try
+	
+	return newRowDataList
+end Fetch_ChargerFault_TimeofFaultRowValues
+//*****************************************************
+--Description: Handler to extract First occurence row values
+---Input : 
+---output:  First occurence row values
+---Created by:Shalini V
+--created on: 12 August 2022
+//*****************************************************
+Fetch_ChargerFault_FirstOccRowValues
+to handle Fetch_ChargerFault_FirstOccRowValues
+	log "start of function Fetch_ChargerFault_FirstOccRowValues"
+	try
+		
+		put [] into newRowDataList 
+		put 0 into iRowFlag
+		If imagefound(text:"First Occurrence") is true
+			put imagelocation(text:"First Occurrence") into valloc
+			
+			put valloc +[-50,27] into Pos1
+			put valloc +[100,-20] into Pos2
+			log readtext(Pos1,Pos2)
+			repeat until length of readtext( Pos1,Pos2,searchrectangle:[Pos1,Pos2]) < 2
+				
+				put Pos1+[0,50] into Pos1
+				put Pos2 +[0,50] into Pos2
+				put readtext(Pos1,Pos2,searchrectangle:[Pos1,Pos2]) into DashboardRowData
+				put iRowFlag+1 into iRowFlag
+				put DashboardRowData into item iRowFlag of newRowDataList
+				set the searchrectangle to [Pos1,Pos2]
+			end repeat
+			log newRowDataList
+		Else
+			"Utilities/GenericOperations".Error "The given datafield column is not found inthe dashboard"
+			put "" into newRowDataList
+		End if
+		
+		
+		set the searchrectangle to empty
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,Fetch_ChargerFault_FirstOccRowValues)
+	End try
+	log "Ending function Fetch_ChargerFault_FirstOccRowValues"
+	return newRowDataList
+end Fetch_ChargerFault_FirstOccRowValues
+//*****************************************************
+--Description: Handler to get the row values for given column name
+---Input : DatafieldcolumnSearchArea from SearchRect
+---output: None
+---Created by:Shalini V
+--created on: 13 July 2022
+//*****************************************************
+to handle Fetch_ChargerFault_RowValues_wrtColumn DatafieldColumn
+	try
+		log "Start of function Fetch_ChargerFault_RowValues_wrtColumn"
+		global ConfigValues
+		put [] into newRowDataList 
+		put 0 into iRowFlag
+		
+		set ColumnRect to SearchRect(DatafieldcolumnSearchArea)
+		set the searchrectangle to ColumnRect
+		Repeat until length of readtext( the searchrectangle) < 2
+			put iRowFlag+1 into iRowFlag
+			set the searchrectangle to ColumnRect
+			
+			put (item 2 of ColumnRect)+50 into item 2 of ColumnRect 
+			put (item 4 of ColumnRect)+50 into item 4 of ColumnRect 
+			put  readtext( the searchrectangle) into DashboardRowData
+			log DashboardRowData
+			put DashboardRowData into item iRowFlag of newRowDataList
+			set the searchrectangle to ColumnRect
+		end repeat
+		
+		log newRowDataList
+		
+		log "end of function Fetch_ChargerFault_RowValues"
+		set the searchrectangle to empty
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,Fetch_ChargerFault_RowValues_wrtColumn)
+	End try
+	
+	return newRowDataList
+end Fetch_ChargerFault_RowValues_wrtColumn
+
+
+
+set DatafieldColnames to "Charger Name,Charger ID (Serial Number),Connector ID,OCPP Fault Code,Vendor Error Code,Priority,Status,Fault name,Fault description,Time of fault,Fault duration,Charging status when fault occurred"
+ValidateDatafieldColumnNames_Charger DatafieldColnames
+//*****************************************************
+--Description: Handler to validate data field column names for charger
+---Input : DatafieldColnames
+---output: None
+---Created by:Shalini V
+--created on: 13 July 2022
+//*****************************************************
+to handle ValidateDatafieldColumnNames_Charger DatafieldColnames
+	try
+		log "Start of function ValidateDatafieldColumnNames_Charger"
+		global ConfigValues
+		repeat with each item of DatafieldColnames
+			set the searchrectangle to ScreenPart("FaultDashboard")
+			
+			if imagefound (text:it,waitfor:ConfigValues.LongTimeOut,SearchRectangle:ScreenPart("FaultDashboard")) then
+				"Utilities/GenericOperations".Success "Data field header"&& it && " is found in the fault dashboard"
+			else
+				put "Utilities//CommonActions".scrollCursorRightHorizontally_WithReferenceText (it,"FD_HorizontalScrollRight") into SearchFound
+				If SearchFound is true or SearchFound is 1  then
+					"Utilities/GenericOperations".Success "Data field header"&& it && " is found in the fault dashboard"
+				else
+					"Utilities/GenericOperations".Error "Data field header"&& it && " is not found in the fault dashboard"
+				end if
+			End if
+		end repeat
+		ResetScrollPosition "FD_LeftScrollbar","FaultDashboard"
+	catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,ValidateDatafieldColumnNames_Charger)
+	end try
+	log "End of function ValidateDatafieldColumnNames_Charger"
+	set the searchrectangle to empty
+end ValidateDatafieldColumnNames_Charger
+//*****************************************************
+--Description: Handler to verify the filtered rows for the given column
+---Input : DataFieldColumnName, row values(fetchedfrom another function), filtered value to validate
+---output: None
+---Created by:Shalini V
+--created on: 13 July 2022
+//*****************************************************
+to handle Verify_FilteredDatafieldColumn DataFieldColumnName,DatafieldValuesList,FilterValue
+	try 
+		global ConfigValues
+		log "start of function Verify_FilteredDatafieldColumn"
+		set iFilterFlag to true
+		If Trim(item 1 of DatafieldValuesList) is DataFieldColumnName
+			delete item 1 of DatafieldValuesList
+		Else
+			--"Utilities/GenericOperations".Error "Data field column"&&DataFieldColumnName&&" is not filtered correctly"
+		End If
+		Repeat with each item  of DatafieldValuesList
+			
+			If it is not FilterValue
+				set iFilterFlag to false
+				"Utilities/GenericOperations".Error "Data field column"&&DataFieldColumnName&&" is not filtered correctly"
+				exit repeat
+			end if
+			
+		end repeat
+		
+		
+		log "End of function Verify_FilteredDatafieldColumn"
+		
+	catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,ValidateDatafieldColumnNames_Charger)
+	end try
+	--ResetScrollPosition "FD_LeftScrollbar","FaultDashboard"
+	If iFilterFlag is true then
+		"Utilities/GenericOperations".Success ("Data field column"&&DataFieldColumnName&&" is  filtered correctly")
+	End If
+	return iFilterFlag
+end Verify_FilteredDatafieldColumn
+--chargerRestrictedFieldsValidation "FD_HorizontalScrollRight","Number Of Occurences","FaultDashboard"
+//*****************************************************
+--Description: Handler to validate the restricted datafield column
+---Input : imgHorizontalScroll, restricted field, searchrect area
+---output: None
+---Created by:Shalini V
+--created on: 14 July 2022
+//*****************************************************
+to handle chargerRestrictedFieldsValidation imgHorizontalScroll, restrictedField,searchRectArea
+	--set imgHorizontalScroll to "FD_HorizontalScrollRight"
+	log "start of function chargerRestrictedFieldsValidation"
+	try 
+		set  the searchrectangle to ScreenPart(searchRectArea)
+		set horizontalScrollLocation to ImageLocation(image:imgHorizontalScroll)
+		log horizontalScrollLocation
+		put item 1 of  horizontalScrollLocation into x
+		put item 2 of  horizontalScrollLocation into y
+		Log x
+		Log y
+		set restrictedfieldflag to true
+		Repeat until  horizontalScrollLocation.x is greater than 1800
+			
+			if imagefound(text:restrictedField,waitfor:3)then
+				set restrictedfieldflag to false
+				"Utilities/GenericOperations".Error "Restricted Datafield"&&restrictedField&&" is found"
+			end if
+			add 200 to x
+			if x>1900
+				set x to 1900
+			end if
+			MoveTo imgHorizontalScroll
+			MouseButtonDown 1 //Holds down the left mouse button
+			--MoveTo the remoteScreenSize*(3/4) 
+			MoveTo [x,y]
+			MouseButtonUp 1 //Releases the left mouse button
+			
+			MoveTo [500,500]
+			
+			
+			set horizontalScrollLocation to ImageLocation(image:imgHorizontalScroll)
+			
+		End Repeat
+		ResetScrollPosition "FD_LeftScrollbar",searchRectArea
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,chargerRestrictedFieldsValidation)
+	End try
+	If  restrictedfieldflag is true then
+		"Utilities/GenericOperations".Success "Restricted Datafields"&&restrictedField&&" is not found"
+	End If
+	log "start of function chargerRestrictedFieldsValidation"
+	set the searchrectangle to empty
+	return restrictedfieldflag
+end chargerRestrictedFieldsValidation
+
+//*****************************************************
+--Description: Handler to reset the scroll  to initial position
+---Input : LeftScrollBarimage and its search rectangle
+---output: None
+---Created by:Shalini V
+--created on: 14 July 2022
+//*****************************************************
+to handle ResetScrollPosition LeftScrollBarimage,SearchrectArea
+	log "Start of function ResetScrollPosition"
+	try
+		set the SearchRectangle to ScreenPart(searchRectArea)
+		IF ImageFound(image:LeftScrollBarimage)
+			
+			set LeftScrollLocation to ImageLocation(image:LeftScrollBarimage)
+			log LeftScrollLocation
+			put item 1 of  LeftScrollLocation into a
+			put item 2 of  LeftScrollLocation into b
+			Log a
+			Log b
+			
+			Repeat until  LeftScrollLocation.x is less than 500
+				add -100 to a
+				if a < 400
+					set a to 400
+				end if
+				MoveTo "FD_LeftScrollbar"
+				MouseButtonDown 1 //Holds down the left mouse button
+				--MoveTo the remoteScreenSize*(3/4) 
+				MoveTo [a,b]
+				MouseButtonUp 1 //Releases the left mouse button
+				
+				MoveTo [500,500]
+				set LeftScrollLocation to ImageLocation(image:"FD_LeftScrollbar")
+			End Repeat
+		Else
+			Log "Scroll bar is in initial position"
+		End if
+		
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,ResetScrollPosition)
+	End try
+	set the searchrectangle to empty
+	log "end of function ResetScrollPosition"
+end ResetScrollPosition
+
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch the fault dashboard of charger 
+---Input : searchArea, Vin
+---output: 
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+--FetchUIDashboardData "FDDashboardFiltered","7JZTH13J9KSOOO152"
+FetchUIDashboardData_Charger "5000666317"
+FetchUIDashboardData_Charger "9985416662"
+FetchUIDashboardData_Charger "10CK35JD43"
+FetchUIDashboardData_Charger "TEST90PE2"
+to handle FetchUIDashboardData_Charger ChargerID
+	log "start of function FetchUIDashboardData_Charger"
+	
+	"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "Charger"
+	--put   Everyimagelocation(text:"5GZEV337X7J141405", waitFor:2) into val
+	put ChargerID into IDref
+	put   Everyimagelocation(text:IDref, valwaitFor:2,validwords:IDref) into ReferenceLoc
+	
+	If number of items in ReferenceLoc is 0
+		replace "0" with"O" in IDref
+		put   Everyimagelocation(text:IDref, waitFor:2,validwords:IDref) into ReferenceLoc
+	End If
+	If number of items in ReferenceLoc is 0
+		LogError "Imagelocation of given text is not found"
+		Exit all
+	End If
+	set 	iUIDataFlag to 0
+	--	put [] into newDashboardOutputfilelist
+	set newDashboardOutputfilelist to ""
+	log ReferenceLoc
+	repeat with each item of ReferenceLoc
+		put iUIDataFlag +1 into iUIDataFlag
+		put "Utilities\GenericOperations".FormattedDateTime into CurrentDateTime
+		put CurrentDateTime into stroutputFilename
+		put "FaultDashboard"&&stroutputFilename  into outputFilename
+		--"Utilities\exceloperations".CreateOutputFile outputFilename
+		
+		log it
+		put  it into Loc
+		put 	fetchChargerNamefromFaultDashboard(Loc) into ChargerName
+		put fetchConnectorIDfromFaultDashboard(Loc) into ConnectorID
+		put fetchOCPPFaultCodeDashboard(Loc) into OCPPFaultCode
+		put fetchVendorErrorCodefromFaultDashboard(Loc) into VendorErrorCode
+		put fetchPriorityFromFaultDashboard(Loc) into priority
+		put fetchStatusFromFaultDashboard(Loc) into status
+		
+		click it
+		
+		set the SearchRectangle to ScreenPart("IndividualPopup")
+		"ApexPages/FaultDashboardVehicle".VerifyTextInFaultDashboard "Fault Details",0,0 
+		//put FoundImageLocation() into Loc --fmi
+		put GetDatafieldColumnValuefromPopup_ChargerFaultDetails ("FaultName") into FaultName
+		put GetDatafieldColumnValuefromPopup_Description("FaultDescription") into FaultDesc
+		put GetDatafieldColumnValuefromPopup_TroubleShoot("TroubleShoot") into Troubleshoot
+		
+		
+		Click "IndividualPopup/CloseFaultDetailsPopup"
+		
+		"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "Charger"
+		"Utilities/CommonActions".scrollCursorRightHorizontally_WithReferenceText "Charging status when fault occurred", "FD_HorizontalScrollRight"
+		
+		put  it into ScrolledLoc
+		
+		put fetchTimeofFaultFromFaultDashboard(Loc) into TimeofFault
+		put fetchFaultDurationFromFaultDashboard(Loc) into FaultDuration
+		put fetchCustomerNamefromFaultDashboard(ScrolledLoc) into CustomerName
+		put fetchChargerfromFaultDashboard(ScrolledLoc) into Charger
+		
+		put fetchChargingStatusfromFaultDashboard(ScrolledLoc) into ChargingStatus
+		
+		"ApexPages/FaultDashboardCharger".ResetScrollPosition "FD_LeftScrollbar","FaultDashboard"
+		
+		delete newline from Troubleshoot
+		delete newline from FaultDesc 
+		
+		put ChargerName&"##"&ConnectorID&"##"&OCPPFaultCode&"##"&VendorErrorCode&"##"&priority&"##"&status&"##"&FaultName&"##"&FaultDesc&"##"&TimeofFault&"##"&FaultDuration&"##"&CustomerName&"##"&Charger&"##"&ChargingStatus&"##"&Troubleshoot&"##"&ChargerID into FrontendData
+		log FrontendData
+		put newDashboardOutputfilelist&FrontendData&"~~" into newDashboardOutputfilelist
+		
+	end repeat
+	log newDashboardOutputfilelist
+	Log "End of function FetchUIDashboardData_Charger"
+	return newDashboardOutputfilelist
+end FetchUIDashboardData_Charger
+
+-------------------------------------------------------------------------------------------------
+
+--Description: This handler is used to fetch the details from fault popup using image
+---Input : None
+---output: 
+---Created by:Shalini V
+---Created On 05 July 2022
+-------------------------------------------------------------------------------------------------
+--GetDatafieldColumnValuefromPopup_Description "FaultDescription"
+to handle GetDatafieldColumnValuefromPopup_Description Fieldname
+	try
+		--put readtext("IndividualPopup/FaultDescription_A", "IndividualPopup/FaultDescription_B",ignorenewlines:True) into myval
+		
+		put "Utilities/CommonActions".TodoTripleClickWRTImage ("IndividualPopup/FaultDescription_A") into FaultDescription 
+		If FaultDescription is not empty then
+			
+			"Utilities/GenericOperations".Success "Data field column "&& FaultDescription && " fetched from popup"
+			
+		else
+			logwarning "The data is empty "&Fieldname
+		end if
+	Catch exception 
+		
+		get "Utilities/GenericOperations".LogException(exception,GetDatafieldColumnValuefromPopup_Description)
+	End try
+	
+	log FaultDescription
+	return FaultDescription
+end GetDatafieldColumnValuefromPopup_Description
+
+-------------------------------------------------------------------------------------------------
+
+--Description: This handler is used to fetch the details from fault popup using image
+---Input : None
+---output: 
+---Created by:Shalini V
+---Created On 05 July 2022
+-------------------------------------------------------------------------------------------------
+GetDatafieldColumnValuefromPopup_TroubleShoot "Troubleshoot"
+to handle GetDatafieldColumnValuefromPopup_TroubleShoot Fieldname
+	try
+		--put readtext("IndividualPopup/TroubleshootingArea_A", "IndividualPopup/TroubleshootingArea_B",ignorenewlines:True) into Tbleshootval
+		put "Utilities/CommonActions".TodoTripleClickWRTImage ("IndividualPopup/TroubleshootingArea_A") into Tbleshootval 
+		If Tbleshootval is not empty then
+			If Tbleshootval contains "Notes:" then
+				delete "Notes:" from Tbleshootval
+			End If
+			"Utilities/GenericOperations".Success "Data field column Troubleshoot"&& Tbleshootval && " fetched from popup"
+			
+		else
+			logwarning "The data is empty "&Fieldname
+		end if
+	Catch exception 
+		
+		get "Utilities/GenericOperations".LogException(exception,GetDatafieldColumnValuefromPopup_TroubleShoot)
+	End try
+	return Tbleshootval
+end GetDatafieldColumnValuefromPopup_TroubleShoot
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch Customer name from the dashboard
+---Input : location of the reference column value
+---output: Customer name
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchCustomerNamefromFaultDashboard Position
+	log "Start of function fetchCustomerNamefromFaultDashboard"
+	
+	Put  Position+[730,-20] into Pos1
+	Put Position+[900,23] into Pos2
+	put ReadText(Pos1,Pos2) into CustomerName
+	
+	if CustomerName is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into CustomerName
+		
+	end if
+	
+	If CustomerName is "" then 
+		set CustomerName to " "
+		Logwarning "Customername is blank"
+	End If
+	log CustomerName
+	Log "End of fetchCustomerNamefromFaultDashboard"
+	return CustomerName
+end fetchCustomerNamefromFaultDashboard
+"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard ("Charger")
+
+set position to [530,480]
+fetchChargingStatusfromFaultDashboard position
+
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch chargingstatus from the dashboard
+---Input : location of the reference column value
+---output: ChargingStatus
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchChargingStatusfromFaultDashboard Position
+
+	log "Start of function fetchChargingStatusfromFaultDashboard"
+	Put  Position+[1080,-20] into Pos1
+	Put Position+[1290,23] into Pos2
+	put ReadText([Pos1,Pos2]) into ChargingStatus
+
+
+	if ChargingStatus is  "" then 
+		put ReadText([Pos1,Pos2],Contrast:on,contrasttolerance:90) into ChargingStatus
+		
+	end if
+	
+	If ChargingStatus is "" then 
+		set ChargingStatus to " "
+		Logwarning "ChargingStatus is blank"
+	End If
+	log ChargingStatus
+	Log "End of fetchChargingStatusfromFaultDashboard"
+	return ChargingStatus
+end fetchChargingStatusfromFaultDashboard
+
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch charger from the dashboard
+---Input : location of the reference column value
+---output: Customer name
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchChargerfromFaultDashboard Position
+
+	log "Start of function fetchChargerfromFaultDashboard"
+	Put  Position+[900,-20] into Pos1
+	Put Position+[1080,23] into Pos2
+	put ReadText([Pos1,Pos2]) into Charger1
+	put ReadText([Pos1,Pos2],Contrast:on,contrasttolerance:90) into Charger2
+	put Charger1&","& Charger2 into Charger
+	If Charger contains "Prater ra"then
+		
+		
+		Replace "Prater ra" with "Proterra" in Charger
+	end if
+	If Charger contains "Pratsna"  then
+		Replace "Pratsna" with "Proterra" in Charger
+	end if
+	If Charger contains "Protena" then
+		Replace "Protena" with "Proterra" in Charger
+	end if
+	If Charger contains "Protara"  then
+		Replace "Protara" with "Proterra" in Charger
+	end if
+	if Charger contains "Pretoria"  then 
+		Replace "Pretoria" with "Proterra" in Charger
+	end if
+	If Charger contains "I25" then 
+		Replace "I25" with "125" in Charger
+	End If
+	If Charger contains "O" then 
+		Replace "O" with "0" in Charger
+	End If
+	(*If Charger contains "o" then 
+		Replace "o" with "0" in Charger
+	End If*)
+	If Charger is "" then 
+		set Charger to " "
+		Logwarning "Charger is blank"
+	End If
+	log Charger
+	Log "End of fetchChargerfromFaultDashboard"
+	return Charger
+end fetchChargerfromFaultDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch VendorErrorCode from the dashboard
+---Input : location of the reference column value
+---output: VendorErrorCode
+---Created by:Shalini V
+---Created On 01 Aug 2022
+-------------------------------------------------------------------------------------------------
+
+--fetchFaultDurationFromFaultDashboard position
+to  handle fetchVendorErrorCodefromFaultDashboard Position
+	log "Start of function fetchVendorErrorCodefromFaultDashboard"
+	put Position+[420,-20] into Pos1
+	Put Position+[570,23] into Pos2
+	put ReadText(Pos1,Pos2) into VendorErrorCode
+	--log Priority
+	If VendorErrorCode is "" 
+		put ReadText([Pos1,Pos2],Contrast:on,contrasttolerance:80) into VendorErrorCode
+	end if
+	If VendorErrorCode is "" then 
+		logError "VendorErrorCode is empty"
+	End If
+	log VendorErrorCode
+	log "end of function fetchVendorErrorCodefromFaultDashboard"
+	return VendorErrorCode
+end fetchVendorErrorCodefromFaultDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch fault duration from the dashboard
+---Input : location of the reference column value
+---output: Fault duration
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchFaultDurationFromFaultDashboard Position
+	Log "Start of function fetchFaultDurationFromFaultDashboard"
+	put Position+[523,-20] into Pos1
+	Put Position+[720,23] into Pos2
+	put ReadText(Pos1,Pos2) into FaultDuration
+	
+	if FaultDuration is "" then 
+		put ReadText([Pos1,Pos2]) into FaultDuration
+		replace <<"_>> with ":"in FaultDuration
+		
+		
+	end if
+	if FaultDuration contains "o" then 
+		replace "o" with "0" in FaultDuration
+		
+	end if
+	if FaultDuration contains "O" then 
+		replace "O" with "0" in FaultDuration
+		
+	end if
+	If   the number of occurrences of ":" in FaultDuration is 1 or   the number of occurrences of ":" in FaultDuration is 0
+		put number of characters in FaultDuration into Chars
+		If character (Chars-2) of FaultDuration is not ":"
+			put ":" after character (Chars-3) of FaultDuration
+		End If
+		If character (Chars-5) of FaultDuration is not ":"
+			put ":" after character (Chars-6) of FaultDuration
+		End If
+		Delete ";"from FaultDuration
+		delete " " from FaultDuration
+	end if
+	
+	(*IF  the number of occurrences of ":" in FaultDuration is 1 
+		If character 3 of FaultDuration is not ":"
+			put ":" after character 2 of FaultDuration
+		END IF
+		If character 6 of FaultDuration is not ":"
+			put ":" after character 5 of FaultDuration
+		END IF
+		
+	End If*)
+	If FaultDuration is "" then 
+		logerror "Fault duration is blank"
+	End If
+	log FaultDuration
+	log "End of fetchFaultDurationFromFaultDashboard"
+	return FaultDuration
+end fetchFaultDurationFromFaultDashboard
+
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch Time of fault from the dashboard
+---Input : location of the reference column value
+---output: Time of fault
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchTimeofFaultfromFaultDashboard Position
+	Log "Start of function fetchTimeofFaultfromFaultDashboard"
+	put Position+[380,-20] into Pos1
+	Put Position+[523,23] into Pos2
+	put ReadText(Pos1,Pos2) into TimeofFaultvalue
+	
+	if TimeofFaultvalue is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into TimeofFaultvalue
+		replace <<"_>> with ":"in TimeofFaultvalue
+		log TimeofFaultvalue
+		
+	end if
+	if TimeofFaultvalue contains "o" then 
+		replace "o" with "0" in TimeofFaultvalue
+		
+	end if
+	if TimeofFaultvalue contains "O" then 
+		replace "O" with "0" in TimeofFaultvalue
+		
+	end if
+	(*If character 11 in TimeofFaultvalue is not " "
+		put " " after character 10 in TimeofFaultvalue
+	end if
+	
+	If character 14 in TimeofFaultvalue is not ":" then
+		put ":" after character 13 in TimeofFaultvalue
+	end if*)
+	
+	if TimeofFaultvalue contains "Q" then 
+		replace "Q" with "0" in TimeofFaultvalue
+		
+	end if
+	
+	
+	If TimeofFaultvalue is "" then 
+		logerror "Time of fault is not fetched"
+	End If
+	Delete " " from TimeofFaultvalue
+	Put " " after character 10 of TimeofFaultvalue
+	If character 14 of TimeofFaultvalue is not ":"
+		Put ":" after character 13 of TimeofFaultvalue
+	End If
+	put  " " after  character 16 of TimeofFaultvalue
+	
+	log TimeofFaultvalue
+	log "End of function fetchTimeofFaultfromFaultDashboard"
+	return TimeofFaultvalue
+	
+end fetchTimeofFaultfromFaultDashboard
+
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch first occ from group by fault  of the dashboard
+---Input : location of the reference column value
+---output: First occurence
+---Created by:Shalini V
+---Created On 12 August 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchFirstOccFromFaultDashboard Position
+	Log "Start of function fetchFirstOccFromFaultDashboard"
+	put Position+[1200,-20] into Pos1
+	Put Position+[1025,23] into Pos2
+	put ReadText(Pos1,Pos2) into FirstOcc
+	
+	if FirstOcc is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into FirstOcc
+		replace <<"_>> with ":"in FirstOcc
+		log FirstOcc
+		
+	end if
+	if FirstOcc contains "o" then 
+		replace "o" with "0" in FirstOcc
+		
+	end if
+	if FirstOcc contains "O" then 
+		replace "O" with "0" in FirstOcc
+		
+	end if
+	
+	
+	if FirstOcc contains "Q" then 
+		replace "Q" with "0" in FirstOcc
+		
+	end if
+	
+	
+	If FirstOcc is "" then 
+		logerror "First occurence is not fetched"
+	End If
+	Delete " " from FirstOcc
+	Put " " after character 10 of FirstOcc
+	If character 14 of FirstOcc is not ":"
+		Put ":" after character 13 of FirstOcc
+	End If
+	put  " " after  character 16 of FirstOcc
+	
+	log FirstOcc
+	log "End of function fetchFirstOccFromFaultDashboard"
+	return FirstOcc
+	
+end fetchFirstOccFromFaultDashboard
+
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch number of occurence from group by fault  of the dashboard
+---Input : location of the reference column value
+---output: number of occ
+---Created by:Shalini V
+---Created On 12 August 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchNumberofOccFromFaultDashboard Position,ChargerType
+	Log "Start of function fetchNumberofOccFromFaultDashboard"
+	If ChargerType is ABB
+		put Position+[1000,-23] into Pos1
+		Put Position+[805,23] into Pos2
+	else
+		put Position+[950,-23] into Pos1
+		Put Position+[805,23] into Pos2
+	End if
+	put ReadText(Pos1,Pos2) into NumbofOcc
+	
+	if NumbofOcc is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into NumbofOcc
+		log NumbofOcc
+	end if
+	if NumbofOcc contains "o" then 
+		replace "o" with "0" in NumbofOcc
+	end if
+	if NumbofOcc contains "O" then 
+		replace "O" with "0" in NumbofOcc
+		
+	end if
+	
+	If NumbofOcc is "" then 
+		logerror "Number of occurence is not fetched"
+	End If
+	
+	log "End of function fetchNumberofOccFromFaultDashboard"
+	return NumbofOcc
+	
+end fetchNumberofOccFromFaultDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch charger platform from group by fault  of the dashboard
+---Input : location of the reference column value
+---output: number of occ
+---Created by:Shalini V
+---Created On 12 August 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchChargerPlatformFaultDashboard Position
+	Log "Start of function fetchChargerPlatformFaultDashboard"
+	--put Position+[1180,-23] into Pos1
+	put Position+[1160,-23] into Pos1
+	Put Position+[1350,23] into Pos2
+	put ReadText(Pos1,Pos2) into ChargerPlatform
+	
+	if ChargerPlatform is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into ChargerPlatform
+
+	end if
+	If ChargerPlatform contains "Prater ra"then
+		
+		Replace "Prater ra" with "Proterra" in ChargerPlatform
+	end if
+	If ChargerPlatform contains "Pratsna"  then
+		Replace "Pratsna" with "Proterra" in ChargerPlatform
+	end if
+	If ChargerPlatform contains "Protena" then
+		Replace "Protena" with "Proterra" in ChargerPlatform
+	end if
+	If ChargerPlatform contains "Protara"  then
+		Replace "Protara" with "Proterra" in ChargerPlatform
+	end if
+	if ChargerPlatform contains "Pretoria"  then 
+		Replace "Pretoria" with "Proterra" in ChargerPlatform
+	end if
+	If ChargerPlatform contains "I25" then 
+		Replace "I25" with "125" in ChargerPlatform
+	End If
+	If ChargerPlatform contains "O" then 
+		Replace "O" with "0" in ChargerPlatform
+	End If
+	
+	log ChargerPlatform
+	
+	If ChargerPlatform is "" then 
+		logerror "Charger plaeform is not fetched"
+	End If
+	
+	log "End of function fetchChargerPlatformFaultDashboard"
+	return ChargerPlatform
+	
+end fetchChargerPlatformFaultDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch Status from the dashboard
+---Input : location of the reference column value
+---output: Status
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchStatusFromFaultDashboard Position
+	log "Start of function fetchStatusFromFaultDashboard"
+	put Position+[670,-20] into Pos1
+	Put Position+[750,23] into Pos2
+	put ReadText(Pos1,Pos2) into Status
+	
+	If Status is "" 
+		put ReadText([Pos1,Pos2],Contrast:on) into Status
+	end if
+	If Status is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on,Contrasttolerance:80) into Status
+		
+	End If
+	If Status is "" then 
+		logError "Status is empty"
+	end if
+	
+	log Status
+	log "End of function fetchStatusFromFaultDashboard"
+	return Status
+end fetchStatusFromFaultDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch Priority from the dashboard
+---Input : location of the reference column value
+---output: Priority
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+
+to  handle fetchPriorityFromFaultDashboard Position
+	log "Start of function fetchPriorityFromFaultDashboard"
+	put Position+[580,-20] into Pos1
+	Put Position+[660,23] into Pos2
+	put ReadText(Pos1,Pos2) into Priority
+	--log Priority
+	If Priority is "" 
+		put ReadText([Pos1,Pos2],Contrast:on,contrasttolerance:80) into Priority
+	end if
+	If Priority is "" then 
+		logError "Priority is empty"
+	End If
+	log Priority
+	log "end of function fetchPriorityFromFaultDashboard"
+	return Priority
+end fetchPriorityFromFaultDashboard
+fetchOCPPFaultCodeDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch ocppfault code from the dashboard
+---Input : location of the reference column value
+---output: ocpp fault code
+---Created by:Shalini V
+---Created On 01 Aug 2022
+-------------------------------------------------------------------------------------------------
+to handle fetchOCPPFaultCodeDashboard Position
+	log "Start of function fetchOCPPFaultCodeDashboard"
+	Put Position+[275,-20] into Pos1
+	Put Position+[405,20] into Pos2
+	put ReadText(Pos1,Pos2) into OCPPFaultCode
+	
+	if OCPPFaultCode is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into OCPPFaultCode
+		
+	end if
+	(*if OCPPFaultCode contains "o" then 
+	replace "o" with "0" in OCPPFaultCode
+	
+end if*)
+	If OCPPFaultCode is "" then 
+		logerror  "OCPPFaultCode is empty"
+	End If
+	log OCPPFaultCode
+	log "End of function fetchOCPPFaultCodeDashboard"
+	return OCPPFaultCode
+	
+end fetchOCPPFaultCodeDashboard
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch ocppfault code from the dashboard(in group by fault)
+---Input : location of the reference column value
+---output: ocpp fault code
+---Created by:Shalini V
+---Created On 01 Aug 2022
+-------------------------------------------------------------------------------------------------
+to handle fetchOCPPFaultCodeDashboardGBF Position
+	log "Start of function fetchOCPPFaultCodeDashboardGBF"
+	Put Position+[275,-20] into Pos1
+	put Position+[415,20] into Pos2
+	put ReadText(Pos1,Pos2) into OCPPFaultCode
+	
+	if OCPPFaultCode is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into OCPPFaultCode
+		
+	end if
+	(*if OCPPFaultCode contains "o" then 
+	replace "o" with "0" in OCPPFaultCode
+	
+end if*)
+	If OCPPFaultCode is "" then 
+		logerror  "OCPPFaultCode in group by fault is empty"
+	End If
+	log OCPPFaultCode
+	log "End of function fetchOCPPFaultCodeDashboardGBF"
+	return OCPPFaultCode
+	
+end fetchOCPPFaultCodeDashboardGBF
+---------------------------------------------------
+--Description: This handler is used to fetch connector id from the dashboard
+---Input : location of the reference column value
+---output: SPN
+---Created by:Shalini V
+---Created On 1 Aug 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchConnectorIDfromFaultDashboard Position
+	log "Start of function fetchConnectorIDfromFaultDashboard"
+	Put  Position+[150,-20] into Pos1
+	Put Position+[255,23] into Pos2
+	put ReadText(Pos1,Pos2) into Connectorid
+	If Connectorid is "" then 
+		put ReadText(Pos1,Pos2,contrast:on) into Connectorid
+	end if
+	log Connectorid
+	If Connectorid is "" then 
+		logError "Connector id value is empty"
+	End If
+	log "End of function fetchConnectorIDfromFaultDashboard"
+	return Connectorid
+end fetchConnectorIDfromFaultDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch vehicle name from the dashboard
+---Input : location of the reference column value
+---output: Vehicle name
+---Created by:Shalini V
+---Created On 01 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchChargerNamefromFaultDashboard Position
+	log "Start of function fetchChargerNamefromFaultDashboard"
+	Put  Position+[-245,-20] into Pos1
+	Put Position+[-52,23] into Pos2
+	--log ReadText(Pos1,Pos2,contrast:on,contrasttolerance:80)
+	--put  ReadText(Pos1,Pos2,contrast:on,contrasttolerance:80) into VehicleName
+	put  ReadText( Pos1,Pos2,SearchRectangle:[Pos1,Pos2],DPI:144) into ChargerName
+	log ChargerName
+	If ChargerName is "" then 
+		logError "Charger Name value is empty"
+	End If
+	log "End of function fetchChargerNamefromFaultDashboard"
+	return ChargerName
+end fetchChargerNamefromFaultDashboard
+GetDatafieldColumnValuefromPopup_ChargerFaultDetails "FaultName"
+To handle GetDatafieldColumnValuefromPopup_ChargerFaultDetails DatafieldName
+
+	try
+		put readtext("IndividualPopup\FaultDetails_PopupA","IndividualPopup\FaultDetails_PopupC") into myval
+		If myval is not empty then
+			--replace "Fault Code" in myval with enter&& " FaultCode:"
+			--replace "Fault Code:" in myval with enter&& " FaultCode:"
+			replace "Priority" in myval with enter&& " Priority:"
+			replace "Priority:" in myval with enter&& " Priority:"
+			
+			replace "Status" in myval with enter&& " Status"
+			replace "Status:" in myval with enter&& " Status:"
+			replace "Charger Name" in myval  with enter&&" ChargerName:"
+			replace "Charger Name:" in myval  with enter&&" ChargerName:"
+			replace "Charger Serial Number" in myval  with enter &&" ChargerSerialNumber:"
+			replace "Charger Serial Number:" in myval  with enter &&" ChargerSerialNumber:"
+			replace "Fault Name" in myval  with enter &&" FaultName:"
+			replace "Fault Name:" in myval  with enter &&" FaultName:"
+			replace "OCPP Fault Code" in myval  with  enter &&" OCPPFaultCode:"
+			replace "OCPP Fault Code:" in myval  with  enter &&" OCPPFaultCode:"
+			replace "Vendor Fault Code" in myval  with  enter &&" VendorFaultCode:"
+			replace "Vendor Fault Code:" in myval  with  enter &&" VendorFaultCode:"
+			replace "Time of Fault" in myval  with  enter &&" TimeofFault:"
+			replace "Time of Fault:" in myval  with  enter &&" TimeofFault:"
+			
+			replace "Fault Duration" in myval  with enter&& " FaultDuration:"
+			replace "Fault Duration:" in myval  with enter&& " FaultDuration:"
+			
+			put split (myval, "") into keyValList
+			set iFoundData to False
+			repeat with each item of keyValList
+				
+				If it contains DatafieldName then
+					--replace every occurrence of ":" with "" in it 
+					
+					replace every occurrence of DatafieldName&":" with "" in it
+					delete tab from it
+					Put trim(it) into it
+					If DatafieldName is not "FaultDuration" and DatafieldName is not "Time of Fault"
+						Delete ":" from it
+						
+					end if
+					If DatafieldName is  "Time of Fault"
+						If first character of it is ":"
+							delete first character of it
+						End If
+						Delete " " from it
+						Put " " after character 10 of it
+						If character 14 of it is not ":"
+							Put ":" after character 13 of it
+						End If
+						
+						put  " " after  character 16 of it
+					end if 
+					put trim(it) into ColumnValue
+					set iFoundData to true
+					exit repeat
+					
+				End If
+			end repeat
+			--log "Data is writtent output file for "&Fieldname
+		else
+			logwarning "The data is empty "&Fieldname
+		end if
+		If iFoundData is True
+			"Utilities/GenericOperations".Success "Data field column"&& DatafieldName && " fetched from popup"
+		Else
+			"Utilities/GenericOperations".Error "Data field collumn"&& DatafieldName && " is not found in the popup"
+		End If
+	Catch exception 
+		
+		get "Utilities/GenericOperations".LogException(exception,FetchFDDetailsFromPopup_FaultDetails)
+	End try
+	log ColumnValue
+	return ColumnValue
+end GetDatafieldColumnValuefromPopup_ChargerFaultDetails
+
+--Fetch_ChargerIDandOCPPIDUsingAssetName "Vijay pc 60"
+to handle Fetch_ChargerIDWRTCPPID OCCPID
+	log "Start of Fetch_ChargerIDWRTCPPID"
+	"ApexPages/FaultDashboardSearchCriteria".NavigateTo "Management","Chargers"
+	
+	set the searchrectangle to ScreenPart("AssetSelection")
+	set textValue to ""
+	If ImageFound(text:"Search")
+		click FoundImageLocation()+[30,0]
+		Typetext controlKey,a
+		Typetext deletekey
+		typetext OCCPID 
+		wait 10
+	End If
+	
+	If imagefound(text:"Dispenser",waitfor:10)
+		put FoundImageLocation() + [-80,70] into SerialNumberpos1
+		put FoundImageLocation() + [105,20] into SerialNumberpos2
+		log readtext(SerialNumberpos1,SerialNumberpos2,searchrectangle:[SerialNumberpos1,SerialNumberpos2])
+		put readtext(SerialNumberpos1,SerialNumberpos2,searchrectangle:[SerialNumberpos1,SerialNumberpos2]) into DispenserID
+	End If
+	(*	If imagefound(text:"OCPP ID",waitfor:10)
+		put FoundImageLocation() + [-50,70] into OCCPPIDpos1
+		put FoundImageLocation() + [130,20] into OCCPPIDpos2
+		log readtext(OCCPPIDpos1,OCCPPIDpos2,searchrectangle:[OCCPPIDpos1,OCCPPIDpos2])
+		put readtext(OCCPPIDpos1,OCCPPIDpos2,searchrectangle:[OCCPPIDpos1,OCCPPIDpos2]) into OCPPID
+	End If*)
+	If DispenserID is not "-" and DispenserID is not "" then
+		"Utilities/GenericOperations".Success( "Dispenser id is fetched from the charger management screen")
+	End If
+	(*If OCPPID is not "-" and OCPPID is not "" then
+		"Utilities/GenericOperations".Success( "OCPPID is fetched from the charger management screen")
+	End If*)
+	log DispenserID
+	return OCCPID&":"&DispenserID
+	Log"End of function Fetch_ChargerIDWRTCPPID"
+end Fetch_ChargerIDWRTCPPID
+
+--[2, "192216", "StatusNotificationFault", {"connectorId":2,"errorCode":"OtherError","status":"Faulted","timestamp":"2017-02-01T15:09:18Z","vendorErrorCode":"32,0,0,0"}]
+(*
+Extract_DatafieldRowSeries_from_FD_WithReferenceValue_Charger  "5000666317","Status"
+Extract_DatafieldRowSeries_from_FD_WithReferenceValue_Charger  "5000666317","Vendor Error Code"
+Extract_DatafieldRowSeries_from_FD_WithReferenceValue_Charger  "5000666317","OCPP Fault Code"*)
+to handle Extract_DatafieldRowSeries_from_FD_WithReferenceValue_Charger RefDataFieldName, DatafieldColname
+	try
+		--set the SearchRectangle to ScreenPart("FaultDashboard")
+		"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "CHARGER"
+		Global Iteration,ConfigValues
+		
+		--Set StatusRectangles to EveryImageRectangle(text:datafieldValue) 
+		Set DatafieldArea to EveryImageLocation(text:RefDataFieldName,validwords:RefDataFieldName)
+		If number of items in DatafieldArea is 0
+			replace "0" with"O" in RefDataFieldName
+			put   Everyimagelocation(text:RefDataFieldName,validwords:RefDataFieldName, waitFor:2) into DatafieldArea
+		End If
+		If number of items in DatafieldArea is 0
+			LogError "Imagelocation of given text is not found"
+			Exit all
+		End If
+		put 0 into iValFlag
+		put [] into Valuelist
+		repeat with DatafieldArea
+			put iValFlag +1 into iValFlag
+			put it into referencearea
+			If DatafieldColname is "Priority" or DatafieldColname is "Status" 
+				put imagelocation(text:DatafieldColname) into expectearea
+				log referencearea
+				put referencearea.y into posy
+				put expectearea.x into posx
+				
+				put [posx,posy] into imageloc
+				
+				put imageloc +[-30,-18] into pos1
+				put imageloc +[60,30] into pos2
+				
+				If readtext(pos1,pos2) is ""
+					Put readtext(pos1,pos2,contrast:on) into DatacolomnValues
+					If DatacolomnValues is ""
+						Put readtext(pos1,pos2,contrast:on,contrasttolerance:90) into DatacolomnValues
+					End If
+				else 
+					put readtext(pos1,pos2) into DatacolomnValues
+				End If
+			else if DatafieldColname is "OCPP Fault Code"
+				put imagelocation(text:DatafieldColname) into expectearea
+				log referencearea
+				put referencearea.y into posy
+				put expectearea.x into posx
+				
+				put [posx,posy] into imageloc
+				put imageloc +[-60,-18] into pos1
+				put imageloc +[80,30] into pos2
+				
+				If readtext(pos1,pos2) is ""
+					Put readtext(pos1,pos2,contrast:on) into DatacolomnValues
+					If DatacolomnValues is ""
+						Put readtext(pos1,pos2,contrast:on,contrasttolerance:90) into DatacolomnValues
+					End If
+				else 
+					put readtext(pos1,pos2) into DatacolomnValues
+				End If
+			Else if DatafieldColname is "Vendor Error Code"
+				put imagelocation(text:DatafieldColname) into expectearea
+				log referencearea
+				put referencearea.y into posy
+				put expectearea.x into posx
+				
+				put [posx,posy] into imageloc
+				
+				put imageloc +[-60,-18] into pos1
+				put imageloc +[70,30] into pos2
+				
+				If readtext(pos1,pos2) is ""
+					Put readtext(pos1,pos2,contrast:on) into DatacolomnValues
+					If DatacolomnValues is ""
+						Put readtext(pos1,pos2,contrast:on,contrasttolerance:90) into DatacolomnValues
+					End If
+				else 
+					put readtext(pos1,pos2) into DatacolomnValues
+				End If
+			End if
+			
+			(*If UPPERCASE(DatafieldColname) is "PRIORITY" OR UPPERCASE(DatafieldColname) is "STATUS"
+				put readtext(posx,posy,validwords:"Red Yellow Green Active Inactive") into DatacolomnValues
+			Else
+				put readtext(posx,posy,contrastcolor:"#313c4a",Contrast:on,contrasttolerance:80) into DatacolomnValues	
+				
+			end if*)
+			
+			log DatacolomnValues
+			put DatacolomnValues into item iValFlag of Valuelist
+		end repeat
+		set the SearchRectangle to empty
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,Extract_DatafieldRowSeries_from_FD_WithReferenceValue_Charger)
+	End try
+	set the SearchRectangle to empty
+	--log	ColumnValue
+	return Valuelist
+end Extract_DatafieldRowSeries_from_FD_WithReferenceValue_Charger
+
+log remoteclipboard()
+
+Charger_ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup "9985416662","Charger ID,Connector ID,OCPP Fault Code,Vendor Error Code,Charger"
+
+Charger_ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup "8909890989","Charger ID"
+
+log remoteclipboard()
+
+
+Charger_ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup "9807654411","Charger ID"
+
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to click on specified row data and validte fault popup in groub by fault
+---Input : ChargerID, DatafieldColnames
+---output: 
+---Created by:Shalini V
+---Created On 12 August 2022
+-------------------------------------------------------------------------------------------------
+to handle Charger_ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup ChargerID, DatafieldColnames
+	try
+		
+		log"Start of function Charger_ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup"
+		--set the SearchRectangle to SearchRect(SearchArea)
+		"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "Charger"
+		Global ConfigValues
+		put ChargerID into RefValue
+		Set DatafieldArea to EveryImageLocation(text:RefValue,validwords:RefValue)
+		If number of items in  DatafieldArea is 0
+			If RefValue contains "0"
+				Replace "0" with "O" in RefValue
+				Set DatafieldArea to EveryImageLocation(text:RefValue,validwords:RefValue)
+			end if
+		End If
+		
+		If number of items in  DatafieldArea is  0
+			LogError RefValue&"is not found in the dashboard"
+			exit all
+		End If
+		repeat with DatafieldArea
+			put it into Loc
+			put 	fetchChargerNamefromFaultDashboard(Loc) into ChargerName
+			put fetchConnectorIDfromFaultDashboard(Loc) into ConnectorID
+			put fetchOCPPFaultCodeDashboardGBF(Loc) into OCPPFaultCode
+			put fetchVendorErrorCodefromFaultDashboard(Loc) into VendorErrorCode
+			Put fetchPriorityFromFaultDashboard(Loc) into priority
+			put fetchFirstOccFromFaultDashboard(Loc) into FirstOcc
+			
+			set the SearchRectangle to SearchRect(SearchArea)
+			"Utilities/CommonActions".scrollCursorRightHorizontally_WithReferenceText "Customer Name", "FD_HorizontalScrollRight"
+			
+			put  it into referencearea
+			put fetchNumberofOccFromFaultDashboard(Loc) into NoOfOcc
+			put fetchChargerPlatformFaultDashboard(Loc) into ChargerPlatform
+			"ApexPages/FaultDashboardCharger".ResetScrollPosition "FD_LeftScrollbar","FaultDashboard"
+			repeat for each columnname in DatafieldColnames
+				"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "Charger"
+				put imagelocation(text:columnname) into expectearea
+				log referencearea
+				put referencearea.y into posy
+				put expectearea.x into posx
+				
+				Click[posx,posy]
+				Log "Datafield column is clicked"
+				set the SearchRectangle to ScreenPart("IndividualPopup")
+				"ApexPages/FaultDashboardVehicle".VerifyTextInFaultDashboard "Fault Details",0,0 
+				"ApexPages/FaultDashboardVehicle".VerifyTextInFaultDashboard "Fault Code",0,0
+				"ApexPages/FaultDashboardVehicle".VerifyTextInFaultDashboard "Charger Name",0,0
+				"ApexPages/FaultDashboardVehicle".VerifyTextInFaultDashboard "Priority",0,0
+				"ApexPages/FaultDashboardVehicle".VerifyTextInFaultDashboard "Charger Serial Number",0,0
+				"ApexPages/FaultDashboardVehicle".VerifyTextInFaultDashboard "Fault Name",0,0 
+				"ApexPages/FaultDashboardVehicle".VerifyTextInFaultDashboard "OCPP Fault Code",0,0 
+				"ApexPages/FaultDashboardVehicle".VerifyTextInFaultDashboard "Vendor Fault Code",0,0 
+				"ApexPages/FaultDashboardVehicle".VerifyTextInFaultDashboard "Fault Description",0,0 
+				"ApexPages/FaultDashboardVehicle".VerifyTextInFaultDashboard "Troubleshooting",0,0
+				"ApexPages/FaultDashboardVehicle".VerifyTextInFaultDashboard "Notes",0,0
+				"ApexPages/FaultDashboardVehicle".VerifyTextInFaultDashboard "Number Of Occurences",0,0 
+				"ApexPages/FaultDashboardVehicle".VerifyTextInFaultDashboard "First Occurence",0,0 
+				"ApexPages/FaultDashboardVehicle".VerifyTextInFaultDashboard "Connector ID",0,0
+				"ApexPages/FaultDashboardVehicle".VerifyTextInFaultDashboard "Charger",0,0
+				
+				put GetDatafieldColumnValuefromPopup_ChargerGroupByFaultDetails("ChargerName") into ChargerNamepopup
+				put GetDatafieldColumnValuefromPopup_ChargerGroupByFaultDetails("Priority") into PriorityPopup
+				
+				put GetDatafieldColumnValuefromPopup_ChargerGroupByFaultDetails("ChargerSerialNumber") into ChargerSerialNum
+				put GetDatafieldColumnValuefromPopup_ChargerGroupByFaultDetails("OCPPFaultCode") into OCPPFaultPopup
+				put GetDatafieldColumnValuefromPopup_ChargerGroupByFaultDetails("VendorFaultCode") into VendorErrPopup
+				
+				put ImageRectangle(text:"Number Of Occurences", waitFor:20) into ImageRectangleOfNoOcc	
+				put  ReadText(ImageRectangleOfNoOcc.TopRight+[5,20],ImageRectangleOfNoOcc.BottomRight+[100,-20])  into NoOFOccPopup
+				put ImageRectangle(text:"Charger:",contrast:on,contrastcolor:"#313c4a",waitFor:20) into ImageRectangleOfCharger	
+				set searchrectangle to ImageRectangleOfCharger
+				put  ReadText(ImageRectangleOfCharger.TopRight+[-3,20],ImageRectangleOfCharger.BottomRight+[150,-20])  into ChargerPlatformPopup
+				
+				put ImageRectangle(text:"First Occurence", waitFor:20) into ImageRectangleOfFirstOcc
+				put  ReadText(ImageRectangleOfFirstOcc.TopRight+[5,20],ImageRectangleOfFirstOcc.BottomRight+[150,-20])  into FirstOCCPopup
+				Delete " " from FirstOCCPopup
+				Put " " after character 10 of FirstOCCPopup
+				If character 14 of FirstOCCPopup is not ":"
+					Put ":" after character 13 of FirstOCCPopup
+				End If
+				
+				put  " " after  character 16 of FirstOCCPopup		
+				
+				put ImageRectangle(text:"Connector ID",validwords:"Connector ID", waitFor:20) into ImageRectangleOfConnID
+				put  ReadText(ImageRectangleOfConnID.TopRight+[5,20],ImageRectangleOfConnID.BottomRight+[100,-20])  into ConnectorIDPopup
+				
+				----Compare the popup data with dashboard data
+				
+				"Utilities/CommonActions".compareValues ConnectorID,ConnectorIDPopup
+				"Utilities/CommonActions".compareValues OCPPFaultCode,OCPPFaultPopup
+				"Utilities/CommonActions".compareValues VendorErrorCode,VendorErrPopup
+				"Utilities/CommonActions".compareValues priority,PriorityPopup
+				"Utilities/CommonActions".compareValues NoOfOcc,NoOFOccPopup
+				"Utilities/CommonActions".compareValues FirstOcc,FirstOCCPopup
+				If ChargerPlatformPopup contains "O" or ChargerPlatformPopup contains "o"
+					replace "O" with "0" in ChargerPlatformPopup
+				End If
+				Delete " " from ChargerPlatformPopup
+				If ChargerPlatform contains "O" or ChargerPlatform contains "o"
+					replace "O" with "0" in ChargerPlatform
+				End If
+				Delete " " from ChargerPlatform
+				"Utilities/CommonActions".compareValues ChargerPlatform,ChargerPlatformPopup
+				
+				--ChargerSerialNum
+				If ChargerID contains "0"
+					replace "0" with "O" in ChargerID
+				End If
+				If ChargerSerialNum contains "0"
+					replace "0" with "O" in ChargerSerialNum
+				End If
+				"Utilities/CommonActions".compareValues ChargerID,ChargerSerialNum
+				
+				Delete " " from ChargerName
+				Delete " " from ChargerNamepopup
+				"Utilities/CommonActions".containsValue ChargerNamepopup,ChargerName
+				put "Utilities/CommonActions".IsTextNotPresentOnScreen ("Download Attachments") into DownloadAttachment
+				If DownloadAttachment is true
+					"Utilities/GenericOperations".Success "Download attachment is not found in the fault popup"
+				Else
+					"Utilities/GenericOperations".Error "Download attachment is  found in the fault popup"
+				End If
+				
+				Click "IndividualPopup/CloseFaultDetailsPopup"
+				Log "Data comparision between dashboard and popup is done successully for "&columnname
+				Repeat until ImageFound("IndividualPopup/CloseFaultDetailsPopup") is False
+					wait 2
+					If repeatindex() is more than 10
+						Exit repeat
+						
+					End If
+				End repeat
+				
+			end repeat
+			
+		end repeat
+		set the SearchRectangle to empty
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Charger_ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup)
+	End try
+	Log "End of function Charger_ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup"
+end Charger_ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used get fault data from the fault popup (1st Fault details section)
+---Input : DatafieldName
+---output: 
+---Created by:Shalini V
+---Created On 12 August 2022
+-------------------------------------------------------------------------------------------------
+To handle GetDatafieldColumnValuefromPopup_ChargerGroupByFaultDetails DatafieldName
+	Log "Starting function GetDatafieldColumnValuefromPopup_ChargerGroupByFaultDetails"
+	try
+		put readtext("IndividualPopup\FaultDetails_PopupA","IndividualPopup\FaultDetails_PopupC") into myval
+		If myval is not empty then
+			--replace "Fault Code" in myval with enter&& " FaultCode:"
+			--replace "Fault Code:" in myval with enter&& " FaultCode:"
+			replace "Priority" in myval with enter&& " Priority:"
+			replace "Priority:" in myval with enter&& " Priority:"
+			
+			(*	replace "Status" in myval with enter&& " Status"
+			replace "Status:" in myval with enter&& " Status:"*)
+			replace "Charger Name" in myval  with enter&&" ChargerName:"
+			replace "Charger Name:" in myval  with enter&&" ChargerName:"
+			replace "Charger Serial Number" in myval  with enter &&" ChargerSerialNumber:"
+			replace "Charger Serial Number:" in myval  with enter &&" ChargerSerialNumber:"
+			replace "Fault Name" in myval  with enter &&" FaultName:"
+			replace "Fault Name:" in myval  with enter &&" FaultName:"
+			replace "OCPP Fault Code" in myval  with  enter &&" OCPPFaultCode:"
+			replace "OCPP Fault Code:" in myval  with  enter &&" OCPPFaultCode:"
+			replace "Vendor Fault Code" in myval  with  enter &&" VendorFaultCode:"
+			replace "Vendor Fault Code:" in myval  with  enter &&" VendorFaultCode:"
+			(*			replace "Time of Fault" in myval  with  enter &&" TimeofFault:"
+			replace "Time of Fault:" in myval  with  enter &&" TimeofFault:"*)
+			(*			
+			replace "Fault Duration" in myval  with enter&& " FaultDuration:"
+			replace "Fault Duration:" in myval  with enter&& " FaultDuration:"*)
+			
+			put split (myval, "") into keyValList
+			set iFoundData to False
+			repeat with each item of keyValList
+				
+				If it contains DatafieldName then
+					--replace every occurrence of ":" with "" in it 
+					
+					replace every occurrence of DatafieldName&":" with "" in it
+					delete tab from it
+					If DatafieldName is not "FirstOccurence" and DatafieldName is not "Time of Fault"
+						Delete ":" from it
+						
+					end if
+					(*If DatafieldName is  "Time of Fault"
+						If first character of it is ":"
+							delete first character of it
+						End If
+						Delete " " from it
+						Put " " after character 10 of it
+						If character 14 of it is not ":"
+							Put ":" after character 13 of it
+						End If
+						
+						put  " " after  character 16 of it
+					end if*) 
+					put trim(it) into ColumnValue
+					set iFoundData to true
+					exit repeat
+					
+					
+				End If
+			end repeat
+			--log "Data is writtent output file for "&Fieldname
+		else
+			logwarning "The data is empty "&Fieldname
+		end if
+		If iFoundData is True
+			"Utilities/GenericOperations".Success "Data field column"&& DatafieldName && " fetched from popup"
+		Else
+			"Utilities/GenericOperations".Error "Data field collumn"&& DatafieldName && " is not found in the popup"
+		End If
+	Catch exception 
+		
+		get "Utilities/GenericOperations".LogException(exception,GetDatafieldColumnValuefromPopup_ChargerGroupByFaultDetails)
+	End try
+	log ColumnValue
+	Log "Ending function GetDatafieldColumnValuefromPopup_ChargerGroupByFaultDetails"
+	return ColumnValue
+end GetDatafieldColumnValuefromPopup_ChargerGroupByFaultDetails

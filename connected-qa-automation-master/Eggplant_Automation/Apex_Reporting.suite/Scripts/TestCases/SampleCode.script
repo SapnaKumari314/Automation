@@ -1,0 +1,506 @@
+﻿put ["No Index","35775.0625","36009.0062"] into odometerReadingList
+//replace  by " " each item of odometerReadingList  which is "35775.0625"  in odometerReadingList
+log odometerReadingList
+replace every occurrence of "No Index" in odometerReadingList by empty
+log odometerReadingList
+
+log odometerReadingList
+
+Run "Reporting/Untitled"
+
+
+
+Run "Utilities/ExcelOperations".readTestDataFrom
+Run "LoginPage".Login
+
+put "LoginPage".Login
+
+
+
+put RemoteClipboard() into val
+put line 1 of file ("Test.csv") into HeaderRow 
+put line 1 of file resourcePath( "\OutputData\outputdataTest1.csv") into HeaderRow
+log HeaderRow
+repeat with each line of val
+	put the repeatIndex into LineNum
+set line1 to (LineNum) line of val
+put RemoteClipboard() into val
+set line2 to fourth line of val
+//put the number of items in line1 
+put item 6 of line2
+log line2
+end repeat 
+
+log val
+
+put "Odometer Value" into Column
+
+put "06/20/2022 12:00AM" into Row
+
+// When you iterate through the data in the CSV file, you'll need to know the position of the column we're after
+
+put RemoteClipboard() into myFile
+
+put line 1 of file ("Test.csv") into HeaderRow // Put the first line into a container
+
+put the item number of Column in HeaderRow into ItemNumber
+
+// Calculate the index of the column and store it in ItemNumber (starts with 1)
+
+log ItemNumber // This will output the ItemNumber in the log
+
+// With the above index set, you can now iterate through the rows in the data file
+
+repeat with MyLine = each line of line 2 to the last of file myFile // Repeats with each row of the .csv file, skipping the header row.
+
+	if the first item of MyLine is Row
+	
+	// as soon as the row you are after is found...
+	
+	then
+		
+		Log "Found row containing '" & Row & "'"// At this point you know that the correct row is selected
+		
+		Put item ItemNumber in MyLine into CellContents // The column index allows us to locate the correct value in the row to store in CellContents
+		
+Log "Cell '" Column "," Row "' contains: " CellContents
+
+// Optionally log when data was not found, useful for debugging
+
+(*
+
+else
+
+log "Row did not contain " & Row
+
+*)
+
+end if
+
+end repeat
+
+
+
+get LoginPage.Login(ProterraAdmin)
+Global configvalues
+log configvalues.BasicTimeOut
+
+
+
+set global configvalues to {BasicTimeOut:"6",MediumTimeOut:"12",LongTimeOut:"25"}
+
+
+
+//put BasicTimeOut into global configvalues
+to tryUTCConversion
+
+
+	Global configvalues
+	log configvalues.BasicTimeOut
+	
+	put the UTCOffset
+	
+	Convert the time to international time 
+	log the international time 
+	log the  UTCOffset
+	put the availableTimeZoneNames into val
+	
+	log the UTC
+	
+	put the timeFormat
+	
+	put availableTimeZoneAbbreviations() into TimeZoneAbbrev
+	log TimeZoneAbbrev
+	
+	set the timeformat's date to LongInternetDate
+	log  the timeFormat.( LongLocalTime24  )
+log  the timeFormat.(UTC
+set the timezone to "[UTC],]"
+//set the timeInputFormat to UTC
+log the timezone
+put the currentTime
+
+set SUT_time to 
+log SUT_time
+
+
+
+repeat with each item x of keys(TimeZoneAbbrev)
+	
+	put x & ": " & property (x) of TimeZoneAbbrev into timeZonesAmericas
+	
+	If timeZonesAmericas contains "UTC"
+		
+		log timeZonesAmericas
+		
+	End If
+	
+end repeat
+end tryUTCConversion
+
+set Global ConfigValues to {MinTimeOut:"4",BasicTimeOut:"7",MediumTimeOut:"14",LongTimeOut:"30"}
+set ExportAssetDataWith to "Only Data fields"
+set ToWait to 2.5
+set TimeType to "DailyIntervals"
+put "Handlers/ReportHandlers".ReadExportCSVProcessingTimeStamp(ExportAssetDataWith,ToWait,TimeType) into ReadValue
+
+log ReadValue
+
+
+
+(*wait ToWait // to wait for clear processing file msg to be displayed
+		if TimeType is "DailyIntervals" then
+			put ReadText(SearchRect("DailyProcessingArea")) into ReadData
+			log "Read Value:"&ReadData
+		end if*)
+
+(*		set val to <<Success: Your file Vehicle_5
+/ Minute lntervals_2022-07-04
+23-37.CSV is now Processing...>>
+		delete newline from val
+		delete " is now Processing" from val
+		log val*)
+
+(*put the long common time into dateTime
+		//put "4 Jul 2022 01:01:02 AM" into dateTime
+		log dateTime
+		put formattedTime("%Y-%m-%d_%H-%M-%S",  dateTime) into timer
+		
+		subtract 5 hours 30 minutes  from timer
+		Add 10 seconds to timer
+		log "timer:"&timer
+		*)
+
+
+
+put "Jul"
+
+
+put "Jul 08,11:02" into DateAndTime
+put "Jul 08,11:02" into DateAndTime1
+Split DateAndTime by ","
+put item 1 of DateAndTime into Date
+put item 2 of DateAndTime into Time
+put item 1 of DateAndTime1 into Date1
+put item 2 of DateAndTime1 into Time1
+if Date is equal to Date1 and Time is equal to Time1
+	LogSuccess "Date and time match"
+else
+	LogError "Date and time doesnot match"
+	
+end if
+
+put "Jul 08,11:02" into DateAndTime
+put "Jul 08,11:02" into DateAndTime1
+Split DateAndTime by ","
+Split DateAndTime1 by ","
+put formattedTime("%Y-%m-%d",  item 1 of DateAndTime ) into DateVal1
+log DateVal1
+put formattedTime("%Y-%m-%d",  item 1 of DateAndTime1 ) into DateVal2
+log DateVal2
+
+put formattedTime("%H-%M-%S",  item 2 of DateAndTime ) into timerVal
+log timerVal
+put formattedTime("%H-%M-%S",  item 2 of DateAndTime1 ) into timerVal1
+log timerVal1
+if DateVal1 is equal to DateVal2 and timerVal is equal to timerVal1
+	LogSuccess "Date and time match"
+else
+	LogError "Date and time doesnot match"
+	
+end if
+
+put formattedTime("%H-%M-%S",  Time) into timer
+log timerVal
+put for
+
+//Description: Function to get the Vehicle Status
+---Input: 
+---Output: 
+---Created By/date: Himaja R (21-Jul-2022)
+to validateFileDownloaded AssetType,TimeType,TimeStampList
+	try
+		set Global ConfigValues to {MinTimeOut:"4",BasicTimeOut:"7",MediumTimeOut:"14",LongTimeOut:"30"}
+		Global  ConfigValues
+		Repeat with each item  of TimeStampList
+			put it into TimeStamp
+			put characters 1 to 8 of it into Chars
+			delete characters 1 to 8 of it
+			Put Chars&newline&it into val
+			//log val
+			Set DownloadedFileName to AssetType&"_"&TimeType&"_"&val&".csv"
+			log DownloadedFileName
+			
+			if ImageFound(Text:"Today", waitFor:ConfigValues.BasicTimeOut,Validwords:"Today",searchRectangle:SearchRect(DownloadsPanelArea))
+				put FoundImageLocation() into Loc
+				Put Loc+[-30,5] into Pos1
+				Put Loc+[350,140] into Pos2
+				put ReadText(Pos1,Pos2) into val1
+				log val1
+				set  DownloadedFileName to <<Vehicle-Daily Intervals_2O22-O7->>
+				//replace "_" with "-" in DownloadedFileName
+				if ImageFound(text:DownloadedFileName,validWords:DownloadedFileName, waitFor:ConfigValues.BasicTimeOut,SearchRectangle:[Pos1,Pos2])
+					LogSuccess " Downloaded  file is in the specified format"
+					put FoundImageLocation() into Loc
+					Put Loc+[40,5] into Pos1
+					Put Loc+[70,70] into Pos2
+					put ReadText(Pos1,Pos2) into val1
+					log val1
+					set Flag to true
+					return TimeStamp
+				else
+					
+				end if
+			end if
+		End repeat
+		log ReadText(SearchRect(DownloadsPanelArea))
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,validateFileDownloaded)
+	End try	
+end validateFileDownloaded
+
+
+
+//Description: Function to get the Vehicle Status
+---Input: 
+---Output: 
+---Created By/date: Himaja R (21-Jul-2022)
+to validateFileDownloaded AssetType,TimeType,TimeStampList
+	try
+		set Global ConfigValues to {MinTimeOut:"4",BasicTimeOut:"7",MediumTimeOut:"14",LongTimeOut:"30"}
+		Global  ConfigValues
+		log TimeStampList
+		set TimeStampList to ["2022-07-21_17-20-47","2022-07-21_17-20-48","2022-07-21_17-20-49"]
+		Repeat with each item  of TimeStampList
+			put it into TimeStamp
+			replace "O" with "0" in it
+			put characters 1 to 8 of it into Chars
+			delete characters 1 to 8 of it
+			Put Chars&newline&it into val
+			//log val
+			Set DownloadedFileName to AssetType&"_"&TimeType&"_"&val&".csv"
+			log DownloadedFileName
+			
+			if ImageFound(Text:"Today", waitFor:ConfigValues.BasicTimeOut,Validwords:"Today",searchRectangle:SearchRect(DownloadsPanelArea))
+				put FoundImageLocation() into Loc
+				Put Loc+[-10,10] into Pos1
+				Put Loc+[370,100] into Pos2
+				put ReadText(Pos1,Pos2) into val1
+				replace "O" with "0" in val1
+				log val1
+				
+				insert  "Vehicle" into list 
+				insert  "Daily" into list 
+				insert Chars into list 
+				insert it into list
+				
+				set flag to true
+				set count to 0
+				repeat with each item of list
+					
+					if val1 contains it
+						add 1 to count
+						logsuccess "Found it:"&it
+					else
+						logwarning "Couldnot find : "& it
+						Set flag to false
+					end if
+					
+				end repeat
+				put empty list into list
+				
+			else
+				LogError "Downloads screen is not shown"
+				
+			end if
+			(*if count is 4 then 
+				put repeatindex() into index
+				LogSuccess " Downloaded file is available in the downloads pannel in the specified format"
+				//put items [index] of TimeStampList into TimeStamp
+				put  TimeStamp  into TimeStampval
+				log "TimeStamp:"&TimeStamp
+				set flag1 to true
+			end if *)
+			//if flag is true then
+			if flag is true  then
+				put repeatindex() into index
+				LogSuccess " Downloaded file is available in the downloads pannel in the specified format"
+				//put items [index] of TimeStampList into TimeStamp
+				put  TimeStamp  into TimeStampval
+				log "TimeStamp:"&TimeStamp
+				set flag1 to true
+				(*else
+				Logerror " Downloaded file is not available in  the specified format"*)
+			end if
+			
+		End repeat
+		log "TimeStamp:"&TimeStampval
+		return TimeStamp
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,validateFileDownloaded)
+	End try	
+end validateFileDownloaded
+(*
+
+
+--Selection done as per filters mentioned
+set ExportAssetDataWith to "Only Data fields"
+put "Handlers/ReportHandlers".ExportCSVAndTimeStampUTC(ExportAssetDataWith) into timestamp
+
+
+put RemoteClipboard() into val
+log val
+
+
+
+
+
+
+
+
+
+Run "Handlers/ReportHandlers".SelectAssetType "Charger"
+
+
+
+//https://34.202.70.129:5601
+
+put ResourcePath("DemoLanguage.txt") into FilePath
+
+
+put RemoteClipboard() into val
+set line1 to first line of val
+set line2 to second line of val
+put the number of items in line1 
+put the last item of line1
+log  item 16 of line2
+log val
+
+repeat with each item val of firstline
+	
+	if MyItem = global MyLanguage
+		
+		put repeatindex() into MyColumn
+		
+	end if
+	
+end repeat
+
+repeat with each line of file FilePath
+	
+	if item 1 of it = MyWord
+		
+		put repeatindex() into MyRow
+		
+	end if
+	
+end repeat
+
+log "Trying to find" && item MyColumn of line MyRow of file FilePath
+
+return ImageLocation (Text:item MyColumn of line MyRow of file FilePath, Language:global MyLanguage)
+
+
+
+
+// Define a location for the CSV file. This step is required if not using the above code to generate the CSV file, so if that applies to you, simply uncomment and provide a suitable path to your CSV:
+
+-- set myFile to "C:\ePF data\myDataFile.csv"
+
+// Pass in information about what column and row you want to work with. This can be set in the script as it is done below, or passed in from a calling script, or drawn from a data file.
+put RemoteClipboard() into val
+set myFile to val
+put "Email" into Column
+
+put "Joe Bloggs" into Row
+
+// When you iterate through the data in the CSV file, you'll need to know the position of the column we're after
+
+put line 1 of file myFile into HeaderRow // Put the first line into a container
+
+put the item number of Column in HeaderRow into ItemNumber
+
+// Calculate the index of the column and store it in ItemNumber (starts with 1)
+
+log ItemNumber // This will output the ItemNumber in the log
+
+// With the above index set, you can now iterate through the rows in the data file
+
+repeat with MyLine = each line of line 2 to the last of file myFile // Repeats with each row of the .csv file, skipping the header row.
+
+	if the first item of MyLine is Row
+	
+	// as soon as the row you are after is found...
+	
+	then
+		
+		Log "Found row containing '" & Row & "'"// At this point you know that the correct row is selected
+		
+		Put item ItemNumber in MyLine into CellContents // The column index allows us to locate the correct value in the row to store in CellContents
+		
+Log "Cell '" Column "," Row "' contains: " CellContents
+
+
+// Optionally log when data was not found, useful for debugging
+
+(*
+
+else
+
+log "Row did not contain " & Row
+
+*)
+
+end if
+
+end repeat
+*)
+
+To val
+	Click {Text:"Export to CSV", SearchRectangle:[1347,48,1908,408]}
+
+	wait 5
+	set the SearchRectangle to empty
+	set the SearchRectangle to [844,672,1307,754]
+	Click {image:"bt_Export",SearchRectangle:[844,672,1307,754],waitfor:6}
+	set the SearchRectangle to empty
+	wait 1.5
+	put ReadText([1632,77,1913,173]) into val
+	log val
+	
+	get LoginPage.Login(ProterraAdmin)
+	
+	get CommonHandlers.readTestDataFrom 
+end val
+
+//get Utilities.CommonActions. 
+
+"CCSS_Pages/BasePage".OpenApplication
+Run "Reporting/Handlers/Untitled"
+
+Run "Handlers/ReportHandlers"
+
+
+(*//set the timeformat's time to ""
+put the long date into date
+log the dateItems
+log today's date & today's time
+//set the clockFormat to 24*)
+(*put the long common time into dateTime
+//put "4 Jul 2022 01:01:02 AM" into dateTime
+log dateTime
+put formattedTime("%Y_%m_%d_%H_%M_%S",  dateTime) into timer
+subtract 5 hours 30 minutes  from timer
+Add 10 seconds to timer
+log timer*)
+
+Typetext controlKey,0
+
+
+
+
+
+(*put "4 Jul 2022 01:01 AM" into timer
+log timer*)
+//put the long time into timer

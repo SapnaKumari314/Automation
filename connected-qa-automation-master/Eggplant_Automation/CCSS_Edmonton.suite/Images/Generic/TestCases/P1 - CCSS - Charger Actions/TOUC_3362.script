@@ -1,0 +1,96 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 18/Apr/22
+@TC_ID: TOUC_3362
+@TC_Description: CCSS-CC-Charger Actions: Terminate Charging Alert action for Ready/Topped Up buses
+***)
+
+BeginTestCase TOUC_3362
+
+Log "###########   Started execution of Test Case--> TOUC_3362  ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Select any Bus from the IQ or search for a Bus which is not in the garage
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusIsNotInTracksFromAPI BusId, "CCSS_P1_TestData", "ChargerActions", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+--Ensure that the Needs Maintenance Checkbox is not selected and click the Recommended Run & Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".UnCheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+
+--Select a Run such that the 
+--Current Energy < Required Energy
+--using the Run override if the default run does not match the requirement
+--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "ThresholdRatio") into threshouldRatio
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectARunWhereCurrentEnrgyLessThnReqEnnrgy 
+
+
+--Select a Charger Track Position using Track Override if the default track does not match the requirement
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgActiveCharger"
+--Click the Assign Run & Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "no"
+
+--Verify Toast msg
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "ToastMsgPosition") into ToastMsgPosition
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage ToastMsgPosition
+
+--Verify that the Initiate Charging Alert is displayed in the Alerts section
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".CreateChargerName "CCSS_P1_TestData", "ChargerActions", "BusID",BusId
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "Alert2") into Alert2
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyAlertMessage Alert2
+
+
+--Click the Initiate Charging alert button
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "InitiateChargingBtn") into InitiateChargingBtn
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "InitiateChargingConfirmMsg") into InitiateChargingConfirmMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickCheckAlertButton InitiateChargingBtn , InitiateChargingConfirmMsg
+
+--Hover over the Bus / Charger Tooltip
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "bus_image_run_and_track_screen") into BusImg
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusAndChargerRateInKw BusImg
+
+
+--Wait until Bus charge is at 100% SOC and verify the Terminate Charging Alert is displayed - to be executed
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "ImgBusFullyCharged") into BusImg
+"CCSS_Pages/RunAndAssignmentTrackPage".WaitUntilBusIsFullyCharged BusImg
+
+--Verify that the Terminate Charging Alert is displayed for the Bus that was assigned first in the Alerts section due to lower LCQ priority
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "TerminateChargingAlert") into Alert
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyAlertMessage Alert
+
+
+--Click the Menu and select Charger Control
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+
+--Click the Terminate Charging alert button
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "TerminateChargingBtn") into TerminateChargingBtn
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "TerminateChargingMsg") into TerminateChargingMsg
+
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickCheckAlertButton TerminateChargingBtn , TerminateChargingMsg
+
+--Verify the Charger Status
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "ImgChargerStatusAfterTerminateCharge") into ImgChargerStatusAfterTerminateCharge
+
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyChargerStatus  ImgChargerStatusAfterTerminateCharge
+
+
+--Hover over the Bus / Charger Tooltip
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "bus_image_run_and_track_screen") into BusImg
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusAndChargerRateInKw BusImg
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3362 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3362
+

@@ -1,0 +1,118 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 20/July/22
+@TC_ID: TOUC_2484
+@TC_Description: (CCSS):Bookout Delay: Validate that the Bus has an timed Bookout Delay when Bus is in a charger position
+***)
+
+BeginTestCase TOUC_2484
+
+Log "###########   Started execution of Test Case--> TOUC_2484  ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Remove buses from the Track
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P1_TestData", "BookoutDelay", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P1_TestData", "BookoutDelay", "BusId2", "customerGarageId", "RunID", "API_Bus_Details_busVins2", "tenantId"
+
+--Select another Bus from the Incoming queue which does not have 100% SOC
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "BookoutDelay", "BusID2") into BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+--Select the Needs Maintenance Checkbox
+"CCSS_Pages/RunAndAssignmentTrackPage".UnCheckNeedsMaintenanceCheckBx
+--Click the Recommended Run and Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+
+--Click Override Run and Select a Run such that Current Energy is less than Required Energy
+
+--Ensure that the Charger Status is not charging and it remains so until Bookout Time
+--The following conditions need to be met to get Bookout Delay:
+--* Bookout Time < Current Time + Estimated Charge Time (Need to confirm)
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectARunWhereCurrentEnrgyLessThnReqEnnrgy 
+
+--Override the Track and select a charger track position
+
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgActiveCharger"
+--Click the Assign Run & Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "no"
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "BookoutDelay", "ToastMsg2") into ToastMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage ToastMsg
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "BookoutDelay", "BusID2") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".CreateChargerName "CCSS_P1_TestData", "BookoutDelay", "BusID2",BusId
+
+
+--Wait for the API to refresh
+"Utilities/GenericOperations".WaitForApiSynchronization
+
+--Verify that the Bus color changes to Red
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "BookoutDelay", "DelayedBus2") into imgDelayedBus2
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusStatus imgDelayedBus2, "Delayed"
+
+--Mouse hover over the Bus and verify the status
+--Delay is displayed in the status
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "BookoutDelay", "DelayedBus2") into imgBus
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetailsInTooltip imgBus, "Bus Status", "Delay"
+
+
+--Verify the Bookout Delay alert is diplayed in the Alerts panel
+--current bus
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "BookoutDelay", "DelayAlert1") into Alert
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyAlertMessage Alert, "have"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "BookoutDelay", "DelayAlert2") into Alert
+log alert
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyAlertMessage Alert, "parked"
+
+--Select a Bus from the Incoming Queue
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "BookoutDelay", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+--Select the Needs Maintenance Checkbox
+"CCSS_Pages/RunAndAssignmentTrackPage".UnCheckNeedsMaintenanceCheckBx
+--Click the Recommended Run and Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+--Click the Override button from Track Details
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+TypeText pageDown
+
+--Select a charger position and confirm selection and click Assign button
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "BookoutDelay", "DelayedBus2") into imgDelayedBus2
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusStatus imgDelayedBus2, "Delayed"
+TypeText pageUp
+
+
+--Navigate to Charger Control screen and validate Bookout delay
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+
+--Navigate to Logical Charge Queue section
+"CCSS_Pages/GarageOverview".NavigateToElement "Logical Charge Queue", "LogicalChargeQueueArea"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "BookoutDelay", "DelayAlert1") into Alert
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyAlertMessage Alert, "have"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "BookoutDelay", "DelayAlert2") into Alert
+log alert
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyAlertMessage Alert, "parked"
+
+
+--Navigate to Garage Overview screen and validate Bookout delay
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+
+--Navigate to Logical Charge Queue section
+"CCSS_Pages/GarageOverview".NavigateToElement "Logical Charge Queue", "LogicalChargeQueueArea"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "BookoutDelay", "DelayedBus2") into imgDelayedBus2
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusStatus imgDelayedBus2, "Delayed"
+
+
+Log "#############  Finished execution of Test Case--> TOUC_2484 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_2484

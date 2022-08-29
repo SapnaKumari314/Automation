@@ -1,0 +1,33 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 04/Apr/22
+@TC_ID: TOUC_3319
+@TC_Description: CCSS-RRT-Run Details: Assigned Run Details for Non Maintenance Bus
+***)
+
+BeginTestCase TOUC_3319
+
+Log "###########   Started execution of Test Case--> TOUC_3319   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+--Remove bus from Garage
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P0_TestData", "RunAndTrackComponents", "BusID", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectARunWhereThrEnrgyIsGreaterThnCurrentEnrgyGreaterThnReqEnnrgy  "0.1"
+
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedRunDetails 
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3319 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3319

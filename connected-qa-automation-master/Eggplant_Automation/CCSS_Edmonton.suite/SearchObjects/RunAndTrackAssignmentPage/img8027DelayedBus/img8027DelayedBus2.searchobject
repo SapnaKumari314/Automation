@@ -1,0 +1,46 @@
+{
+	"lastmodifieddate": 1658406247.7550001,
+	"lastfoundlocation": [
+		588,
+		441,
+		18,
+		56
+	],
+	"originalcapturelocation": [
+		588,
+		441,
+		18,
+		56
+	],
+	"createddate": 1658406247.7550001,
+	"lastfounddate": 1658413010.842,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[9,28]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/img8027DelayedBus/img8027DelayedBus2.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"capturerect": [
+					588,
+					441,
+					18,
+					56
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com"
+			}
+	],
+	"name": "RunAndTrackAssignmentPage/img8027DelayedBus/img8027DelayedBus2"
+}

@@ -1,0 +1,87 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 28/July/22
+@TC_ID: TOUC_9515
+@TC_Description: ETS - Validate the ETS Customer's COE Read Only role permissions
+***)
+
+BeginTestCase TOUC_9515
+
+Log "###########   Started execution of Test Case--> TOUC_9515   ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+
+-------------------------------------Test Data preparation for the test case
+"CCSS_Pages/BasePage".Login
+"CCSS_Pages/PrerequsiteTestData/RolesAndPermissions".RemoveBusFromAPI "CCSS_P2_TestData", "RolesPermissions", "BusId", "RunID", "API_Bus_Details_busVins", "TOUC_9515"
+"CCSS_Pages/PrerequsiteTestData/RolesAndPermissions".CreateBusWithAnStatusAndAssignOnTrack "not ready", "RunAndTrackAssignmentPage\imgActiveCharger" ,"CCSS_P1_TestData", "RolesPermissions", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "TOUC_9515", "ToastMsg", "no"
+
+"CCSS_Pages/BasePage".LogOff
+
+--------------------------------------------
+"CCSS_Pages/BasePage".Login "COEReadOnlyUserID"
+
+--Verify that user is not able to assign Run & Track for Buses
+--Verify that user is not able to re-assign Run & Track for Buses
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyImageIsPresent "RunAndTrackAssignmentPage\imgDisabledRecommendedRunAndTrackBtn.png", "BusDetailsArea", "disabled"
+
+--Verify that user is able to Drag and Drop Buses
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyDragBusAndDropIsDisabled "RunAndTrackAssignmentPage/bus_8035.png", "RunAndTrackAssignmentPage/imgBlackTrack"
+
+--Click Menu and click Charger Control screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+
+--Verify that user is not able to perform Charger Actions from Alerts section
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyImageIsPresent "RunAndTrackAssignmentPage\imgDisabledInitiateChargingBtn.png", "AlertsArea", "disabled"
+
+--Verify that user is able to perform Emergency Stop All from the legend section
+"CCSS_Pages/ChargerControl".VerifyImageIsPresent "RunAndTrackAssignmentPage\imgDisabledEmergencyStopAll.png", "TracksArea", "disabled"
+
+--Verify that user is not able to download CSV and PDF from LCQ section
+--Navigate to Logical Charge Queue section
+"CCSS_Pages/GarageOverview".NavigateToElement "Logical Charge Queue", "LogicalChargeQueueArea"
+--Click on ellipsis / Menu should be disabled
+"CCSS_Pages/GarageOverview".SelectMenuOptionFrom "LogicalChargeQueueArea", "Export to CSV"
+
+
+--Verify that user is able to download CSV and PDF from Charge History section
+--Verify that user is able to download CSV and PDF from Charger Faults section
+--Verify that user is able to download CSV and PDF from Bus Faults section
+
+--Navigate to Garage Overview screen by selecting 'Garage Overview' link from main menu
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+--Navigate to Logical Charge Queue section
+"CCSS_Pages/GarageOverview".NavigateToElement "Logical Charge Queue", "LogicalChargeQueueArea"
+
+--Click on ellipsis / Menu should be disabled
+"CCSS_Pages/GarageOverview".SelectMenuOptionFrom "LogicalChargeQueueArea", "Export to CSV"
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Energy Management", "Energy Management", 1
+"CCSS_Pages/EnergyManagement".CheckFieldIsEditable  "Online Power Capacity", 0,0,0,80,"ElectricalServiceMonitoringArea"
+
+--Verify user is able to download PDF and CSV files for the Power Monitoring graph
+
+"CCSS_Pages/GarageOverview".SelectMenuOptionFrom "LogicalChargeQueueArea", "Export to CSV"
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "CCSS Configuration", "CCSS Configuration", 1
+"CCSS_Pages/CCSSConfiguration".CheckFieldIsEditable  "ROB Server URL", 300,-15,800,10,"GlobalTabFieldsArea"
+
+
+Log "#############  Finished execution of Test Case--> TOUC_9515 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_9515
+
+
+
+
+
+
+
+
+
+
+
+

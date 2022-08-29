@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="External API Test Suite">
+	<listeners>
+		<listener
+			class-name="main.java.com.proterra.ExtentListeners.ExtentListeners">
+		</listener>
+	</listeners>
+
+	<test name="Events API External API Test for Centennial Garage"
+		preserve-order="true">
+
+		<!-- <parameter name="startDate" value="2021-06-08T00:00:01Z" /> <parameter 
+			name="endDate" value="2021-06-14T23:59:59Z" /> -->
+
+		<classes>
+			<class
+				name="test.java.com.proterra.testcases.apexAPI.externalAPI.EventsAPINonNullTest">
+				<parameter name="garageID"
+					value="8a86ef86-ebab-4c11-95ba-233cdf18a2c2" />
+			</class>
+			<class
+				name="test.java.com.proterra.testcases.apexAPI.externalAPI.EventsAPIChargingTerminatedRecordsTest">
+				<parameter name="type" value="CHARGER_STATUS_UPDATE" />
+				<parameter name="garageID"
+					value="8a86ef86-ebab-4c11-95ba-233cdf18a2c2" />
+			</class>
+		</classes>
+	</test>
+
+	<test
+		name="Events API External API Test for Kathleen Andrews Garage"
+		preserve-order="true">
+
+		<!-- <parameter name="startDate" value="2021-06-08T00:00:01Z" /> <parameter 
+			name="endDate" value="2021-06-14T23:59:59Z" /> -->
+		<classes>
+			<class
+				name="test.java.com.proterra.testcases.apexAPI.externalAPI.EventsAPINonNullTest">
+				<parameter name="garageID"
+					value="a4ac820a-9d67-4bd8-af67-9d9b30d0aaea" />
+			</class>
+			<class
+				name="test.java.com.proterra.testcases.apexAPI.externalAPI.EventsAPIChargingTerminatedRecordsTest">
+				<parameter name="type" value="CHARGER_STATUS_UPDATE" />
+				<parameter name="garageID"
+					value="a4ac820a-9d67-4bd8-af67-9d9b30d0aaea" />
+			</class>
+		</classes>
+	</test>
+
+	<test name="Charger Metrics External API Test"
+		preserve-order="true">
+
+		<!-- <parameter name="startDate" value="2021-06-08T00:00:01Z" /> <parameter 
+			name="endDate" value="2021-06-14T23:59:59Z" /> -->
+		<classes>
+			<class
+				name="test.java.com.proterra.testcases.apexAPI.externalAPI.ChargerMetricsAPINonNullData">
+				<parameter name="chargerIds"
+					value="
+  00120C2DF6905E01,
+  HVC150-IT1-1019-119,
+  HVC150-IT1-2319-029,
+  00120C2DF6939301,
+  HVC150-MX1-0220-010,
+  NAMHVC150-US1-1619-975,
+  HVC150-MX1-5219-005,
+  HVC150-MX1-5219-006,
+  HVC150-IT1-2219-088,
+  HVC150-IT1-2219-065,
+  HVC150-MX1-0220-013,
+  HVC150-MX1-0220-009,
+  HVC150-IT1-1119-045,
+  HVC150-MX1-0120-001,
+  00120C2DF6A50A01,
+  00120C2DF6B03F01,
+  00120C2DF6BCA201,
+  HVC150-IT1-2219-082,
+  00120C2DF6B05901,
+  HVC150-IT1-2219-091,
+  HVC150-IT1-1119-017,
+  HVC150-IT1-2219-079,
+  NAMHVC150-US1-1619-974,
+  00120C2DF6AC0401,
+  HVC150-IT1-1019-068,
+  HVC150-IT1-2119-099,
+  HVC150-IT1-1119-012,
+  HVC150-MX1-0220-008,
+  HVC150-MX1-5219-004,
+  HVC150-IT1-2219-093,
+  HVC150-IT1-2219-064,
+  HVC150-MX1-5219-003,
+  HVC150-MX1-0220-011" />
+			</class>
+		</classes>
+	</test>
+
+
+	<test name="Fleet Metrics External API Test" preserve-order="true">
+
+		<classes>
+			<class
+				name="test.java.com.proterra.testcases.apexAPI.externalAPI.FleetMetricsAPIAllBusData">
+				<parameter name="busVins"
+					value="7JZTH13J4LS000299,7JZTH13J3LS000309,7JZTH13J3LS000312,7JZTH13J9LS000315,7JZTH13J4KS000169,7JZTH13J5KS000164,7JZTH13J8LS000306,7JZTH13JXLS000310,7JZTH13J1LS000311,7JZTH13J7KS000151,7JZTH13J0KS000153,7JZTH13J9KS000152,7JZTH13J0LS000297,7JZTH13JXKS000161,7JZTH13JXKS000158,7JZTH13J5LS000313,7JZTH13J8KS000157,7JZTH13J8KS000160,7JZTH13J1KS000159,7JZTH13J0LS000302,7JZTH13J9LS000301,7JZTH13J4KS000155,7JZTH13J2KS000171,7JZTH13J2KS000154,7JZTH13J2KS000168,7JZTH13JXLS000307,7JZTH13J2LS000298,7JZTH13J1LS000308,7JZTH13J6LS000305,7JZTH13J7KS000165,7JZTH13J0KS000170,7JZTH13J3KS000163,7JZTH13J0KS000167,7JZTH13J9KS000166,7JZTH13J4LS000304,7JZTH13J2LS000303,7JZTH13J1KS000162,7JZTH13J7LS000300,7JZTH13J6KS000156,7JZTH13J7LS000314" />
+				<parameter name="signalNames"
+					value="efficiencyKWHPerMileV2,distanceInMiles,regenResult.regenEnergyInKWH,totalEnergyConsumedInKWH,totalEnergyChargedInKWH,totalOperatingTimeInS,energyConsumptionResult.energyRegeneratedKWH,statResults.ambientTempInC.min,statResults.ambientTempInC.max,statResults.cabinTempInC.min,statResults.cabinTempInC.max,statResults.movingSpeedInMph.min,statResults.movingSpeedInMph.max,startStates.odometerReading,endStates.odometerReading,distanceInMilesOdo,startStates.availSystemEnergyInKWH,endStates.availSystemEnergyInKWH,startStates.dashSOC,endStates.dashSOC,startStates.latitudeInDeg,startStates.longitudeInDeg,endStates.latitudeInDeg,endStates.longitudeInDeg"></parameter>
+			</class>
+		</classes>
+	</test>
+</suite>

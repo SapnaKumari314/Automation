@@ -1,0 +1,77 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 04/Apr/22
+@TC_ID: TOUC_2825
+@TC_Description: (CCSS):Re-assignment: Validate user is able to re-assign non manitenance bus to different run with same track
+***)
+
+BeginTestCase TOUC_2825
+
+Log "###########   Started execution of Test Case--> TOUC_2825   ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Select a Bus from the Incoming Queue
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackReassignment", "BusID") into BusId
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackReassignment", "API_Bus_Details_id") into API_Bus_Details_id
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackReassignment", "API_Bus_Details_busVins") into API_Bus_Details_busVins
+
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetails BusId, API_Bus_Details_id, API_Bus_Details_busVins
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackReassignment", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+
+--Click the Recommended Run and Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+
+--API - Verify Run and Trackdetails
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedRunDetails 
+
+--Click the Assign button from Track Details
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "yes"
+--Verify Toast msg
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackReassignment", "ToastMsg") into ToastMsg
+put "CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage (ToastMsg) into toastMessageGeneratedAfterAssignTrack
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+
+--Select a Run such that the Track is not changed
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectRunWithoutChangingTrack "recommendedrundetailsafteroverriderun"
+
+--Click the Assign Run and Track button
+--Click Yes
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "yes"
+
+--Verify the new Run and Track details by hovering over the tooltip
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRunAndTrackDetailsByHoveringOverToolTip  "RunAndTrackAssignmentPage\bus_8027", "recommendedrundetailsafteroverriderun"
+
+--Navigate to Charger Control and Garage Overview screens and verify the tooltip and LCQ
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRunAndTrackDetailsByHoveringOverToolTip  "RunAndTrackAssignmentPage\bus_8027", "recommendedrundetailsafteroverriderun"
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRunAndTrackDetailsByHoveringOverToolTip  "RunAndTrackAssignmentPage\bus_8027", "recommendedrundetailsafteroverriderun"
+
+
+Log "#############  Finished execution of Test Case--> TOUC_2825 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_2825
+
+
+
+
+
+
+
+
+
+
+
+

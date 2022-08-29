@@ -1,0 +1,7 @@
+
+msg::Are you sure you want to move Bus 8027 from position 8-1 to 11-1?
+msg::Are you sure you want to move Bus 8027 from position 12-3 to 1-1?
+msg::Are you sure you want to move Bus 8027 from position 7-3 to 11-1?
+msg::Are you sure you want to move Bus 8027 from position 7-3 to 11-1?
+msg::Are you sure you want to move Bus 8027 from position 7-3 to 11-1?
+msg::Are you sure you want to move Bus 8027 from position 8-1 to 11-1?

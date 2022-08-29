@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		44,
+		402,
+		242,
+		178
+	],
+	"lastmodifieddate": 1659010641.865,
+	"createddate": 1659005542.299,
+	"name": "RunAndTrackAssignmentPage/disabledRecommendedRunAndTrackBtn",
+	"lastfounddate": 1659017365.3,
+	"ocrcapturestring": "Jerts (02) 7 Jul 16:09 larger at position (KATG 7-4)",
+	"lastfoundlocation": [
+		63,
+		421,
+		217,
+		35
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[121,89]",
+					"Tolerance": "_66",
+					"Discrepancy": "_0",
+					"SearchType": "Smoothed for Text"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/imgDisabledRecommendedRunAndTrackBtn.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com",
+				"capturerect": [
+					44,
+					402,
+					242,
+					178
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "Recommended Run & Track"
+			}
+	]
+}

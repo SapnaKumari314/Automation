@@ -1,0 +1,111 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 23/Feb/22
+@Description: Its a Global Operations to perform operations in browser.
+***)
+
+-----------------------------------------Run and Assignment Page
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		APIArea:[[.25,.25],[.75,.75]],
+
+	}
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+End ScreenPart
+-----------------------------------------------------
+
+to handle CloseBrowser
+	if ImageFound(imageName:"Generic/imgChromeBrowser", waitFor:10)
+		Click "Generic/imgChromeBrowser"
+		TypeText altKey, f4
+		Log "Initial Chrome browser was open, closed successfully!!"
+	end if
+end CloseBrowser
+
+to LaunchApplication browser, appUrl
+	CloseBrowser
+	typetext WindowsKey, r
+	Typetext browser&& appUrl,  return
+	if ImageFound(text:"User name", waitFor:15)
+		LogSuccess "Application launched successfully --> "&&appUrl
+	else
+		if ImageFound(text:"Logout", waitFor:15)
+			Log "Application launched successfully, initially logged in --> "&&appUrl
+			Click text:"Logout"
+			
+		end if
+	end if
+	
+	--WaitFor 20, text:"User name" or 20, text:"Logout"
+	--WaitFor
+	--Typetext windowsKey, upArrow
+end LaunchApplication
+
+to handle ApiSynchronization
+
+	Log "-----------------Start of Synch"
+	set the SearchRectangle to ScreenPart("APIArea")
+	put the time into startTime
+	log startTime
+	if  imagefound(image:"imgSynch3", waitfor:5) 
+		log "image found"
+		put the time - startTime into secondsElapsed
+		log secondsElapsed
+		
+		repeat until not imagefound(imagename:"imgSynch3",waitFor:2) 
+			wait 1
+		end repeat
+	else
+		log "not found"
+	end if
+	
+	put the time - startTime into secondsElapsed
+	log secondsElapsed
+	Log "-----------------End of Synch"
+	set the SearchRectangle to empty
+end ApiSynchronization
+
+to handle WaitForApiSynchronization
+
+	Log "-----------------Start of Synch"
+	set the SearchRectangle to ScreenPart("APIArea")
+	put the time into startTime
+	log startTime
+	if  imagefound(image:"imgSynch3", waitfor:120) 
+		log "image found"
+		put the time - startTime into secondsElapsed
+		log secondsElapsed
+		
+		repeat until not imagefound(imagename:"imgSynch3",waitFor:2) 
+			wait 1
+		end repeat
+	else
+		log "not found"
+	end if
+	
+	put the time - startTime into secondsElapsed
+	log secondsElapsed
+	Log "-----------------End of Synch"
+	set the SearchRectangle to empty
+end WaitForApiSynchronization
+
+to handle CaptureScreenshot
+	set the timeformat's date to "%d_%m_%Y"
+	log date
+	
+	put time into normalTime
+	put formattedTime("%H_%M_%S", normalTime) into longTime
+	log longTime
+	
+	put date&"_"&longTime into timeStamp
+	
+	CaptureScreen {Name: timeStamp}
+end CaptureScreenshot
+
+

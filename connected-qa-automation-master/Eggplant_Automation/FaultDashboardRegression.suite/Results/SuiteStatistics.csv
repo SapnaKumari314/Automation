@@ -1,0 +1,3 @@
+﻿Script,Last Status,Runs,Fails,First Run,Last Run,Avg Time(Success)
+ApexPages/FaultDashboardVehicle,Success,24,3,2022-06-27 15:23:38 +0530,2022-06-30 21:31:22 +0530,0:00:05
+TestCases/S3_TC15_TOUC-10568,Success,8,6,2022-07-12 13:00:38 +0530,2022-07-12 17:06:47 +0530,0:09:17

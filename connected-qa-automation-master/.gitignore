@@ -1,0 +1,15 @@
+CCSS/UI/CCSS_UI_API_Automation/.classpath
+CCSS/UI/CCSS_UI_API_Automation/.project
+CCSS/UI/CCSS_UI_API_Automation/.settings/
+CCSS/UI/CCSS_UI_API_Automation/target/
+CCSS/UI/CCSS_UI_API_Automation/test-output/
+CCSS/UI/CCSS_UI_API_Automation/extent_report/
+CCSS/.DS_Store
+CCSS/UI/.DS_Store
+.DS_Store
+CCSS/UI/CCSS_UI_API_Automation/.classpath
+*.prefs
+APEX/UI/APEX_UI_API_Automation/target/classes/META-INF/maven/com.proterra.apex_automation/Proterra_APEX_UI_API_Automation/.project
+APEX/UI/APEX_UI_API_Automation/target/classes/META-INF/maven/com.proterra.apex_automation/Proterra_APEX_UI_API_Automation/.classpath
+JMETER/apache-jmeter-5.3/bin/jmeter.log
+

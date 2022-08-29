@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		949,
+		182,
+		213,
+		42
+	],
+	"lastmodifieddate": 1656327775.122,
+	"createddate": 1656327775.122,
+	"name": "VehicleChargerToggle",
+	"lastfounddate": 1656604720.7130001,
+	"ocrcapturestring": "Vehicle Charger",
+	"lastfoundlocation": [
+		949,
+		182,
+		213,
+		42
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[55,19]",
+					"Tolerance": "_52",
+					"Discrepancy": "_0",
+					"SearchType": "Smoothed for Text"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "VehicleChargerToggle.png",
+				"connectionname": "SUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					949,
+					182,
+					213,
+					42
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "Vehicle Charger"
+			}
+	]
+}

@@ -1,0 +1,38 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 04/Aug/22
+@TC_ID: TOUC_2401
+@TC_Description: CCSS-Alerts: Alerts are sorted by the most recent alert displayed at the bottom
+***)
+
+BeginTestCase TOUC_2401
+
+Log "###########   Started execution of Test Case--> TOUC_2401   ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Empty the Garage first
+"CCSS_Pages/PrerequsiteTestData/AlertsAndNotfications".RemoveBusFromAPI "CCSS_P2_TestData", "AlertsAndNotifications", "BusId", "RunID", "API_Bus_Details_busVins", "TOUC_2401"
+"CCSS_Pages/PrerequsiteTestData/AlertsAndNotfications".RemoveBusFromAPI "CCSS_P2_TestData", "AlertsAndNotifications", "BusId2","RunID2", "API_Bus_Details_busVins2", "TOUC_2401"
+--Adding bus as "Not Ready" on track
+--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "AlertsAndNotfications", "BusID") into BusId
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "AlertsAndNotifications", "BusID") into BusId
+"CCSS_Pages/PrerequsiteTestData/AlertsAndNotfications".ParkBusInTheTrack BusId
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "AlertsAndNotifications", "BusID2") into BusId
+"CCSS_Pages/PrerequsiteTestData/AlertsAndNotfications".ParkBusInTheTrack BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".DragBusAndDropToAnyPosition "RunAndTrackAssignmentPage/bus_8027.png", "RunAndTrackAssignmentPage/imgBlackTrack"
+
+--Verify that the Alerts are sorted in the descending order of the Date and Timestamp
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyDatesAreInAscOrder "AlertsArea"
+
+
+
+Log "#############  Finished execution of Test Case--> TOUC_2401 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_2401

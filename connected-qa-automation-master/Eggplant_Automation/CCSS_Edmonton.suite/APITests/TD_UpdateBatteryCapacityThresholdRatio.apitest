@@ -1,0 +1,39 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = "";
+	    showCheckedNumber = <*BY>;
+	    value = "";
+	}
+    );
+    authenticationType = None;
+    httpVerb = PUT;
+    oauth1Token = "";
+    password = "";
+    requestBody = "{
+    \"id\": \"PUT_CONFIGURATION-10fb2aeb-e9b1-4c75-a928-1ab6a055d2af\",
+    \"configurations\": [
+        {
+            \"id\": 19,
+            \"key\": \"energyThresholdRatio\",
+            \"value\": \"[[energyThresholdRatio]]\"
+        },
+        {
+            \"id\": 41,
+            \"key\": \"globalVehicleBatteryCapacity\",
+            \"value\": \"[[globalVehicleBatteryCapacity]]\"
+        }
+        
+    ]
+}";
+    requestBodyFormat = "JSON (application/json)";
+    requestHeaders = "<![CDATA[authorization:[[authToken]]
+content-type:application/json
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "[[BaseURI]]/tenants/[[tenantId]]/garages/[[garageId]]/configurations";
+    userName = "";
+}

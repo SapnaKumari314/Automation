@@ -1,0 +1,34 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = "";
+	    showCheckedNumber = <*BY>;
+	    value = "";
+	}
+    );
+    authenticationType = None;
+    httpVerb = POST;
+    oauth1Token = "";
+    password = "bgqRyYx~0Yb}";
+    requestBody = "{
+    \"batteryCapacity\": 528,
+    \"busUnitId\": \"7JZTH13J2LS000303\",
+    \"customerGarageId\": \"2\",
+    \"id\": \"RUNS-271cdf63-8da8-4824-9bb5-45112dbea239\",
+    \"soc\": null,
+    \"time\": 1648403284012,
+    \"maintenanceRequired\": false,
+    \"systemEnergy\": 433,
+    \"tenantId\": \"b9ed83eb-5a8d-489c-9639-076d408be8a4\",
+    \"busName\": \"8027\"
+}";
+    requestBodyFormat = "JSON (application/json)";
+    requestHeaders = "<![CDATA[authorization:[[authToken]]
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "[[BaseURI]]/tenants/[[tenantId]]/garages/[[garageId]]/runs/7JZTH13J2LS000303";
+    userName = "vnm66g+qa-launch2020_eadmin@gmail.com";
+}

@@ -1,0 +1,60 @@
+﻿(***
+@Author: Shalini Vijayakumar
+@Date: 11/July/2022
+@TC_ID: TOUC_10568
+@TC_Description: 
+***)
+
+BeginTestCase TOUC_10568
+Log "###########   Started execution of Test Case--> TOUC_10568  ##############"
+Log "#######################################################"
+--"1.Login as an superadmin in Apex Portal.
+Set DatasheetPath to Resourcepath("TestData\S3_TC15_TOUC-10568.xlsx")
+"LoginPage".OpenApplication
+
+"LoginPage".Login "ProterraAdmin"
+
+--2.Under Historical Data on Left menu choose Fault Dashboard
+"ApexPages/FaultDashboardSearchCriteria".NavigateTo "HISTORICAL DATA","FAULT DASHBOARD"
+--3.Select the vehicle in toggle and select the options as below
+--customer dropdown = Single
+--Vehicle name = Single 
+--Fault status = Inactive and select the from & to date 
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "DataFieldHeaders") into DataFieldHeaders
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "CustomerName") into CustomerName
+"ApexPages/FaultDashboardSearchCriteria".SelectCustomer CustomerName
+"ApexPages/FaultDashboardSearchCriteria".AssetTypeSelection "Vehicle"
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "AssetName") into AssetID
+"ApexPages/FaultDashboardSearchCriteria".SelectAssetID "Vehicle",AssetID
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FaultStatus") into FaultStatus
+"ApexPages/FaultDashboardSearchCriteria".SelectFaultStatus FaultStatus
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDateTime") into FromDate
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDateTime") into ToDate
+"ApexPages/FaultDashboardSearchCriteria".SelectDateRange FromDate,ToDate
+
+
+get "ApexPages/FaultDashboardSearchCriteria".ClickGetDataBtn
+--4Click on Group by fault and verify the Data
+---the first column in the vehicle fault dashboard gets freeze and should be consistent when user slides to right
+"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Group by Fault"
+
+"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "Source Address"
+"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "Customer name"
+"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "Model"
+---the first column in the vehicle fault dashboard gets freeze and should be consistent when user slides to right
+"ApexPages/FaultDashboardVehicle".Verify_VehicleName_Freeze_Column_OnRightScrolling "Model"
+--5.Click on Customize and select below fileds,apply
+--Source Address
+--Customer Name
+--Vehicle
+--.Customized fields should be shown as per selected options
+put "Utilities/ExcelOperations".readTestDataFrom (DatasheetPath, "TestData", "DataFieldHeaders") into DataFieldHeaders
+"ApexPages/FaultDashboardVehicle".ValidateDatafieldColumnNames_Vehicle DataFieldHeaders
+
+"LoginPage".Logout
+
+Log "#############  Finished execution of Test Case--> TOUC_10568 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_10568
+

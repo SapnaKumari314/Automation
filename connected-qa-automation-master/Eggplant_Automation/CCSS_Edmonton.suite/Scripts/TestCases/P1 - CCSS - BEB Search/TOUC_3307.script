@@ -1,0 +1,34 @@
+﻿(***
+@Author: Mohammed Gouse
+@Date: 21/March/22
+@TC_ID: TOUC_3307
+@TC_Description: CCSS-RRT-BEB Search: Search Maintenance bus from Garage
+***)
+
+BeginTestCase TOUC_3307
+
+Log "###########   Started execution of Test Case--> TOUC_3307   ##############"
+Log "#######################################################"
+
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+-----Find a Bus is dislayed in Garage 
+"CCSS_Pages/PrerequsiteTestData/BEBSearch".RemoveBusFromAPI "CCSS_P1_TestData", "P1_BEBSarch", "BusId", "RunID", "API_Bus_Details_busVins", "TOUC_3307"
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "P1_BEBSarch", "BusID") into BusId
+"CCSS_Pages/PrerequsiteTestData/BEBSearch".ParkBusInTheTrack BusId
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "P1_BEBSarch", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetails BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedTrackDetailsAreBlank 
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedRunDetailsAreBlank
+
+Log "#############  Finished execution of Test Case--> TOUC_3307 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3307

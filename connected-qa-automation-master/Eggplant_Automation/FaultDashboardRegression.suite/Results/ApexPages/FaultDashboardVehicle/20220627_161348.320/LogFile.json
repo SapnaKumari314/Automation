@@ -1,0 +1,60 @@
+{
+	"entries": [
+		{
+				"message": "Running ApexPages/FaultDashboard.script",
+				"identifier": "START",
+				"timestamp": "2022-06-27 16:13:48.323 +0530"
+			},
+		{
+				"handlerName": "on_apexpages_faultdashboard",
+				"timestamp": "2022-06-27 16:13:48.443 +0530",
+				"message": "SEARCHRECTANGLE = [[240,135],[960,540]]",
+				"scriptName": "ApexPages/FaultDashboard.script",
+				"handlerLine": 2,
+				"identifier": "set"
+			},
+		{
+				"handlerName": "on_apexpages_faultdashboard",
+				"timestamp": "2022-06-27 16:13:48.538 +0530",
+				"message": "SEARCHRECTANGLE = [[864,113.4],[1728,324]]",
+				"scriptName": "ApexPages/FaultDashboard.script",
+				"handlerLine": 3,
+				"identifier": "set"
+			},
+		{
+				"handlerName": "on_apexpages_faultdashboard",
+				"timestamp": "2022-06-27 16:13:48.650 +0530",
+				"message": "SEARCHRECTANGLE = [[230.4,378],[1920,1026]]",
+				"scriptName": "ApexPages/FaultDashboard.script",
+				"handlerLine": 4,
+				"identifier": "set"
+			},
+		{
+				"handlerName": "on_apexpages_faultdashboard",
+				"timestamp": "2022-06-27 16:13:48.747 +0530",
+				"message": "SEARCHRECTANGLE = [[1728,216],[1920,378]]",
+				"scriptName": "ApexPages/FaultDashboard.script",
+				"handlerLine": 5,
+				"identifier": "set"
+			},
+		{
+				"handlerName": "on_apexpages_faultdashboard",
+				"timestamp": "2022-06-27 16:13:48.843 +0530",
+				"message": "SEARCHRECTANGLE = [[1440,0],[1920,135]]",
+				"scriptName": "ApexPages/FaultDashboard.script",
+				"handlerLine": 6,
+				"identifier": "set"
+			},
+		{
+				"message": "(Duration:\"0.648\", Errors:\"0\", Exceptions:\"0\", StartTime:\"2022-06-27 16:13:48 +0530\", Successes:\"1\", TestCase:\"ApexPages/FaultDashboard.script\", Warnings:\"0\")",
+				"identifier": "EndTestCase",
+				"timestamp": "2022-06-27 16:13:48.971 +0530"
+			},
+		{
+				"message": "Execution Time 0:00:00 ApexPages/FaultDashboard.script",
+				"identifier": "SUCCESS",
+				"timestamp": "2022-06-27 16:13:49.009 +0530"
+			}
+	],
+	"createdTimestamp": "2022-06-27 16:13:48.323 +0530"
+}

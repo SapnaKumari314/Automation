@@ -1,0 +1,267 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 09/Apr/22
+@Description: This script is the POM scripts for Charger Control page.
+***)
+
+-----------------------------------------Charger Control Page
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		LogoffArea:[[.75,0],[1,.125]],
+		ElectricBusFaultsArea:[[0.59,0.125],[0.80,.375]],
+		TracksArea:[[0.33,.35],[1,1]],
+		ToastMessageArea:[[0.25,.06],[1,.25]],
+		ConfirmationPopupArea:[[0,.470],[.95,.65]],
+		LogicalChargeQueueArea:[[0,0.125],[0.6,.375]],
+	}
+	
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+End ScreenPart
+-----------------------------------------------------
+
+to handle getTotalNumberOfFaultsInBus
+	--Get Current Energy
+	set the SearchRectangle to ScreenPart("TracksArea")
+	put ImageRectangle(text:"Bus ID", waitFor:20) into ImageRectangleOfFieldName
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100,20],ImageRectangleOfFieldName.BottomRight+[0,200]) as list into busesId 
+	log busesId
+	--put split(busesId, newline) into sbusesId
+	put 0 into faultsInBusCounter
+	Repeat with each item  of busesId
+		log it
+		put it into b
+		delete "[" in b
+		delete "]" in b
+		delete "@" in b
+		log b
+		put split(b, newline) into c
+		Repeat with each item  of c
+			log it
+			add 1 to faultsInBusCounter
+			
+		End repeat
+	End repeat
+	log "Number of faults in the bus are--> "&&faultsInBusCounter
+	return faultsInBusCounter
+	set the SearchRectangle to empty
+end getTotalNumberOfFaultsInBus
+
+
+to handle verifyNumberOfFaultsAreEqualToHDDTCCount outputFileName
+	put getTotalNumberOfFaultsInBus() into faultsCount
+	put "Utilities\exceloperations".ReadFromFile  (outputFileName, "hddtc") into hddtc
+	
+	if faultsCount=hddtc
+		LogSuccess "Number of Electric Buses Faults "&&faultsCount&&" on the 'Charger Control Screen' are equal to HDDTC count--> "&&hddtc
+	else
+		LogError "Number of Electric Buses Faults "&&faultsCount&&" on the 'Charger Control Screen' are not equal to HDDTC count--> "&&hddtc
+	end if
+	
+end verifyNumberOfFaultsAreEqualToHDDTCCount
+
+to handle RightClickOnIconAndSelectOption busPriority, txtOptionInMenu, msgCharging, confirmationMsg
+
+	Log "****Right click on bus icon in track"
+	if busPriority="high"
+		put FindHighestPriorityBus() into busId
+		put false into flagConfirmPopup
+		put "text" into imgOrOCR
+	end if
+	if busPriority="low"
+		put FindLowestPriorityBus() into busId
+		put true into flagConfirmPopup
+		put "text" into imgOrOCR
+	end if
+	if busPriority="activecharger"
+		put "RunAndTrackAssignmentPage\imgActiveChargerWoBus" into busId
+		put true into flagConfirmPopup
+		put "image" into imgOrOCR
+	end if
+	if busPriority="busatcharger"
+		put "RunAndTrackAssignmentPage\imgChargerNotAvailable" into busId
+		put false into flagConfirmPopup
+		put "image" into imgOrOCR
+	end if
+	set the SearchRectangle to ScreenPart("TracksArea")
+	if "Utilities/commonactions".RightClickMouse(busId,0,-10, txtOptionInMenu, imgOrOCR)
+		set the SearchRectangle to empty
+		set the SearchRectangle to ScreenPart("ConfirmationPopupArea")
+		LogSuccess "Mouse right clicked successfully and selected the options"&&txtOptionInMenu
+		if flagConfirmPopup=true
+			if ImageFound(text:confirmationMsg, waitFor:5)
+				"Utilities/commonactions".ClickBtnByText "Yes"
+			end if
+		end if
+		
+		set the SearchRectangle to empty
+		
+		set the SearchRectangle to ScreenPart("ToastMessageArea")
+		
+		if ImageFound(text:msgCharging)
+			LogSuccess "Message is appearing"&&msgCharging
+		else
+			LogError "Message is not appearing"&&msgCharging
+		End If
+		--if ImageFound(text:"Successfully performed the action on the charger", waitFor:5)
+		--LogSuccess "Message is appearing correctly after click on "&&txtOptionInMenu&&"option in charger icon"&&imgChargerIcon
+		--else
+		--LogError "Message is not appearing correctly after click on "&&txtOptionInMenu&&"option in charger icon"&&imgChargerIcon
+		--end if
+	else
+		LogError  "Mouse right clicked was not successful and selected the options"&&txtOptionInMenu
+	end if
+	set the SearchRectangle to empty
+end RightClickOnIconAndSelectOption
+
+to handle FindHighestPriorityBus 
+	put FindAllBusesAndChargingPriorityFromAPI() into busespriority
+	log busespriority
+	
+	--put [12,4,22,8,23,1,26,0,21,5] into busespriority
+	
+	put 2 into priorityVal
+	put 2 into priorityVal2
+	put 1 into busNo
+	put item priorityVal of busespriority into lowestPriority
+	put item busNo of busespriority into correspondingBusNo
+	
+	repeat with each item of busespriority		
+		put item (priorityVal+2) of busespriority into lowestPriority2
+		if lowestPriority2 is ""
+			exit repeat
+		end if
+		if lowestPriority > lowestPriority2
+			put lowestPriority2 into lowestPriority
+			put item (busNo+2) of busespriority into correspondingBusNo
+		end if
+		add 2 to priorityVal
+		add 2 to busNo		
+	end repeat
+	
+	Log "Highest priority bus"&&correspondingBusNo&&" & its Highest priority is "&&lowestPriority
+	return correspondingBusNo
+	
+end FindHighestPriorityBus
+
+to handle FindLowestPriorityBus 
+	put FindAllBusesAndChargingPriorityFromAPI() into busespriority
+	log busespriority
+	
+	--put [12,4,22,8,23,1,26,0,21,5] into busespriority
+	
+	put 2 into priorityVal
+	put 2 into priorityVal2
+	put 1 into busNo
+	put item priorityVal of busespriority into lowestPriority
+	put item busNo of busespriority into correspondingBusNo
+	put "<" into opr
+	repeat with each item of busespriority		
+		put item (priorityVal+2) of busespriority into lowestPriority2
+		if lowestPriority2 is ""
+			exit repeat
+		end if
+		if lowestPriority < lowestPriority2
+			put lowestPriority2 into lowestPriority
+			put item (busNo+2) of busespriority into correspondingBusNo
+		end if
+		add 2 to priorityVal
+		add 2 to busNo		
+	end repeat
+	
+	Log "Lowest priority bus"&&correspondingBusNo&&" & its Lowest priority is "&&lowestPriority
+	return correspondingBusNo
+	
+end FindLowestPriorityBus
+
+to handle FindAllBusesAndChargingPriorityFromAPI	
+	Log "****Setting Limit of Charger Limit using API"
+	--put "Utilities/GetAuthorizationToken".getAutherizationTokenForAPI into authToken
+	put "Utilities\exceloperations".ReadFromFile  ("authtoken", "token") into authToken
+	put QA_FindBusChargingPriority() into findBusPriority
+	put findBusPriority.responsebody into respbody1
+	put jsonvalue (respbody1) into responsebody2 
+	--log 	responsebody2
+	put responsebody2 into lstRespo
+	put "" into priority
+	put "" into buses
+	--put ["busId_"&&"",""] into busespriority
+	repeat each item of lstRespo
+		
+		put it into a
+		log a.busName
+		log a.positionInChargeQueue
+		insert a.busName after  buses
+		insert a.positionInChargeQueue after  priority
+		insert [a.busName , a.positionInChargeQueue] after  busespriority
+	end repeat
+	put {busID: buses, chargingPriority: priority} into lstBusPriority
+	log lstBusPriority
+	log busespriority
+	
+	return busespriority
+end FindAllBusesAndChargingPriorityFromAPI
+
+to handle NavigateToElement elementName, screenPartName 
+	set the SearchRectangle to ScreenPart(screenPartName)
+	if "Utilities/CommonActions".ClickBtnByText( elementName)
+		LogSuccess "Clicked on "&&elementName&&" successfully!!"
+	else
+		LogError "Unable to click on "&&elementName&&" successfully!!"
+	end if
+	set the SearchRectangle to empty
+end NavigateToElement 
+
+to handle VerifyMenuIsDisabled screenPartName 
+	set the SearchRectangle to ScreenPart(screenPartName)
+	--Verify "Override" button is disabled
+	"Utilities/CommonActions".MoveToElement "GarageOverview\imgEllipseMenu"
+	
+	if "Utilities/CommonActions".IsTextNotPresentOnScreen ("Export to PDF")
+		LogSuccess "Menu is disabled on Logical Charge Queue section"
+	else
+		LogError "Menu is not disabled on Logical Charge Queue section"
+	end if
+	
+	set the SearchRectangle to empty
+	
+end VerifyMenuIsDisabled
+
+to handle SelectMenuOptionFrom screenPartName, optionToSelect
+	set the SearchRectangle to ScreenPart(screenPartName)
+	--Verify "Override" button is disabled
+	"Utilities/CommonActions".ClickBtnByImage "GarageOverview\imgEllipseMenu"
+	
+	if "Utilities/CommonActions".ClickElementByCoordinates (optionToSelect,0,0)
+		LogSuccess  optionToSelect&&" Menu item clicked Successfully"
+	else
+		LogError  optionToSelect&&" Menu item not clicked Successfully"
+	end if
+	
+	set the SearchRectangle to empty
+	
+end SelectMenuOptionFrom
+
+to handle VerifyImageIsPresent imgOfControl, screenPart, msg
+	set the SearchRectangle to ScreenPart(screenPart)
+	if screenPart="TracksArea"
+		"Utilities/CommonActions".pagedown
+	end if
+	
+	if "Utilities/CommonActions".IsImagePresentOnScreen(imgOfControl)
+		LogSuccess imgOfControl && "is appearing "&&msg&&" on the screen"
+		else
+		LogError imgOfControl && "is not appearing "&&msg&&" on the screen"
+	end if
+	if screenPart="TracksArea"
+		"Utilities/CommonActions".pageUp
+	end if
+	set the SearchRectangle to empty	
+end VerifyImageIsPresent

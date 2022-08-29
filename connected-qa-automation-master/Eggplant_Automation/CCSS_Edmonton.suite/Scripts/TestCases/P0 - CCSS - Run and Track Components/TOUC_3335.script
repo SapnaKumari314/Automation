@@ -1,0 +1,45 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 07/Apr/22
+@TC_ID: TOUC_3335
+@TC_Description: CCSS-RRT-Track Details: Recommended Track Details for Maintenance Bus
+***)
+
+BeginTestCase TOUC_3335
+
+Log "###########   Started execution of Test Case--> TOUC_3335   ##############"
+Log "#######################################################"
+
+--Navigate to the CCSS Application
+"CCSS_Pages/BasePage".OpenApplication
+
+--Login
+"CCSS_Pages/BasePage".Login
+
+--Remove bus from Garage
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P0_TestData", "RunAndTrackComponents", "BusID", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+
+--Enter a Bus ID in the BEB search box for a Bus which is not in the garage
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "BusIDNotInGarage") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+--Select the Needs Maintenance Checkbox and Click the Recommended Run and Track button from the Bus Details
+"CCSS_Pages/RunAndAssignmentTrackPage".CheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedRunDetails 
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3335 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3335
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,84 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 25/March/22
+@TC_ID: TOUC_3848
+@TC_Description: CCSS-Config-Garage: Bus in Charger position when Energy Threshold Ratio is updated
+***)
+
+(***
+@Preconditions for this test case:
+1. Threshold values should be between 0 to 1 
+2. In Energy management system (ECMS) Active Charging Sessions /Limit should be more than 1
+3. Available battery capacity = 528
+***)
+
+BeginTestCase TOUC_3848
+
+Log "###########   Started execution of Test Case--> TOUC_3848  ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login "COEAdmin"
+
+--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "ConfigScreen", "GarageNameToSwitch") into varGarageNameToSwitch
+--"CCSS_Pages/CCSSConfiguration".SwitchTheGarage varGarageNameToSwitch
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "CCSS Configuration", "CCSS Configuration", 1
+"CCSS_Pages/CCSSConfiguration".ClickOnGarageTab
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "ConfigScreen", "ThresholdRatio") into thresholdRatio
+"CCSS_Pages/CCSSConfiguration".UpdateField "Energy Threshold Ratio", thresholdRatio
+"CCSS_Pages/CCSSConfiguration".ClickCancelButton
+--Verify the field value is reset to 0.1
+"CCSS_Pages/CCSSConfiguration".VerifyFieldValueIsReset "Energy Threshold Ratio", "0.1"
+
+"CCSS_Pages/CCSSConfiguration".UpdateField "Energy Threshold Ratio", thresholdRatio
+
+"CCSS_Pages/CCSSConfiguration".ClickApplyButton
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Run & Track Assignment", "Run & Track Assignment", 1
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "ConfigScreen", "BusID") into BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+
+-----Create handle to select run Th E> Cur E> Req E
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "ConfigScreen", "ThresholdRatio") into thresholdRatio
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectARunWhereThrEnrgyIsGreaterThnCurrentEnrgyGreaterThnReqEnnrgy  thresholdRatio
+--"CCSS_Pages/RunAndAssignmentTrackPage".ClickConfirmButton
+
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick  "RunAndTrackAssignmentPage\imgBlackTrack"
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "ConfigScreen", "ReadyBusImgName") into ReadyBusImgName
+"CCSS_Pages/RunAndAssignmentTrackPage".findBusInTracksByImage ReadyBusImgName
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "ConfigScreen", "AlertMsg") into AlertMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyAlertMessage AlertMsg
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "CCSS Configuration", "CCSS Configuration", 1
+"CCSS_Pages/CCSSConfiguration".ClickOnGarageTab
+"CCSS_Pages/CCSSConfiguration".UpdateField "Energy Threshold Ratio", "0.1"
+"CCSS_Pages/CCSSConfiguration".ClickApplyButton
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Run & Track Assignment", "Run & Track Assignment", 1
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "ConfigScreen", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "ConfigScreen", "ToppedUpBusImgName") into ToppedUpBusImgName
+"CCSS_Pages/RunAndAssignmentTrackPage".findBusInTracksByImage ToppedUpBusImgName
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "ConfigScreen", "AlertMsg") into AlertMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyAlertMessageNotPresent AlertMsg
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3848 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3848
+
+
+

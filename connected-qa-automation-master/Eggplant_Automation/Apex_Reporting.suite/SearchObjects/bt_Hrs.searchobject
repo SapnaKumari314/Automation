@@ -1,0 +1,46 @@
+{
+	"lastmodifieddate": 1659535513.576,
+	"lastfoundlocation": [
+		1374,
+		335,
+		20,
+		18
+	],
+	"originalcapturelocation": [
+		1374,
+		335,
+		20,
+		18
+	],
+	"createddate": 1659535513.576,
+	"lastfounddate": 1659536090.925,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[-85,138]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "bt_Hrs.png",
+				"connectionname": "PROSUT",
+				"type": 1,
+				"capturerect": [
+					1374,
+					335,
+					20,
+					18
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com"
+			}
+	],
+	"name": "bt_Hrs"
+}

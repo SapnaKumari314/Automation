@@ -1,0 +1,30 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 04/Apr/22
+@TC_ID: TOUC_3312
+@TC_Description: CCSS-RRT-Bus Details: Current Energy before Bus Assignment
+***)
+
+BeginTestCase TOUC_3312
+
+Log "###########   Started execution of Test Case--> TOUC_3312   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+--Remove bus from Garage
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P0_TestData", "RunAndTrackComponents", "BusID", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "BusID") into BusId
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "API_Bus_Details_id") into API_Bus_Details_id
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "API_Bus_Details_busVins") into API_Bus_Details_busVins
+
+--API Call
+
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetails BusId, API_Bus_Details_id, API_Bus_Details_busVins
+
+Log "#############  Finished execution of Test Case--> TOUC_3312 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3312

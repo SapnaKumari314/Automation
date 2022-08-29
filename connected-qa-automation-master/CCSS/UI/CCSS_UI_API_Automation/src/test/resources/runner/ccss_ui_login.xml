@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Suite">
+	<listeners>
+		<listener
+			class-name="main.java.com.proterra.ExtentListeners.ExtentListeners">
+		</listener>
+	</listeners>
+
+	<test name="Login Test" preserve-order="true">
+
+		<classes>
+
+			<!-- Do not remove the test below -->
+			<class
+				name="test.java.com.proterra.testcases.ccss.Login.NavigateToCCSS" />
+			<!-- Do not remove the test above -->
+
+
+			<class
+				name="test.java.com.proterra.testcases.ccss.Login.TOUC3292" />
+			<class
+				name="test.java.com.proterra.testcases.ccss.Login.TOUC3296" />
+			<class
+				name="test.java.com.proterra.testcases.ccss.Login.TOUC3297" />
+			<class
+				name="test.java.com.proterra.testcases.ccss.Login.TOUC3293" />
+			<class
+				name="test.java.com.proterra.testcases.ccss.Login.TOUC3294" />
+			<class
+				name="test.java.com.proterra.testcases.ccss.Login.TOUC3298" />
+
+
+			<!-- Do not remove the test below -->
+			<class
+				name="test.java.com.proterra.testcases.ccss.Login.LogoutFromCCSS" />
+			<!-- Do not remove the test above -->
+
+		</classes>
+	</test>
+</suite>
+
+
+<!-- To run using cmd -->
+<!-- clean install test -Denv.Name=qa -Dbrowser.headless=true -Dtestng.dtd.http=true 
+	-Dbrowser.type=chrome -DsuiteXmlFile=testng_ccss_ets_maven.xml -->

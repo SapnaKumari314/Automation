@@ -1,0 +1,38 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = "";
+	    showCheckedNumber = <*BY>;
+	    value = "";
+	}
+    );
+    authenticationType = None;
+    httpVerb = POST;
+    oauth1Token = "";
+    password = "";
+    requestBody = "{
+    \"customerGarageId\": \"[[customerGarageId]]\",
+    \"id\": \"[[RunID]]\",
+    \"run\": {
+        \"trackPosition\": null,
+        \"positionInTrack\": null,
+        \"busVIN\": \"[[API_Bus_Details_busVins]]\",
+        \"busName\":\"[[BusID]]\",
+        \"isMaintenanceRequired\": true,
+        \"overrideRunComment\": null,
+        \"overrideRun\": false,
+        \"overrideTrack\": false,
+        \"busUnitId\": \"[[BusID]]\"
+    },
+    \"tenantId\": \"[[tenantId]]\"
+}";
+    requestBodyFormat = "JSON (application/json)";
+    requestHeaders = "<![CDATA[Authorization:[[authToken]]
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "[[BaseURI]]/tenants/[[tenantId]]/garages/[[garageId]]/assignRun/[[API_Bus_Details_busVins]]";
+    userName = "";
+}

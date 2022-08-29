@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		1291,
+		268,
+		21,
+		42
+	],
+	"lastmodifieddate": 1656352303.684,
+	"createddate": 1656352303.684,
+	"name": "SelectedCheckBox",
+	"lastfounddate": 1657537251.6469998,
+	"ocrcapturestring": "0",
+	"lastfoundlocation": [
+		267,
+		268,
+		21,
+		42
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[10,21]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "SelectedCheckBox.png",
+				"connectionname": "SUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					1291,
+					268,
+					21,
+					42
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "0"
+			}
+	]
+}

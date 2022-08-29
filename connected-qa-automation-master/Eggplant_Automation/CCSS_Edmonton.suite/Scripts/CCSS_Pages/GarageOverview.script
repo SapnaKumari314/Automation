@@ -1,0 +1,596 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 09/Apr/22
+@Description: This script is the POM scripts for Garage Overview page.
+***)
+
+----------------------------------------Garage Overview Page
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		LogoffArea:[[.75,0],[1,.125]],
+		ElectricBusFaultsArea:[[0.59,0.125],[0.80,.375]],
+		LogicalChargeQueueArea:[[0,0.125],[0.6,.375]],
+		BEBBookoutStatusArea:[[0.0,0.88],[0.35,.95]],
+		BEBBookoutStatusArea1:[[0.1,0.88],[0.35,.95]],
+		BusCountArea:[[0.35,.88],[0.65,.95]],
+		ChargingStationsArea:[[0.65,.88],[1.0,.95]],
+	}
+	
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+End ScreenPart
+-----------------------------------------------------
+set the SearchRectangle to ScreenPart("BusCountArea")
+
+to handle getTotalNumberOfFaultsInBus
+	--Get Current Energy
+	set the SearchRectangle to ScreenPart("ElectricBusFaultsArea")
+	put ImageRectangle(text:"Bus ID", waitFor:20) into ImageRectangleOfFieldName
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100,20],ImageRectangleOfFieldName.BottomRight+[0,200]) as list into busesId 
+	log busesId
+	--put split(busesId, newline) into sbusesId
+	put 0 into faultsInBusCounter
+	Repeat with each item  of busesId
+		log it
+		put it into b
+		delete "[" in b
+		delete "]" in b
+		delete "@" in b
+		log b
+		put split(b, newline) into c
+		Repeat with each item  of c
+			log it
+			add 1 to faultsInBusCounter
+			
+		End repeat
+	End repeat
+	log "Number of faults in the bus are--> "&&faultsInBusCounter
+	return faultsInBusCounter
+	set the SearchRectangle to empty
+end getTotalNumberOfFaultsInBus
+
+
+to handle verifyNumberOfFaultsAreEqualToHDDTCCount outputFileName
+	put getTotalNumberOfFaultsInBus() into faultsCount
+	put "Utilities\exceloperations".ReadFromFile  (outputFileName, "hddtc") into hddtc
+	
+	if faultsCount=hddtc
+		LogSuccess "Number of Electric Buses Faults "&&faultsCount&&" on the 'Charger Control Screen' are equal to HDDTC count--> "&&hddtc
+	else
+		LogError "Number of Electric Buses Faults "&&faultsCount&&" on the 'Charger Control Screen' are not equal to HDDTC count--> "&&hddtc
+	end if
+	
+end verifyNumberOfFaultsAreEqualToHDDTCCount
+
+to handle NavigateToElement elementName, screenPartName 
+	set the SearchRectangle to ScreenPart(screenPartName)
+	if "Utilities/CommonActions".ClickBtnByText( elementName)
+		LogSuccess "Clicked on "&&elementName&&" successfully!!"
+	else
+		LogError "Unable to click on "&&elementName&&" successfully!!"
+	end if
+	set the SearchRectangle to empty
+end NavigateToElement 
+
+to handle VerifyMenuIsDisabled screenPartName 
+	set the SearchRectangle to ScreenPart(screenPartName)
+	--Verify "Override" button is disabled
+	"Utilities/CommonActions".MoveToElement "GarageOverview\imgEllipseMenu"
+	
+	if "Utilities/CommonActions".IsTextNotPresentOnScreen ("Export to PDF")
+		LogSuccess "Menu is disabled on Logical Charge Queue section"
+	else
+		LogError "Menu is not disabled on Logical Charge Queue section"
+	end if
+	
+	set the SearchRectangle to empty
+	
+end VerifyMenuIsDisabled
+
+to handle SelectMenuOptionFrom screenPartName, optionToSelect
+	set the SearchRectangle to ScreenPart(screenPartName)
+	--Verify "Override" button is disabled
+	"Utilities/CommonActions".ClickBtnByImage "GarageOverview\imgEllipseMenu"
+	
+	if "Utilities/CommonActions".ClickElementByCoordinates (optionToSelect,0,0)
+		LogSuccess  optionToSelect&&" Menu item clicked Successfully"
+	else
+		LogError  optionToSelect&&" Menu item not clicked Successfully"
+	end if
+	
+	set the SearchRectangle to empty
+	
+end SelectMenuOptionFrom
+
+to handle CreateBusWithAnStatusAndAssignOnTrack busStatus, BusId, imgChargerOrNoncharger, xlFileName, xlSheetName, BusIdCol, customerGarageId, RunID, API_Bus_Details_busVins, tenantId
+	
+	--Select any Bus from the IQ or search for a Bus which is not in the garage
+	--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "BusID") into BusId
+	"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusIsNotInTracksFromAPI BusId, xlFileName, xlSheetName, BusIdCol, customerGarageId, RunID, API_Bus_Details_busVins, tenantId
+	
+	--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "BusID") into BusId
+	typetext pageUp
+	"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+	
+	--Ensure that the Needs Maintenance Checkbox is not selected and click the Recommended Run & Track button
+	"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+	
+	if busStatus="not ready"
+		--Select a Run such that the 
+		--Current Energy < Required Energy
+		--using the Run override if the default run does not match the requirement
+		"CCSS_Pages/RunAndAssignmentTrackPage".SelectARunWhereCurrentEnrgyLessThnReqEnnrgy
+	else if busStatus="ready"
+		--Select a Run such that the 
+		--Threshold Energy > Current Energy  > Required Energy
+		--using the Run override if the default run does not match the requirement
+		put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlFileName&".xlsx", xlSheetName, "ThresholdRatio") into threshouldRatio
+		"CCSS_Pages/RunAndAssignmentTrackPage".SelectARunWhereThrEnrgyIsGreaterThnCurrentEnrgyGreaterThnReqEnnrgy threshouldRatio
+	else if  busStatus="topped up"
+		--Select a Run such that the 
+		--Current Energy  > Threshold Energy 
+		--& Current Energy  > Required Energy
+		--using the Run override if the default run does not match the requirement
+		put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlFileName&".xlsx", xlSheetName, "ThresholdRatio") into threshouldRatio
+		"CCSS_Pages/RunAndAssignmentTrackPage".SelectARunWhereCurrentEnrgyGreaterThnReqEnnrgyAndThrEnrgy threshouldRatio
+	end if 
+	
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+	
+	--Select a Non Charger Track Position using Track Override if the default track does not match the requirement
+	"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick imgChargerOrNoncharger
+	--Click the Assign Run & Track button
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "no"
+	--Verify Toast msg
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlFileName&".xlsx", xlSheetName, "ToastMsg") into ToastMsg
+	"CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage ToastMsg
+	
+end CreateBusWithAnStatusAndAssignOnTrack
+
+to handle FindBus busId, busIdUpdated
+	put false into flag
+	repeat with each item of busIdUpdated
+		put it into var
+		delete "[" in var
+		delete "]" in var
+		delete quote in var
+		delete "@" in var
+		log var
+		if busId= var
+			put true into flag
+			exit repeat
+		end if
+	end repeat
+	return flag
+end FindBus
+
+to handle VerifyPriorityOfBusIs txtPriority, busId
+
+	--Select a run
+	set the SearchRectangle to ScreenPart("LogicalChargeQueueArea")
+	--put 8027 into busId
+	put ImageRectangle(text:"Bus ID", waitFor:20) into ImageRectangleOfFieldName
+	
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-50,20],ImageRectangleOfFieldName.BottomRight+[0,200]) as list into busIdUpdated 
+
+	log busIdUpdated 
+	
+	put split(busIdUpdated, "\n") into busIdUpdated
+	
+	--Find bus from the list of buses
+	if FindBus (busId, busIdUpdated)
+		Log "Bus is found in the LCQ list---> "&&busId
+	else
+		LogError "Bus is not found in the LCQ list---> "&&busId
+	end if
+	
+	put ImageRectangle(text:busId, waitFor:20) into ImageRectangleOfBusId
+	put ImageRectangle(text:"Priority", waitFor:20) into ImageRectangleOfPriority
+	
+	put ImageRectangleOfPriority.topleft.x into x1
+	put ImageRectangleOfPriority.topright.x into x2
+	put ImageRectangleOfBusId.topleft.y into y1
+	put (x1+x2)/2 rounded to 0 places into x
+	put ReadText (x, y1) into actualPriority
+	
+	if txtPriority="highest"
+		if actualPriority="0" or actualPriority="o"
+			LogSuccess "The bus in LCQ -->"&&busId&&"is having highest priority, actual priority is-->" &&actualPriority
+		else			
+			LogError "The bus in LCQ -->"&&busId&&"is not having highest priority, actual priority is-->" &&actualPriority
+		end if
+	end if
+	
+	if txtPriority="lowest"
+		if actualPriority="1" or actualPriority="1"
+			LogSuccess "The bus in LCQ -->"&&busId&&"is having lowest priority, actual priority is-->" &&actualPriority
+		else			
+			LogError "The bus in LCQ -->"&&busId&&"is not having lowest priority, actual priority is-->" &&actualPriority
+		end if
+	end if
+	
+	set the SearchRectangle to empty
+	return flag
+	
+end VerifyPriorityOfBusIs
+
+to handle VerifyPriorityOfBusAccordingToTimeStamp txtPriority, busId
+
+	--Select a run
+	set the SearchRectangle to ScreenPart("LogicalChargeQueueArea")
+	--put 8027 into busId
+	put ImageRectangle(text:"Book Out Time", waitFor:20) into ImageRectangleOfFieldName
+	
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100,20],ImageRectangleOfFieldName.BottomRight+[0,200]) as list into bookOutTimeUpdated 
+
+	log bookOutTimeUpdated 
+	
+	put split(bookOutTimeUpdated, "\n") into bookOutTimeUpdated
+	
+	--Fetching the book out time
+	repeat with each item of bookOutTimeUpdated
+		put it into var
+		delete "[" in var
+		delete "]" in var
+		delete quote in var
+		delete "@" in var
+		log var
+		put var into bookoutTimeForABus
+		
+		insert ConvertTimeToText( bookoutTimeForABus) after bookouttimeLst
+		log bookouttimeLst
+		
+		put ImageRectangle(text:var, waitFor:20) into ImageRectangleOfBookOutTime
+		put ImageRectangle(text:"Priority", waitFor:20) into ImageRectangleOfPriority
+		
+		put ImageRectangleOfPriority.topleft.x into x1
+		put ImageRectangleOfPriority.topright.x into x2
+		put ImageRectangleOfBookOutTime.topleft.y into y1
+		put (x1+x2)/2 rounded to 0 places into x
+		put ReadText (x, y1) into actualPriority
+		
+		insert actualPriority after priorityLst
+		log priorityLst
+		
+	end repeat
+	
+	repeat with each item of bookouttimeLst
+		put  item 1 of bookouttimeLst into f
+		put  item 2 of bookouttimeLst into s
+		if s=""
+			exit repeat
+		end if
+		if f < s
+			LogSuccess  "Book out time is appearing according to sorted order, first time--> "&&f&&", second time--> "&&s
+			put  item 1 of  priorityLst into fp
+			put  item 2 of  priorityLst into sp
+			
+			if fp="o"
+				put 0 into fp
+			end if
+			
+			if fp<sp
+				LogSuccess "Priority"&&fp&&" of bus are ordered according to the book out time"&&f
+			else
+				LogError "Priority"&&fp&&" of bus are not ordered according to the book out time"&&f
+			end if 
+		end if
+		delete item 1 of bookouttimeLst
+		delete item 1 of priorityLst
+	end repeat
+	
+	set the SearchRectangle to empty
+	return flag
+	
+end VerifyPriorityOfBusAccordingToTimeStamp
+
+to handle ConvertTimeToText timeInFormate
+	put split(timeInFormate, ":") into lst
+	log lst
+	put first item of lst into hrs
+	put second item of lst into mins
+	put hrs&mins into combinedTime
+	log combinedTime
+	return combinedTime
+end convertTimeToText
+
+
+to handle VerifyPriorityOfBusAccordingToRequiredEnergyIfBookoutTimeIsSame txtPriority, busId
+
+	--Select a run
+	set the SearchRectangle to ScreenPart("LogicalChargeQueueArea")
+	--put 8027 into busId
+	put ImageRectangle(text:"Book Out Time", waitFor:20) into ImageRectangleOfFieldName
+	
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100,20],ImageRectangleOfFieldName.BottomRight+[0,200]) as list into bookOutTimeUpdated 
+
+	log bookOutTimeUpdated 
+	
+	put split(bookOutTimeUpdated, "\n") into bookOutTimeUpdated
+	
+	--Fetching the book out time
+	repeat with each item of bookOutTimeUpdated
+		put it into var
+		delete "[" in var
+		delete "]" in var
+		delete quote in var
+		delete "@" in var
+		log var
+		put var into bookoutTimeForABus
+		
+		insert ConvertTimeToText( bookoutTimeForABus) after bookouttimeLst
+		log bookouttimeLst
+		
+		put ImageRectangle(text:var, waitFor:20) into ImageRectangleOfBookOutTime
+		put ImageRectangle(text:"Required Energy", waitFor:20) into ImageRectangleOfReqEnergy
+		
+		put ImageRectangleOfReqEnergy.topleft.x into x1
+		put ImageRectangleOfReqEnergy.topright.x into x2
+		put ImageRectangleOfBookOutTime.topleft.y into y1
+		put (x1+x2)/2 rounded to 0 places into x
+		put ReadText (x, y1) into actualReqEnergy
+		put split(actualReqEnergy, space) into actualReqEnergy
+		put first item of actualReqEnergy into actualReqEnergy
+		insert actualReqEnergy after actualReqEnergyLst
+		log actualReqEnergyLst
+		
+	end repeat
+	
+	repeat with each item of bookouttimeLst
+		put  item 1 of bookouttimeLst into f
+		put  item 2 of bookouttimeLst into s
+		if s=""
+			exit repeat
+		end if
+		if f < s or f > s
+			Log  "Book out time is not found as equal"
+		else	if f=s
+			put  item 1 of  actualReqEnergyLst into fre
+			put  item 2 of  actualReqEnergyLst into sre
+			
+			if fre="o"
+				put 0 into fre
+			end if
+			
+			if fre<sre
+				LogSuccess "Priority for the less required energy "&&fre&&"is high for the bus is having high priority, if book out time is same for all"
+			else
+				LogError "Priority for the less required energy "&&fre&&" is high for the bus is having high priority, if book out time is same for all"
+			end if 
+			LogError "Book out time is not appearing according to sorted order, first time--> "&&f&&", second time--> "&&s
+		end if
+		delete item 1 of bookouttimeLst
+		delete item 1 of priorityLst
+	end repeat
+	
+	set the SearchRectangle to empty
+	return flag
+	
+end VerifyPriorityOfBusAccordingToRequiredEnergyIfBookoutTimeIsSame
+
+to handle GetLCQFieldDetail busId, fieldName
+	--Select a run
+	set the SearchRectangle to ScreenPart("LogicalChargeQueueArea")
+	--put 8027 into busId
+	put ImageRectangle(text:"Bus ID", waitFor:20) into ImageRectangleOfFieldName
+	
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100,20],ImageRectangleOfFieldName.BottomRight+[0,200]) as list into busIdUpdated 
+
+	log busIdUpdated 
+	
+	put split(busIdUpdated, "\n") into busIdUpdated
+	
+	--Fetching the book out time
+	repeat with each item of busIdUpdated
+		put it into var
+		delete "[" in var
+		delete "]" in var
+		delete quote in var
+		delete "@" in var
+		log var
+		
+		if busId=var
+			--insert ConvertTimeToText( bookoutTimeForABus) after bookouttimeLst
+			log bookouttimeLst
+			
+			put ImageRectangle(text:var, waitFor:20) into ImageRectangleOfBusId
+			put ImageRectangle(text:fieldName, waitFor:20) into ImageRectangleOfFieldName
+			
+			put ImageRectangleOfFieldName.topleft.x into x1
+			put ImageRectangleOfFieldName.topright.x into x2
+			put ImageRectangleOfBusId.topleft.y into y1
+			put (x1+x2)/2 rounded to 0 places into x
+			put ReadText (x, y1) into actualFieldNameValue
+			--put split(actualFieldNameValue, space) into actualFieldNameValue
+			--put first item of actualFieldNameValue into actualFieldNameValue
+			--insert actualFieldNameValue after actualFieldNameValueLst
+			--log actualFieldNameValueLst
+		end if
+	end repeat
+	return actualFieldNameValue
+	set the SearchRectangle to empty
+end GetLCQFieldDetail
+
+
+to handle GetLCQDetailsFromAPI busId
+	--put "8027" into busId
+	
+	put "Utilities\exceloperations".ReadFromFile  ("authtoken", "token") into authToken
+	put QA_TrackSetup() into tracksetupAPI
+	put tracksetupAPI.responsebody into respbody1
+	--log respbody1
+	
+	put jsonvalue (respbody1) into responsebody2 
+	log responsebody2
+	
+	put responsebody2 into respBody
+	log respBody
+	
+	repeat each item of respBody
+		put it into respBody1
+		if respBody1.busname = busId
+			put {
+				"busName":respBody1.busName,
+				"chargerName":respBody1.chargerName,
+				"assignedRunNumber":respBody1.assignedRunNumber,
+				"currentEnergy":respBody1.currentEnergy,
+				"energyRequired":respBody1.energyRequired,
+				"positionInChargeQueue":respBody1.positionInChargeQueue,
+				"chargerStatus":respBody1.chargerStatus,
+				"bookOutTime":respBody1.bookOutTime,} into responseLcq
+			exit repeat
+		end if
+		
+	end repeat
+	return responseLcq
+	
+end GetLCQDetailsFromAPI
+
+
+to handle VerifyLCQDetails busId
+	--put "8027" into busId
+	put GetLCQDetailsFromAPI (busId) into lstAPIResponseData
+	
+	put GetLCQFieldDetail (busId, "Charging Station") into chargerStationUI
+	if chargerStationUI= lstAPIResponseData.chargerName
+		LogSuccess "In LCQ, Charger name is appearing correctly as --> "&&chargerStationUI
+	else
+		LogError "In LCQ, Charger name is not appearing correctly as --> "&&chargerStationUI
+	end if
+	
+	put GetLCQFieldDetail (busId, "Assigned Run ID") into asignedRunIDUI
+	if asignedRunIDUI= lstAPIResponseData.assignedRunNumber
+		LogSuccess "In LCQ, Charger name is appearing correctly as --> "&&chargerStationUI
+	else
+		LogError "In LCQ, Charger name is not appearing correctly as --> "&&chargerStationUI
+	end if
+	
+	put GetLCQFieldDetail (busId, "Current Energy") into  currentEnergyUI
+	if currentEnergyUI = round( lstAPIResponseData.currentEnergy)
+		LogSuccess "In LCQ, Charger name is appearing correctly as --> "&&chargerStationUI
+	else
+		LogError "In LCQ, Charger name is not appearing correctly as --> "&&chargerStationUI
+	end if
+	
+	put GetLCQFieldDetail (busId, "Required Energy") into requiredEnergyUI
+	if requiredEnergyUI = round( lstAPIResponseData.energyRequired)
+		LogSuccess "In LCQ, Required Energy is appearing correctly as --> "&&chargerStationUI
+	else
+		LogError "In LCQ, Required Energy is not appearing correctly as --> "&&chargerStationUI
+	end if
+	
+	put GetLCQFieldDetail (busId, "Charge Time") into chargeTimeUI
+	
+	
+	put GetLCQFieldDetail (busId, "Priority") into priorityUI
+	if priorityUI = round( lstAPIResponseData.positionInChargeQueue)
+		LogSuccess "In LCQ, Priority is appearing correctly as --> "&&chargerStationUI
+	else
+		LogError "In LCQ, Priority is not appearing correctly as --> "&&chargerStationUI
+	end if
+	
+	put GetLCQFieldDetail (busId, "Charger Status") into chargerStatusUI
+	if priorityUI =  lstAPIResponseData.chargerStatus
+		LogSuccess "In LCQ, Charger Status is appearing correctly as --> "&&chargerStationUI
+	else
+		LogError "In LCQ, Charger Status is not appearing correctly as --> "&&chargerStationUI
+	end if
+	
+	put GetLCQFieldDetail (busId, "Book Out Time") into bookOutTimeUI
+	if bookOutTimeUI =  lstAPIResponseData.bookOutTime
+		LogSuccess "In LCQ, Book Out Time is appearing correctly as --> "&&chargerStationUI
+	else
+		LogError "In LCQ, Book Out Time is not appearing correctly as --> "&&chargerStationUI
+	end if
+	
+end VerifyLCQDetails
+
+to handle VerifyBEBBookoutStatus lblField, valOfField, x1,y1,x2,y2
+
+	if lblField="Ready/Topped Up" or lblField="Not Ready" or lblField="Delay Expected"
+		set the SearchRectangle to ScreenPart("BEBBookoutStatusArea")		
+	end if
+	
+	if lblField="Ready"
+		set the SearchRectangle to empty
+		set the SearchRectangle to ScreenPart("BEBBookoutStatusArea1")
+	end if
+	
+	if lblField="Waiting" or  lblField="Parked"  or  lblField="Charging"   or  lblField="Incoming Queue" 
+		set the SearchRectangle to empty
+		set the SearchRectangle to ScreenPart("BusCountArea")
+	end if
+	
+	if lblField="Charging_InChargingStn" 
+		put "Charging" into lblField
+		set the SearchRectangle to empty
+		set the SearchRectangle to ScreenPart("ChargingStationsArea")
+	end if
+	
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates (lblField, x1,y1,x2,y2) into val
+	log val
+	set the SearchRectangle to empty
+	if valOfField >= val
+		LogSuccess "Correct value is appearing in the BEB Bookout Status for the field: "&&lblField&&"as value: "&&valOfField
+	else
+		LogError "Correct value is not appearing in the BEB Bookout Status for the field: "&&lblField&&"as value: "&&valOfField
+	end if
+	
+end VerifyBEBBookoutStatus
+
+to handle VerifyBusCounts lblField, valOfField, x1,y1,x2,y2
+	
+	if lblField="Waiting" or  lblField="Parked"  or  lblField="Charging"   or  lblField="Incoming Queue" 
+		set the SearchRectangle to empty
+		set the SearchRectangle to ScreenPart("BusCountArea")
+	end if
+	
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates (lblField, x1,y1,x2,y2) into val
+	log val
+	set the SearchRectangle to empty
+	if valOfField >= val
+		LogSuccess "Correct value is appearing in the BEB Bus Count for the field: "&&lblField&&"as value: "&&valOfField
+		else
+		LogError "Correct value is not appearing in the BEB Bus Count for the field: "&&lblField&&"as value: "&&valOfField
+	end if
+	
+end VerifyBusCounts
+
+to handle VerifyChargingStations lblField, valOfField, x1,y1,x2,y2
+	if lblField="Charging_InChargingStn" or  lblField="Active"  or  lblField="Fault"   or  lblField="Inactive" 
+		set the SearchRectangle to empty
+		set the SearchRectangle to ScreenPart("ChargingStationsArea")
+	end if
+	
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates (lblField, x1,y1,x2,y2) into val
+	
+	log val
+	put split(val, "|") into lstVal
+	put item 2 of lstVal into val
+	
+	set the SearchRectangle to empty
+	if valOfField >= val
+		LogSuccess "Correct value is appearing in the Charging Stations for the field: "&&lblField&&"as value: "&&valOfField
+	else
+		LogError "Correct value is not appearing in the Charging Stations for the field: "&&lblField&&"as value: "&&valOfField
+	end if
+	
+end VerifyChargingStations
+

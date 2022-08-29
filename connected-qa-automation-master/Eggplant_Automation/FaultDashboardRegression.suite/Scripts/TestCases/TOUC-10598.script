@@ -1,0 +1,75 @@
+﻿(***
+@Author: Shalini Vijayakumar
+@Date: 2/Aug/2022
+@TC_ID: TOUC_10598
+@TC_Description: Verify user able to see data fields as per grouping by unique combination by selecting the all option in customer drop down with single charger
+***)
+
+BeginTestCase TOUC_10598
+Log "###########   Started execution of Test Case--> TOUC_10598  ##############"
+Log "#######################################################"
+
+
+--Prereq:
+--Create an active charger fault
+
+--"1.Login as an superadmin in Apex Portal.
+
+"LoginPage".OpenApplication
+
+"LoginPage".Login "ProterraAdmin"
+Set DatasheetPath to Resourcepath("TestData\TOUC-10598.xlsx")
+--Fetch the charger id from the charger management screen forthe given ocpp id
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "OCPPID") into OCPPID
+put "ApexPages/FaultDashboardCharger".Fetch_ChargerIDWRTCPPID(OCPPID) into ChargerID
+put item 2 of split(ChargerID,":") into ChargerID
+
+--2.Under Historical Data on Left menu choose Fault Dashboard
+get "ApexPages/FaultDashboardSearchCriteria".NavigateTo ("HISTORICAL DATA","FAULT DASHBOARD")
+
+get  "ApexPages/FaultDashboardSearchCriteria".AssetTypeSelection ("Charger")
+--3.Select the particular customer with charger name and verify the data fields Click on Group by fault and verify the Data-->Selected options should be displayed and date should be shown as per selection
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "CustomerName") into CustomerName
+get "ApexPages/FaultDashboardSearchCriteria".SelectCustomer (CustomerName)
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "AssetName") into AssetID
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "Priority") into Priority
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "Status") into Status
+get "ApexPages/FaultDashboardSearchCriteria".SelectAssetID ("Charger",AssetID)
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultPriority (Priority)
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultStatus (Status)
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDateTime") into FromDateTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDateTime") into ToDateTime
+
+If uppercase(Status) is not "ACTIVE"
+	
+	"ApexPages/FaultDashboardSearchCriteria".SelectDateRange FromDateTime,ToDateTime
+end if
+
+get "ApexPages/FaultDashboardSearchCriteria".ClickGetDataBtn
+
+"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Group by Fault"
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromTime") into FromTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToTime") into ToTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDate") into ToDate
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDate") into FromDate
+If uppercase(Status) is not "ACTIVE"
+	put "ApexPages/FaultDashboardCharger".Fetch_ChargerFault_FirstOccRowValues into faultdateTime
+	get "ApexPages/FaultDashboardCharger".VerifyTimeofFaultRange (FromDate,ToDate,FromTime,ToTime,faultdateTime)
+end if
+--4. Click on charger serial number + connector ID + unique fault (charger platform + error code & vendor error code) Data field and verify the Popup-->Popup should be display with the Individual Fault details and Download attachments should not be displayed on popup
+
+--selecting all datafieldcolumns under customization
+"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "All"
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ChargerType") into ChargerType
+
+"ApexPages/FaultDashboardCharger".Charger_ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup ChargerID,ChargerType,"Charger ID,Connector ID,OCPP Fault Code,Vendor Error Code,Charger"
+
+--logout from the application
+"LoginPage".Logout
+Log "#############  Finished execution of Test Case--> TOUC_10598 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_10598
+
+

@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		1468,
+		760,
+		35,
+		30
+	],
+	"lastmodifieddate": 1657021440.3109999,
+	"createddate": 1657021440.3109999,
+	"name": "FD_HorizontalScroll",
+	"lastfounddate": 1657021940.0149999,
+	"ocrcapturestring": "=",
+	"lastfoundlocation": [
+		1468,
+		760,
+		35,
+		30
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[63,16]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "FD_HorizontalScroll.png",
+				"connectionname": "SUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					1468,
+					760,
+					35,
+					30
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "="
+			}
+	]
+}

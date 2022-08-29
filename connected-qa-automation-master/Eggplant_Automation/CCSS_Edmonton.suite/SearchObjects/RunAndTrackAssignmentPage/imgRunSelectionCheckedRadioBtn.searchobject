@@ -1,0 +1,46 @@
+{
+	"lastmodifieddate": 1660923082.948,
+	"lastfoundlocation": [
+		1796,
+		599,
+		23,
+		30
+	],
+	"originalcapturelocation": [
+		1796,
+		599,
+		23,
+		30
+	],
+	"createddate": 1660922895.552,
+	"lastfounddate": 1660922989.2750001,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[11,15]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/imgRunSelectionCheckedRadioBtn.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"capturerect": [
+					1796,
+					599,
+					23,
+					30
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com"
+			}
+	],
+	"name": "RunAndTrackAssignmentPage/imgRunSelectionCheckedRadioBtn"
+}

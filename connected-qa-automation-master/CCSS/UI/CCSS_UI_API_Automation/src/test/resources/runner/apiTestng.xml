@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Suite">
+	<listeners>
+		<listener
+			class-name="main.java.com.proterra.ExtentListeners.ExtentListeners">
+		</listener>
+	</listeners>
+
+
+	<test name="Demo">
+		<classes>
+			<class name="test.java.com.proterra.testcases.ccssAPI.loginAPI.LoginAPITest" />
+			<class name="test.java.com.proterra.testcases.ccssAPI.loadGaragesAPI.LoadGaragesAPITest" />
+			<class name="test.java.com.proterra.testcases.ccssAPI.trackSetupAPI.TrackSetupAPITest" />
+			<class name="test.java.com.proterra.testcases.ccssAPI.assetsAPI.AssetsAPITest" />
+			<class name="test.java.com.proterra.testcases.ccssAPI.incomingBusesAPI.IncomingBusesAPITest" />
+			<class name="test.java.com.proterra.testcases.ccssAPI.getBusDetailsAPI.GetBusDetailsAPITest" />
+			<class name="test.java.com.proterra.testcases.ccssAPI.getM5BusStatusAPI.GetM5BusStatusAPITest" />
+			<class name="test.java.com.proterra.testcases.ccssAPI.notificationsAPI.NotificationsAPITest" />
+			<class name="test.java.com.proterra.testcases.ccssAPI.logicalChargeQueueAPI.LogicalChargeQueueAPITest" />
+			<class name="test.java.com.proterra.testcases.ccssAPI.chargerStatesAPI.ChargerStatesAPITest" />
+			<class name="test.java.com.proterra.testcases.ccssAPI.chargerSessionsAPI.ChargerSessionsAPITest" />
+			<class name="test.java.com.proterra.testcases.ccssAPI.chargerFaultsAPI.ChargerFaultsAPITest" />
+			<class name="test.java.com.proterra.testcases.ccssAPI.busFaultsAPI.BusFaultsAPITest" />
+			<class name="test.java.com.proterra.testcases.ccssAPI.ecmsMonitoringAPI.ECMSMonitoringAPITest" />
+			<class name="test.java.com.proterra.testcases.ccssAPI.ecmsPowerAPI.ECMSPowerAPITest" />
+		</classes>
+	</test>
+</suite>

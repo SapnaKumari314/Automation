@@ -1,0 +1,312 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 23/Feb/22
+@Description: Its a Global Operations to perform operations in browser.
+***)
+
+-----------------------------------------Run and Assignment Page
+
+--Description: Handler to launch application
+---Input : Browser - Browser name, appUrl - Application URL
+---output: None
+---Created by:
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		APIArea:[[.25,.25],[.75,.75]],
+		TopHalf: [[0,0],[1,.5]],
+
+	}
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+End ScreenPart
+
+
+
+--Description: Handler to log exception and capturescreen
+---Input : Exception , HandlerName -Name of the handler
+---output: None
+---Created by:Himaja
+to LogException Exception,HandlerName
+	
+	log Exception
+	
+	delete the first 25 characters of line 1 of Exception
+	
+	//to get current time and date
+	set the timeformat's date to "%d_%m_%Y"
+	put time into normalTime
+	put formattedTime("%H_%M_%S", normalTime) into longTime
+	put date&"_"&longTime into timeStamp
+	
+	CaptureScreen {Name: Exception&"_"&timeStamp}
+	if HandlerName is not empty then
+		Throw "Failed Due to"&&Exception&&" in Handler/Function named"&&HandlerName
+	else
+		Throw "Failed Due to"&&Exception
+	end if
+	
+end LogException
+
+//--------------------
+
+--Description: Handler to log exception and capturescreen
+---Input : Exception , HandlerName -Name of the handler
+---output: None
+---Created by:Himaja
+to Error ErrorMsg
+	
+	//to get current time and date
+	set the timeformat's date to "%d_%m_%Y"
+	put time into normalTime
+	put formattedTime("%H_%M_%S", normalTime) into longTime
+	put date&"_"&longTime into timeStamp
+	
+	put characters 1 to 60 of ErrorTrimMsg
+	CaptureScreen {Name: ErrorTrimMsg&"_"&timeStamp}
+	LogError ErrorMsg
+	
+end Error
+
+//--------------------
+
+--Description: Handler to log exception and capturescreen
+---Input : Exception , HandlerName -Name of the handler
+---output: None
+---Created by/Date:Himaja(11/7/2022)
+to Success SuccessMsg
+	
+	//to get current time and date
+	set the timeformat's date to "%d_%m_%Y"
+	put time into normalTime
+	put formattedTime("%H_%M_%S", normalTime) into longTime
+	put date&"_"&longTime into timeStamp
+	
+	CaptureScreen {Name:"Success_"&timeStamp,}
+	LogSuccess SuccessMsg
+	
+end Success
+//---------------------------------------
+--Description: Handler to Click on the dropdown
+---Input :DropdownFiled name , Search Rectangle
+---output: None
+---Created by/date:Himaja (11-07-2022)
+
+to ClickDropdown DropDownField,SearchRect
+	try
+		Global ConfigValues
+		if imagefound (Text:DropDownField,waitfor:ConfigValues.MediumTimeOut,SearchRectangle:SearchRect)
+			put FoundImageLocation() into Loc
+			Put Loc+[-40,20] into Pos1
+			Put Loc+[300,290] into Pos2
+			
+			Click FoundImageLocation()+[0,27]
+			Success "Clicked on"&&DropDownField&&" Dropdown successfully!!"
+			return true
+		else
+			Error "Unable to click on"&&DropDownField&&" Dropdown successfully!!"
+			return false
+		end if
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,ClickDropdown)
+	End try
+end ClickDropdown
+
+//----------------------------------------------------------
+//Handler to close the chrome browser
+to handle CloseBrowser 
+	try
+		if ImageFound(imageName:"Generic/imgChromeBrowser", waitFor:15)
+			Click "Generic/imgChromeBrowser"
+			TypeText altKey, f4
+			Log "Initial Chrome browser was open, closed successfully!!"
+		end if
+	Catch exception
+		get LogException(exception,CloseBrowser)
+	End try
+end CloseBrowser
+
+--Description: Handler to launch application
+---Input : Browser - Browser name, appUrl - Application URL
+---output: None
+---Created by:
+to LaunchApplication browser, appUrl
+	try
+		global ConfigValues
+		CloseBrowser
+		typetext WindowsKey, r
+		Typetext browser&& appUrl
+		wait 2
+		Typetext returnkey
+		wait 1
+		if ImageFound(Image:"CommonImages/img_ProfileIcon", waitFor:ConfigValues.MediumTimeOut) 
+			Success "Application launched successfully --> "&&appUrl
+			
+			LoginPage.Logout
+		else
+			
+			Success "Application launched successfully, initially logged in --->>"&appUrl
+		end if
+	Catch exception
+		get LogException(exception,LaunchApplication)
+	End try
+end LaunchApplication
+
+--Description: Handler for API Synchronization
+---Input : 
+---Output: 
+---Created by: Vivek
+to handle ApiSynchronization
+	try
+		Log "-----------------Start of Synch"
+		set the SearchRectangle to ScreenPart("APIArea")
+		put the time into startTime
+		log startTime
+		if  imagefound(image:"imgSynch3", waitfor:5) 
+			log "image found"
+			put the time - startTime into secondsElapsed
+			log secondsElapsed
+			
+			repeat until not imagefound(imagename:"imgSynch3",waitFor:2) 
+				wait 1
+			end repeat
+		else
+			log "not found"
+		end if
+		
+		put the time - startTime into secondsElapsed
+		log secondsElapsed
+		Log "-----------------End of Synch"
+		set the SearchRectangle to empty
+	Catch exception
+		get LogException(exception,ApiSynchronization)
+	End try
+end ApiSynchronization
+
+--Description: Handler to wait for API Synchronization
+---Input : 
+---Output: 
+---Created by: Vivek
+to handle WaitForApiSynchronization
+	try
+		Log "-----------------Start of Synch"
+		set the SearchRectangle to ScreenPart("APIArea")
+		put the time into startTime
+		log startTime
+		if  imagefound(image:"imgSynch3", waitfor:120) 
+			log "image found"
+			put the time - startTime into secondsElapsed
+			log secondsElapsed
+			
+			repeat until not imagefound(imagename:"imgSynch3",waitFor:2) 
+				wait 1
+			end repeat
+		else
+			log "not found"
+		end if
+		
+		put the time - startTime into secondsElapsed
+		log secondsElapsed
+		Log "-----------------End of Synch"
+		set the SearchRectangle to empty
+	Catch exception
+		get LogException(exception,WaitForApiSynchronization)
+	End try
+end WaitForApiSynchronization
+
+
+--Description: Handler to capture screenshot
+---Input : 
+---Output: 
+---Created by: Vivek
+to handle CaptureScreenshot
+	set the timeformat's date to "%d_%m_%Y"
+	log date
+	
+	put time into normalTime
+	put formattedTime("%H_%M_%S", normalTime) into longTime
+	log longTime
+	
+	put date&"_"&longTime into timeStamp
+	
+	CaptureScreen {Name: timeStamp,}
+end CaptureScreenshot
+
+to handle CaptureScreenshotScreenName ScreenName
+	set the timeformat's date to "%d_%m_%Y"
+	log date
+	
+	put time into normalTime
+	put formattedTime("%H_%M_%S", normalTime) into longTime
+	log longTime
+	
+	put date&"_"&longTime into timeStamp
+	
+	CaptureScreen {Name: ScreenName&&timeStamp}
+end CaptureScreenshotScreenName
+
+
+to handle FormattedDateTime
+	set the timeformat's date to "%d_%m_%Y"
+	log date
+	
+	put time into normalTime
+	put formattedTime("%H_%M_%S", normalTime) into longTime
+	log longTime
+	
+	put date&"_"&longTime into timeStamp
+	return timeStamp
+	
+end FormattedDateTime
+
+
+--to connect to the SUT
+--connectToSUT "ec2-3-81-234-4.compute-1.amazonaws.com", "3389"
+
+to handle connectToSUT ServerID,PortNumber, Username,Password
+
+	Connect {serverID: ServerID, portNum: PortNumber, Type:"RDP", Width: 1920, Height: 1080}
+	Repeat until the status of ConnectionInfo() is "Connected"
+		Wait 1 minute
+		If the RepeatIndex is greater than 10 then 
+			logerror "Unable to connect to SUT.", "SUT is not available." 
+			exit all
+		end if
+		
+	End repeat
+	
+	
+end connectToSUT
+
+
+LaunchOCPPclientApplication ,"C:\Users\svijayakumar\Downloads\ocpp_client\ocpp_client"
+To handle LaunchOCPPclientApplication browser, AppPath
+
+	Log "start of function LaunchOCPPclientApplication"
+	global ConfigValues
+	CloseBrowser
+	typetext WindowsKey, r
+	Typetext  AppPath
+	wait 2
+	Typetext returnkey
+	wait 5
+	Click {image:"CommonImages/FolderRefreshIcon",waitFor:ConfigValues.MediumTimeOut}
+	typetext "cmd"
+	wait 2
+	Typetext returnkey
+	typetext "gulp serve"
+	wait 2
+	Typetext returnkey
+	set the searchrectangle to ScreenPart("TopHalf")
+	If imagefound(text:"Proterra OCPP Client",waitFor:ConfigValues.MediumTimeOut)
+		LogSuccess "Proterra OCPP Client Application is launched successfully"
+	Else
+		LogError   "Proterra OCPP Client Application is not launched"
+		
+	End If
+	Log "End of function LaunchOCPPclientApplication"
+End LaunchOCPPclientApplication

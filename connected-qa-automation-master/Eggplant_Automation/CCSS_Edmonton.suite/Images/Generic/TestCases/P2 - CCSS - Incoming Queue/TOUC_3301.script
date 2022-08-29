@@ -1,0 +1,23 @@
+﻿(***
+@Author: Mohammed Gouse
+@Date: 22/March/22
+@TC_ID: TOUC_3301
+@TC_Description: CCSS-RRT-IQ: Incoming Queue components
+***)
+
+BeginTestCase TOUC_3301
+
+Log "###########   Started execution of Test Case--> TOUC_3301   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+
+
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyElevenBusesInIQ 
+
+Log "#############  Finished execution of Test Case--> TOUC_3301 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3301

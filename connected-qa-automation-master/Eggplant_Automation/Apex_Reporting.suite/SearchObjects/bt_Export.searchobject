@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		1183,
+		712,
+		53,
+		18
+	],
+	"lastmodifieddate": 1656327337.2079999,
+	"createddate": 1656327337.2079999,
+	"name": "bt_Export",
+	"lastfounddate": 1659110642.9749999,
+	"ocrcapturestring": "Export",
+	"lastfoundlocation": [
+		1183,
+		712,
+		53,
+		18
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[26,9]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "bt_Export.png",
+				"connectionname": "PROSUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					1183,
+					712,
+					53,
+					18
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "Export"
+			}
+	]
+}

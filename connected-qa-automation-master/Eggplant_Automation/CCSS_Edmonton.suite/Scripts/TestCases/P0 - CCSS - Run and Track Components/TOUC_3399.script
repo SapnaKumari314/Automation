@@ -1,0 +1,69 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 04/Apr/22
+@TC_ID: TOUC_3399
+@TC_Description: CCSS-Tooltip: Tooltip components
+***)
+
+BeginTestCase TOUC_3399
+
+Log "###########   Started execution of Test Case--> TOUC_3399   ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Remove bus from Garage
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P0_TestData", "RunAndTrackComponents", "BusID", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+
+--Select a bus from IQ
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+--Select a Run such that Current Energy < Required Energy
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectARunWhereCurrentEnrgyLessThnReqEnnrgy
+
+--Select a Charger Position
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgActiveCharger"
+--Click Assign Run and Track
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton
+
+--Verify the Estimated Charge Time in the tooltip
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "bus_image_run_and_track_screen") into BusImg
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusAndChargerDetailsByHoverOnBusOrChargerIconWhichIsParkedAtChargerLocation BusImg
+
+
+--Click Menu and click Charger Control screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+--Verify the Estimated Charge Time in the tooltip
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "bus_image_run_and_track_screen") into BusImg
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusAndChargerDetailsByHoverOnBusOrChargerIconWhichIsParkedAtChargerLocation BusImg
+
+
+--Click Menu and click Garage Overview screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+--Verify the Estimated Charge Time in the tooltip
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "bus_image_run_and_track_screen") into BusImg
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusAndChargerDetailsByHoverOnBusOrChargerIconWhichIsParkedAtChargerLocation BusImg
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3399 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3399
+
+
+
+
+
+
+
+
+
+
+
+

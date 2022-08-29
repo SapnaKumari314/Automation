@@ -1,0 +1,41 @@
+{
+	"lastmodifieddate": 1647438635.711,
+	"ocrcapturestring": "'O",
+	"originalcapturelocation": [
+		914,
+		514,
+		81,
+		73
+	],
+	"createddate": 1647434636.645,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"deleted": true,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[40,36]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "Generic/imgAPIRefresh.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"capturerect": [
+					914,
+					514,
+					81,
+					73
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com"
+			}
+	],
+	"name": "imgAPIRefresh"
+}

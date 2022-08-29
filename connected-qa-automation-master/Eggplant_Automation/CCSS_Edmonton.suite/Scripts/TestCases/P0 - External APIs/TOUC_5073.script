@@ -1,0 +1,57 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 18/July/22
+@TC_ID: TOUC_5073
+@TC_Description: CCSS-RRT-BEB Search: Search bus from IQ
+***)
+
+BeginTestCase TOUC_5073
+
+Log "###########   Started execution of Test Case--> TOUC_5073   ##############"
+Log "#######################################################"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "EnvironmentDetails", "busName") into busName
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "EnvironmentDetails", "startTimestamp") into startTimestamp
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "EnvironmentDetails", "endTimestamp") into endTimestamp
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "EnvironmentDetails", "BaseURI") into BaseURI
+
+
+put  "CCSS_Pages/API".RunAPIForTestScript( "TOUC_5073", busName, startTimestamp, endTimestamp) into responseBody
+log responseBody
+
+--Fetch response to validate
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "TOUC_5073", "ResponseToValidate") into ResponseToValidate
+log responseToValidate
+
+
+"CCSS_Pages/API".CompareResponses responseToValidate, responseBody
+
+
+
+
+--repeat with each item linedata of respbody2
+--put item one of linedata into respbody3
+--put number of items in linedata into count
+--repeat count times
+--put repeatindex() into a
+--log item && (a) of linedata
+
+--end repeat
+
+--log item one of linedata
+--log item 2 of linedata
+--log item 3 of linedata
+--log item 4 of linedata
+--log item 5 of linedata
+--repeat with each item celldata of respbody3
+--			
+--log celldata
+--end repeat
+
+--end repeat
+
+
+Log "#############  Finished execution of Test Case--> TOUC_5073 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_5073

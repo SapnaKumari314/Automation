@@ -1,0 +1,41 @@
+{
+	"lastmodifieddate": 1659948327.253,
+	"ocrcapturestring": "u",
+	"originalcapturelocation": [
+		1866,
+		566,
+		29,
+		27
+	],
+	"createddate": 1659948327.253,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Tolerance": "_45",
+					"HotSpot": "[14,13]",
+					"Scale": "    1",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "VerticalScrollEnd.png",
+				"connectionname": "SUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					1866,
+					566,
+					29,
+					27
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "u"
+			}
+	],
+	"name": "VerticalScrollEnd"
+}

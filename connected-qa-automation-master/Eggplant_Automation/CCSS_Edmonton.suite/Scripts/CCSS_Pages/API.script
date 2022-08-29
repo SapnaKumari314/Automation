@@ -1,0 +1,135 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 19/July/22
+@TC_Description: POM for External API
+***)
+
+to handle RunAPIForTestScript testScriptName, busName, startTimestamp, endTimestamp, signalNames, type, garageid
+	--Read Environment Information of an API
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "EnvironmentDetails", "BaseURI") into BaseURI
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "EnvironmentDetails", "xapikey") into xapikey
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "EnvironmentDetails", "Tenant") into Tenant
+	
+	if testScriptName = "TOUC_5073"
+		put API_TOUC_5073() into summaryAPI
+	end if
+	
+	if testScriptName = "TOUC_5071"
+		put API_TOUC_5071() into summaryAPI
+	end if
+	
+	if testScriptName = "TOUC_5075"
+		put API_TOUC_5075() into summaryAPI
+	end if
+	
+	if testScriptName = "TOUC_7645"
+		put API_TOUC_7645() into summaryAPI
+	end if
+	
+	if testScriptName = "TOUC_7646"
+		put API_TOUC_7646() into summaryAPI
+	end if
+	
+	
+	put summaryAPI.responsebody into respbody1
+	return respbody1
+	
+end RunAPIForTestScript
+
+to handle RunAPIForChargersTestScript testScriptName, chargerId, startTimestamp, endTimestamp
+	--Read Environment Information of an API
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "EnvironmentDetails", "BaseURI") into BaseURI
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "EnvironmentDetails", "xapikey") into xapikey
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "EnvironmentDetails", "Tenant") into Tenant
+	
+	if testScriptName = "TOUC_5072"
+		put API_TOUC_5072() into summaryAPI
+	end if
+	
+	if testScriptName = "TOUC_5074"
+		put API_TOUC_5074() into summaryAPI
+	end if
+	
+	put summaryAPI.responsebody into respbody1
+	return respbody1
+	
+end RunAPIForChargersTestScript
+
+to handle CompareResponses responseToValidate, responseBody
+
+	put responseBody split by newline into respbody2
+	put responseToValidate split by newline into responseToValidateList
+	
+	repeat with each item linedata of responseToValidateList
+		pull responseToValidateList into expectedResult
+		pull respbody2 into actualResult
+		
+		if expectedResult is actualResult caseSensitive =false
+			LogSuccess " Actual response "&&expectedResult&&"Compared to expected response"&&expectedResult&&" - are matched"
+		else
+			LogError " Actual response "&&expectedResult&&"Compared to expected response"&&expectedResult&&" - are not matched"
+			
+		end if
+	end repeat
+	
+end CompareResponses
+
+
+to handle CompareJsonResponses responseToValidate, responseBody
+	put jsonvalue (responseToValidate) into responseToValidate
+	put jsonvalue (responseBody) into responseBody
+	
+	repeat with each item of keys(responseToValidate)
+		
+		put it & ": " & property (it) of responseToValidate
+		put  property (it)  of responseToValidate into valExpected
+		put it into keyToRetrieve
+		
+		put responseBody.(keyToRetrieve) into valActual
+		
+		repeat with each item of keys(valActual)
+			
+			put it & ": " & property (it) of valActual
+			put it into keyToRetrieveIndi
+			
+			if valExpected.(keyToRetrieveIndi) = valActual.(keyToRetrieveIndi)
+				LogSuccess " Actual response "&&valExpected.(keyToRetrieveIndi)&&"Compared to expected response"&&valActual.(keyToRetrieveIndi)&&" - are matched"
+			else
+				LogError " Actual response "&&valExpected.(keyToRetrieveIndi)&&"Compared to expected response"&&valActual.(keyToRetrieveIndi)&&" - are not matched"
+				
+			end if
+		end repeat
+		
+	end repeat
+	
+end CompareJsonResponses
+
+to handle CompareJsonResponses1 responseToValidate, responseBody
+	put jsonvalue (responseToValidate) into responseToValidate
+	put jsonvalue (responseBody) into responseBody
+	
+	repeat with each line item of responseToValidate
+		
+		put it & ": " & property (it) of responseToValidate
+		put  property (it)  of responseToValidate into valExpected
+		put it into keyToRetrieve
+		
+		--put responseBody.(keyToRetrieve) into valActual
+		
+		repeat with each line item of valActual
+			
+			put it & ": " & property (it) of valActual
+			put it into keyToRetrieveIndi
+			
+			if valExpected.(keyToRetrieveIndi) = valActual.(keyToRetrieveIndi)
+				LogSuccess " Actual response "&&valExpected.(keyToRetrieveIndi)&&"Compared to expected response"&&valActual.(keyToRetrieveIndi)&&" - are matched"
+			else
+				LogError " Actual response "&&valExpected.(keyToRetrieveIndi)&&"Compared to expected response"&&valActual.(keyToRetrieveIndi)&&" - are not matched"
+				
+			end if
+		end repeat
+		
+	end repeat
+	
+end CompareJsonResponses1
+

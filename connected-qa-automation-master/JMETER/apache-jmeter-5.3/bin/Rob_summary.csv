@@ -1,0 +1,7 @@
+Label,# Samples,Average,Min,Max,Std. Dev.,Error %,Throughput,Received KB/sec,Sent KB/sec,Avg. Bytes
+GetGarages- HTTP Request,10,258,230,279,16.04,0.000%,8.51064,30.86,5.21,3713.0
+GetLayoutDefinitions- HTTP Request,10,54,49,58,3.23,0.000%,10.50420,35.41,7.33,3452.0
+GetPositionDefinitions- HTTP Request,10,214,189,229,13.29,0.000%,8.94454,1859.70,6.47,212904.0
+GetLayoutInstanceSets- HTTP Request,10,66,57,72,5.08,0.000%,10.41667,53.44,7.25,5253.0
+AM_Shift - Today - GetLayoutInstances- HTTP Request,10,55,48,61,4.49,0.000%,10.54852,86.42,7.57,8389.0
+TOTAL,50,129,48,279,88.96,0.000%,31.32832,1430.03,21.61,46742.2

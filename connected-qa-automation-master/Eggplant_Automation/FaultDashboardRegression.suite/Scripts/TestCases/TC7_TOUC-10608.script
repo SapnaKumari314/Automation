@@ -1,0 +1,70 @@
+﻿(***
+@Author: Shalini Vijayakumar
+@Date: 27/July/2022
+@TC_ID: TOUC_10608
+@TC_Description:  Verify user able to see data fields as per grouping by unique combination by selecting the All customer and Single vehicle
+***)
+
+BeginTestCase TOUC_10608
+Log "###########   Started execution of Test Case--> TOUC_10608  ##############"
+Log "#######################################################"
+--"1.Login as an superadmin in Apex Portal.
+Set DatasheetPath to Resourcepath("TestData\TC7_TOUC-10608.xlsx")
+"LoginPage".OpenApplication
+
+"LoginPage".Login "ProterraAdmin"
+
+--2.Under Historical Data on Left menu choose Fault Dashboard
+"ApexPages/FaultDashboardSearchCriteria".NavigateTo "HISTORICAL DATA","FAULT DASHBOARD"
+
+--3.Select the vehicle in toggle and select the options as below
+--customer dropdown = all
+--vehicle name = Single 
+--select the from & to date 
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "CustomerName") into CustomerName
+"ApexPages/FaultDashboardSearchCriteria".SelectCustomer CustomerName
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "AssetName") into AssetID
+
+get  "ApexPages/FaultDashboardSearchCriteria".AssetTypeSelection ("Vehicle")
+
+get "ApexPages/FaultDashboardSearchCriteria".SelectAssetID ("Vehicle",AssetID)
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FaultStatus") into FaultStatus
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FaultPriority") into FaultPriority
+"ApexPages/FaultDashboardSearchCriteria".SelectFaultStatus FaultStatus
+"ApexPages/FaultDashboardSearchCriteria".SelectFaultPriority FaultPriority
+--select the date range
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDateTime") into FromDateTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDateTime") into ToDateTime
+
+"ApexPages/FaultDashboardSearchCriteria".SelectDateRange FromDateTime,ToDateTime
+--4.Click on get data and click on Group fault 
+get "ApexPages/FaultDashboardSearchCriteria".ClickGetDataBtn
+put "ApexPages/FaultDashboardVehicle".Fetch_VehicleFault_TimeofFaultRowValues into faultdateTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDate") into FromDate
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDate") into ToDate
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromTime") into FromTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToTime") into ToTime
+get "ApexPages/FaultDashboardCharger".VerifyTimeofFaultRange (FromDate,ToDate,FromTime,ToTime,faultdateTime)
+"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Sequential"
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "SequentialHeaders") into DatafieldColnames
+"ApexPages/FaultDashboardVehicle".ValidateDatafieldColumnNames_Vehicle DatafieldColnames
+--5.Verify the grouping of data and rows created in group by fault 
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "VIN") into VINID
+"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "Source Address"
+"ApexPages/FaultDashboardVehicle".UnSelectCustomiztionOption_Vehicle "Fault name"
+"ApexPages/FaultDashboardVehicle".UnSelectCustomiztionOption_Vehicle "Fault description"
+
+"ApexPages/FaultDashboardSearchCriteria".SelectFilterDropdown "VIN",VINID,"VEHICLE"
+
+--6. Verify the data showing as per occurrences in the rows created in group by fault
+"ApexPages/FaultDashboardVehicle".CheckGroupByFaultFunctionality_Vehicle VINID
+
+--Logout from the application
+"LoginPage".Logout
+
+Log "#############  Finished execution of Test Case--> TOUC_10608 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_10608

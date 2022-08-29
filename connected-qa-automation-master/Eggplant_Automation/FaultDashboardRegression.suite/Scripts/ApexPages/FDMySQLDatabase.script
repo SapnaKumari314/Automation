@@ -1,0 +1,226 @@
+﻿
+FetchVehicleNameFromAMSDB "QA","ams.asset_vehicle","5GZEV337X7J141405"
+
+//*****************************************************
+--Description: Handler to fetch Vehicle name from database
+---Input : DSN,tablename,Userid,Password,VIN
+---output: DBVehicleName
+---Created by:Shalini V
+--Created on: 29 July 2022
+//*****************************************************
+To handle FetchVehicleNameFromAMSDB DSN,tablename,VIN
+	Log "Start of function FetchVehicleNameFromAMSDB"
+	"Utilities/ExcelOperations".readTestDataFrom Resourcepath("TestData\MySQL_Data.xlsx"), "TestData", "DBUserID"
+	Set DBUserID to the result
+	
+	"Utilities/ExcelOperations".readTestDataFrom Resourcepath("TestData\MySQL_Data.xlsx"), "TestData", "DBPassword"
+	Set DBPassword to the result
+	
+	set myDB to {type:"ODBC",DSN:DSN,User:DBUserID,Password:DBPassword }
+	open database myDB
+	If  the databaseIdentifier of myDB is empty
+		LogWarning "Database is not open"
+		Exit handler
+	Else
+		Log "Data base is connected and open"&   the databaseIdentifier of myDB
+	End If
+	
+	put table tablename of myDB into myTable
+	
+	get the records of myTable where vehiclevin is VIN
+	If it.vehicle_name1 is ""
+		Log "Vehicle_name 1 is empty in the database"
+		put it.vehicle_name2 into DBVehicleName
+	Else
+		put it.vehicle_name1 into DBVehicleName
+	End If
+	Log DBVehicleName
+	If  DBVehicleName is not ""
+		Logsuccess "Vehicle name is fetched from mySQL database"&&DBVehicleName
+	Else
+		LogError "Vehicle name is not available in the database"
+	End If
+	Log "End of function FetchVehicleNameFromAMSDB"
+	close database myDB
+	return DBVehicleName
+End FetchVehicleNameFromAMSDB
+(*select mddispense1_.ocpp_id as ocpp_id, pcs0_.charger_vendor as chargerVendor, pcs0_.charger_model as chargerModel,
+mddispense1_.serial_number as dispenserSerialNumber, pcs0_.charger_serial_number as chargerSerialNumber, mddispense1_.customer_disp_name
+as customerChargerName, mddispense1_.proterra_disp_name as chargerName from ams.pcs pcs0_ cross join ams.dispenser mddispense1_
+where pcs0_.pcs_id=mddispense1_.pcs_id
+and (mddispense1_.ocpp_id in ('00120C2DF6B0010101')) ;*)
+--FetchChargerModelFromDatabase "QA","SELECT ac.ocpp_id ,ac.charger_vendor,ac.charger_model,di.serial_number , ac.charger_serial_number, ac.customer_charger_name FROM ams.asset_charger ac,ams.dispenser di WHERE ac.ocpp_id=di.ocpp_id AND ac.ocpp_id in('00120C2DF6AB5666');"
+FetchChargerModelFromDatabase "QA","select mddispense1_.ocpp_id as ocpp_id, pcs0_.charger_vendor as chargerVendor, pcs0_.charger_model as chargerModel,mddispense1_.serial_number as dispenserSerialNumber, pcs0_.charger_serial_number as chargerSerialNumber,mddispense1_.customer_disp_name as customerChargerName, mddispense1_.proterra_disp_name aschargerName from ams.pcs pcs0_ cross join ams.dispenser mddispense1_ where pcs0_.pcs_id=mddispense1_.pcs_id and(mddispense1_.ocpp_id in ('00120C2DF6AB5666')) ;"
+To handle FetchChargerModelFromDatabase DSN,sQuery
+	Log "Start fetching charger model"
+	"Utilities/ExcelOperations".readTestDataFrom Resourcepath("TestData\MySQL_Data.xlsx"), "TestData", "DBUserID"
+	Set DBUserID to the result
+	
+	"Utilities/ExcelOperations".readTestDataFrom Resourcepath("TestData\MySQL_Data.xlsx"), "TestData", "DBPassword"
+	Set DBPassword to the result
+	
+	set myDB to {type:"ODBC",DSN:DSN,User:DBUserID,Password:DBPassword }
+	open database myDB
+	If  the databaseIdentifier of myDB is empty
+		LogWarning "Database is not open"
+		Exit handler
+	Else
+		Log "Data base is connected and open"&   the databaseIdentifier of myDB
+	End If
+	
+	--put table tablename of myDB into myTable
+	put executeSQL(myDB,sQuery) into returnVal
+	log returnVal
+	if number of items in returnVal is 1 or number of items in returnVal is greater than 1
+		put item 1 of returnval into myval
+	end if
+	log myval."chargerModel"
+	put myval."chargerModel" into chargerModel
+	Log "End of fetching charger model"
+	return chargerModel
+End FetchChargerModelFromDatabase
+
+--"select mddispense1_.ocpp_id as ocpp_id, pcs0_.charger_vendor as chargerVendor, pcs0_.charger_model as chargerModel,mddispense1_.serial_number as dispenserSerialNumber, pcs0_.charger_serial_number as chargerSerialNumber,mddispense1_.customer_disp_name as customerChargerName, mddispense1_.proterra_disp_name aschargerName from ams.pcs pcs0_ cross join ams.dispenser mddispense1_ where pcs0_.pcs_id=mddispense1_.pcs_id and(mddispense1_.ocpp_id in ('00120C2DF6AB5666')) ;"
+FetchChargerNameFromDatabase "QA","select mddispense1_.ocpp_id as ocpp_id, pcs0_.charger_vendor as chargerVendor, pcs0_.charger_model as chargerModel,mddispense1_.serial_number as dispenserSerialNumber, pcs0_.charger_serial_number as chargerSerialNumber,mddispense1_.customer_disp_name as customerChargerName, mddispense1_.proterra_disp_name aschargerName from ams.pcs pcs0_ cross join ams.dispenser mddispense1_ where pcs0_.pcs_id=mddispense1_.pcs_id and(mddispense1_.ocpp_id in ('00120C2DF6AB5666')) ;"
+to handle FetchChargerNameFromDatabase DSN,sQuery
+	Log "Start of fetching charger name from database"
+	"Utilities/ExcelOperations".readTestDataFrom Resourcepath("TestData\MySQL_Data.xlsx"), "TestData", "DBUserID"
+	Set DBUserID to the result
+	
+	"Utilities/ExcelOperations".readTestDataFrom Resourcepath("TestData\MySQL_Data.xlsx"), "TestData", "DBPassword"
+	Set DBPassword to the result
+	
+	set myDB to {type:"ODBC",DSN:DSN,User:DBUserID,Password:DBPassword }
+	open database myDB
+	If  the databaseIdentifier of myDB is empty
+		LogWarning "Database is not open"
+		Exit handler
+	Else
+		Log "Data base is connected and open"&   the databaseIdentifier of myDB
+	End If
+	put executeSQL(myDB,sQuery) into returnVal
+	log returnVal
+	if number of items in returnVal is 1 or number of items in returnVal is greater than 1
+		put item 1 of returnval into myval
+	end if
+	--log myval.customerChargerName
+	log myval.aschargerName
+	--If myval.customerChargerName is ""
+	put myval.aschargerName into DBChargername
+	--Else
+	---	put myval.customerChargerName into DBChargername
+	--End If
+	log"Finished fetching charger name from database"
+	return DBChargername
+end FetchChargerNameFromDatabase
+FetchDispenserSerialNumberFromDatabase "QA","select mddispense1_.ocpp_id as ocpp_id, pcs0_.charger_vendor as chargerVendor, pcs0_.charger_model as chargerModel,mddispense1_.serial_number as dispenserSerialNumber, pcs0_.charger_serial_number as chargerSerialNumber,mddispense1_.customer_disp_name as customerChargerName, mddispense1_.proterra_disp_name aschargerName from ams.pcs pcs0_ cross join ams.dispenser mddispense1_ where pcs0_.pcs_id=mddispense1_.pcs_id and(mddispense1_.ocpp_id in ('00120C2DF6AB5666')) ;" 
+
+to handle FetchDispenserSerialNumberFromDatabase DSN,sQuery
+	Log "Start of fetching charger serial number from database"
+	"Utilities/ExcelOperations".readTestDataFrom Resourcepath("TestData\MySQL_Data.xlsx"), "TestData", "DBUserID"
+	Set DBUserID to the result
+	
+	"Utilities/ExcelOperations".readTestDataFrom Resourcepath("TestData\MySQL_Data.xlsx"), "TestData", "DBPassword"
+	Set DBPassword to the result
+	
+	set myDB to {type:"ODBC",DSN:DSN,User:DBUserID,Password:DBPassword }
+	open database myDB
+	If  the databaseIdentifier of myDB is empty
+		LogWarning "Database is not open"
+		Exit handler
+	Else
+		Log "Data base is connected and open"&   the databaseIdentifier of myDB
+	End If
+	put executeSQL(myDB,sQuery) into returnVal
+	log returnVal
+	if number of items in returnVal is 1 or number of items in returnVal is greater than 1
+		put item 1 of returnval into myval
+	end if
+	log myval.dispenserSerialNumber
+	put myval.dispenserSerialNumber into DBChargerserialnumber
+	log"Finished fetching charger serial number from database"
+	
+	return DBChargerserialnumber
+End FetchDispenserSerialNumberFromDatabase
+to handle FetchCustomerNameFromDatabase DSN,sQuery
+	Log "Start of fetching customer name from database"
+	"Utilities/ExcelOperations".readTestDataFrom Resourcepath("TestData\MySQL_Data.xlsx"), "TestData", "DBUserID"
+	Set DBUserID to the result
+	
+	"Utilities/ExcelOperations".readTestDataFrom Resourcepath("TestData\MySQL_Data.xlsx"), "TestData", "DBPassword"
+	Set DBPassword to the result
+	
+	set myDB to {type:"ODBC",DSN:DSN,User:DBUserID,Password:DBPassword }
+	open database myDB
+	If  the databaseIdentifier of myDB is empty
+		LogWarning "Database is not open"
+		Exit handler
+	Else
+		Log "Data base is connected and open"&   the databaseIdentifier of myDB
+	End If
+	put executeSQL(myDB,sQuery) into returnVal
+	log returnVal
+	if number of items in returnVal is 1 or number of items in returnVal is greater than 1
+		put item 1 of returnval into myval
+	end if
+	log myval.customerChargerName
+	
+	put myval.customerChargerName into DBCustomername
+	
+	log"Finished fetching customer name from database"
+	return DBCustomername
+	
+end FetchCustomerNameFromDatabase
+
+fetchPriorityFaultNameAndDescriptionFromDB "QA","select  priority,name,description from  ams.scmt_diagnostics_code_charger where  error_code='OtherError' and vendor_error_code='208' and bus_platform='Proterra-PCS-125' ;","Priority"
+to handle fetchPriorityFaultNameAndDescriptionFromDB DSN,squery,datafieldname
+	Log "Fetch charger PriorityFaultNameAndDescription from db"
+	"Utilities/ExcelOperations".readTestDataFrom Resourcepath("TestData\MySQL_Data.xlsx"), "TestData", "DBUserID"
+	Set DBUserID to the result
+	
+	"Utilities/ExcelOperations".readTestDataFrom Resourcepath("TestData\MySQL_Data.xlsx"), "TestData", "DBPassword"
+	Set DBPassword to the result
+	
+	set myDB to {type:"ODBC",DSN:DSN,User:DBUserID,Password:DBPassword }
+	open database myDB
+	If  the databaseIdentifier of myDB is empty
+		LogWarning "Database is not open"
+		Exit handler
+	Else
+		Log "Data base is connected and open"&   the databaseIdentifier of myDB
+	End If
+	put executeSQL(myDB,sQuery) into returnVal
+	
+	if number of items in returnVal is 1 or number of items in returnVal is greater than 1
+		put item 1 of returnval into myval
+	end if
+	put  myval.priority into Priority
+	Put myval.name into FaultName
+	put myval.description into FaultDescription
+	IF datafieldname is "FaultPriority"
+		If Priority is 4
+			set Priority to "Red"
+		End If
+		If Priority is between 2 and 3
+			set Priority to "Yellow"
+		End If
+		If Priority is between 0 and 1
+			set Priority to "Green"
+		End If
+		return Priority
+		
+	END IF
+	
+	IF datafieldname is "FaultName"
+		return FaultName
+		
+	END IF
+	
+	IF datafieldname is "Description"
+		return FaultDescription
+		
+	END IF
+	
+	Log "Fetch of  charger PriorityFaultNameAndDescription from db is done"
+end fetchPriorityFaultNameAndDescriptionFromDB
+

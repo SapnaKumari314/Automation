@@ -1,0 +1,566 @@
+﻿
+(*set UIDataValueList to ["vijay kt check##516213##9##Red##Inactive##2022-07-02 07:11 AM##00:05:00##73##Unknown##Proterra####Port B Shunt update rate too high##Abnormal Update Rate##This most likely means that there are multiple shunts in the high voltage junction box that are configuredas port A shunts. Port A, port B, and overhead shunts have different configurations. Verify configurationon all charge port shunts."]
+ComapareUIandOpenSearchBackEndValues UIDataValueList,"5GZEV337X7J141405","26b9fe644fd1","07/02/2022 07:11 AM","07/02/2022 07:15 AM","Jouley"*)
+
+(*set UIDataValueList to  ["fijay Joule check##516202##6##Red##Inactive##2022-06-15 07:11 AM##00:10:00##73##Unknown## ## ##Port B positive charge contactor welded##Current Above Normal, or Grounded Circuit##This fault will cause the charge cable to remain locked to the vehicle, even across a power cycle. First,clear the fault. This will unlock the lock motor. Then, power down and lock out the vehicle. Unplug chargecable. Replace port B positive charge contactor, in high voltage junction box. After replacement performa 10 minute charge session and end with the stop charge button on vehicle."]
+ComapareUIandOpenSearchBackEndValues UIDataValueList,"WAUHGAFC6DN030356","26b9fe644fd1","06/15/2022 07:11 AM","06/15/2022 07:21 AM","Jouley"*)
+
+(*
+set UIDataValueList to [@"vijay kt check##516109##9##Red##Active##2022-08-10 07:11 AM##00:05:00##73##Unknown##Proterra## ##Port A Shunt update rate too high##Abnormal Update Rate##This most likely means that there are multiple shunts in the high voltage junction box that are configuredas port A shunts. Port A, port B, and overhead shunts have different configurations. Verify configurationon all charge port shunts.##5GZEV337X7J141405::",@"vijay kt check##516099##3##Yellow##Active##2022-08-10 07:11 AM##00:05:00##73##Unknown##Proterra## ##Port A negative charge contactor voltage above normal##Voltage Above Normal or Shorted to High Source##Check harnessing between port A negative charge contactor and charge controller.##5GZEV337X7J141405::",@"vijay kt check##516100##6##Green##Active##2022-08-10 07:11 AM##00:05:00##73##Unknown##Proterra## ##Port A Shunt Over current##Current Above Normal, or Grounded Circuit##Follow appropriate safety procedures and wear appropriate PPE. Check harnessing between chargecontroller and port A shunt.##5GZEV337X7J141405::"]
+Vehicle_ComapareUIandOpenSearchBackEndValues UIDataValueList,"26b9fe644fd1","08/10/2022 07:11 AM","08/10/2022 07:27 AM","Jouley"*)
+(*set UIDataValueList to "AutotestBE ##520359##14##Red##Active##2022-08-04 07:11 AM##00:10:00##33##Unknown##Proterra## ##12V Cntctr##Special Instructions##The MUX has detected a fault on the Output.  It can detect faults in two different ways.  Fault recorded WITHOUT MUX pin Active:  The MUX monitors the voltage at the output pin to detect if the output is properly pulled down via the device it controls (example:  HV contact solenoid pulls floating output to ground).  MUX has likely detected an open circuit in the wiring.  Check wire from MUX pin to device.  Wire should not be open circuit and should show some resistance to ground.  Wiggle testing wires can be helpful to determine fault.  Wiggle wiring harness and see if fault is recorded to help focus on certain areas of the wiring harness.  If wiring has not failed, device maybe faulted.  Test and/or replace device by measuring resistance of device.   Fault recorded WITH MUX pin Active:    The MUX monitors the temperature of the output to detect if it is overheating due to high current.  Mux has likely detected a short circuit to ground.  Check wire from MUX pin to device.  Wire should not be shorted to ground.  Wiggle testing wires can be helpful to determine fault.  Wiggle wiring harness and see if fault is recorded to help focus on certain areas of the wiring harness.  If wiring has not failed, device maybe faulted.  Test and/or replace device by measuring resistance fo device.    If fault is still present this could be a failed MUX pin.  Replace MUX unit in question.##WV2YB0257EH008533"
+
+Vehicle_ComapareUIandOpenSearchBackEndValues UIDataValueList,"943a48971cae","2022-08-04 07:11 AM","2022-08-04 07:30 AM","BE35","WV2YB0257EH008533"*)
+---------------------------------------------------------------------------------------------------
+--Description: This handler is to compare UI fault dashboard data with open search and database for vehicle
+---Input : UIDataValueList,VIN,VehicleHeaderID,GTE,LTE
+---output: 
+---Created by:Shalini V
+---Created on: 21July 2022
+-----------------------------------------------------------------------------------------------------
+to handle Vehicle_ComapareUIandOpenSearchBackEndValues UIDataValueList,VehicleHeaderID,GTE,LTE,BusType,VIN
+	global iTeration
+	log "Start of function Vehicle_ComapareUIandOpenSearchBackEndValues"
+	
+	put "ApexPages/FDOpenSearchDashboardHandlers".convertDateandTimeFormat (GTE) into GTE
+	put "ApexPages/FDOpenSearchDashboardHandlers".convertDateandTimeFormat(LTE) into LTE
+	Split UIDataValueList by "::"
+	
+	
+	repeat for each item ValueLists in UIDataValueList
+		--Split ValueLists by "::" 
+		--Repeat with each item UIDataList in ValueLists
+		--VehicleName&"##"&SPN&","&FMI&","&priority&","&status&","&UITimeofFault&","&FaultDuration&","&SourceAddressValue&","&CustomerName&","&Manufacturer&","&Model&","&Trim(FaultName)&","&FaultDesc&","&Troubleshoot
+		split ValueLists by "##"
+		put ValueLists into FrontEndData
+		put item 1 of FrontEndData into VehicleName
+		put item 2 of FrontEndData into SPNValue
+		put item 3 of FrontEndData into FMI
+		put item 4 of FrontEndData into Priority
+		put item 5 of FrontEndData into Status
+		put item 6 of FrontEndData into TimeofFault
+		put item 7 of FrontEndData into FaultDuration
+		Put item 8 of FrontEndData into SourceAddress
+		put item 9  of FrontEndData into CustomerName
+		put item 10 of FrontEndData into Manufacturer
+		put item 11 of FrontEndData into Model
+		put item 12 of FrontEndData into FaultName
+		put item 13 of FrontEndData into FaultDescription
+		put item 14 of FrontEndData into Troubleshoot
+		put item 15 of FrontEndData into VIN
+		If VIN contains "::"
+			Delete "::" from VIN
+		End if
+		
+		If SourceAddress contains "o" then
+			replace "o" with "0" in SourceAddress
+		End If
+		--clearing the existing query
+		"OpenSearchDashboard".ClearExistingQueries
+		put "ApexPages/FDOpenSearchDashboardHandlers".OSDVehicleQuery (VIN,VehicleHeaderID,GTE,LTE,SPNValue) into sQuery
+		set OpensearchQuery to sQuery
+		--enter the query and get the response
+		put "OpenSearchDashboard".EnterQueryRunAndGetResponse (sQuery) into OpensearchResponse
+		
+		put "ApexPages/FDOpenSearchDashboardHandlers".FormatJsonFile into FormattedResponse
+		
+		put VIN&"_"&SPNValue&"_"&FMI into ResponseFileName
+		put "ApexPages/FDOpenSearchDashboardHandlers".createJSONFileAndWrite (ResponseFileName,FormattedResponse) into SaveRepsonse
+		
+		If SaveRepsonse is false then
+			Logerror "Local copy of response is not saved"
+		End If
+		
+		put "ApexPages/FDOpenSearchDashboardHandlers".getJSONValueFromJSONFile (ResponseFileName) into myRepsonse
+		--	put TimeofFault into UITimeofFault
+		put first 10 characters of TimeofFault into FaultDate
+		delete first 10 characters of TimeofFault 
+		delete last 2 characters of TimeofFault
+		put Trim(TimeofFault) into FaultTime 
+		put myRepsonse.hits.(hits) into ResponseValue
+		set iValidationFlag to False
+		Repeat with each item of ResponseValue
+			put it into ResponseItems
+			if ResponseItems.(_id) contains  VIN&"_"&SPNValue&"_"&FMI&"_"&SourceAddress&"_"&FaultDate&"T"&FaultTime
+				set FormattedFaultTime to FaultDate&"T"&FaultTime
+				set iValidationFlag to True
+				set ItemToValidate to ResponseItems 
+				///Validate the VIN
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDVINid (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime) into OSDVIN 
+				"Utilities/CommonActions".compareValues OSDVIN,VIN 
+				
+				///Validate the SPN
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDSPN (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime) into OSDSPN
+				"Utilities/CommonActions".compareValues OSDSPN,SPNValue 
+				///Validate the FMI
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDFMI (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime) into OSDFMI
+				"Utilities/CommonActions".compareValues OSDFMI,FMI 
+				///Validate the Prioriy
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_FaultPriorityFromOpensearch (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime,BusType) into OSDPriority
+				"Utilities/CommonActions".compareValues OSDPriority,Priority 
+				
+				///Validate the status
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDFaultStatus (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime,BusType) into OSDStatus
+				"Utilities/CommonActions".compareValues OSDStatus,Trim(Status )
+				
+				///validate the Time of fault
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDFirstOcurrence (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime,BusType) into sOSDFirstOcurrence
+				"Utilities/CommonActions".containsValue FormattedFaultTime,sOSDFirstOcurrence 
+				///Validate the Fault Duration
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_FaultDuration (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime,BusType) into OSDFDuration
+				put "ApexPages/FDOpenSearchDashboardHandlers".ConvertUITimeofFaultToSeconds (FaultDuration) into UIFaultDuration
+				"Utilities/CommonActions".compareValues OSDFDuration,UIFaultDuration 
+				////Validate the source address
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDSourceAddress (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime,BusType) into sOSDSourceAdd
+				"Utilities/CommonActions".compareValues sOSDSourceAdd,SourceAddress 
+				
+				///Validate the customer name
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDCustomerName (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime,BusType) into OSDCustomerName
+				"Utilities/CommonActions".compareValues OSDCustomerName,CustomerName 
+				///Validate the model
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_BusModelFromOpensearch (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime,BusType) into OSDModel
+				"Utilities/CommonActions".compareValues OSDModel,Model 	
+				///Validate the fault name
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDFaultName (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime,BusType) into OSDFaultName
+				"Utilities/CommonActions".compareValues Trim(OSDFaultName),Trim(FaultName)
+				
+				///Validate the fault description
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDFaultDescription (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime,BusType) into OSDFaultDesc
+				"Utilities/CommonActions".compareValues Trim(OSDFaultDesc),Trim(FaultDescription)
+				
+				///validate the troubleshoot
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDTroubleshoot (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime,BusType) into OSDTroubleshoot
+				If OSDTroubleshoot contains "&nbsp;"
+					delete "&nbsp;" from OSDTroubleshoot
+					delete "<br>" from OSDTroubleshoot
+				End If
+				delete newline in OSDTroubleshoot
+				delete newline in Troubleshoot
+				delete " " in OSDTroubleshoot
+				delete " " in Troubleshoot
+				"Utilities/CommonActions".containsValue Troubleshoot,OSDTroubleshoot
+				
+				--Validate vehicle name with database vehicle name
+				put "ApexPages/FDMySQLDatabase".FetchVehicleNameFromAMSDB ("QA","ams.asset_vehicle",VIN) into DBVehicleName
+				
+				If DBVehicleName contains "@"
+					delete "@" from DBVehicleName
+				End If
+				"Utilities/CommonActions".compareValues Trim(DBVehicleName),Trim(VehicleName)
+			end if
+		End Repeat
+		If iValidationFlag is True
+			LogSuccess "Validation is done successfully for the query "&sQuery
+		Else
+			LogError "There is no matching response in the opensearch for the given query:  "&sQuery
+		End If
+		--End repeat
+	end repeat
+	
+	log "End of function Vehicle_ComapareUIandOpenSearchBackEndValues"
+end Vehicle_ComapareUIandOpenSearchBackEndValues
+(*
+
+set UIDataValueList to "vijay pcs 60##2##OtherError##382##Red##Active##PCS_5_2_RESERVED##This is a placeholder for a future fault code.##2022-08-04 11:10 AM##24:29:06##vijay pcs 60##Pr0terra-PCS-60,Pr0terra-PCS-60## ##Contact Proterra Service if fault is observed.##5000666317~~"
+put "ApexPages/FaultDashboardSearchCriteria".GetUTCTimeStamp_HM("UTC") into CurrentTime
+ActiveChargerFaults_ComapareUIandOpenSearchBackEndValues UIDataValueList,"00120C2DF6AB5666","1659350160000","1659350280000","5000666317",CurrentTime,"Charging","",""
+*)
+---------------------------------------------------------------------------------------------------
+--Description: This handler is to compare UI fault dashboard data with open search and database for charger
+---Input : UIDataValueList,OCPPID,EpochStartTime,EpochEndTime,ChargerID,CurrentTime,ChargingStatus,ChargerNameModelSLNumQuery,ChargerPlatform
+---output: 
+---Created by:Shalini V
+---Created on: 21July 2022
+-----------------------------------------------------------------------------------------------------
+to handle ActiveChargerFaults_ComapareUIandOpenSearchBackEndValues UIDataValueList,OCPPID,EpochStartTime,EpochEndTime,ChargerID,CurrentTime,ChargingStatus,ChargerNameModelSLNumQuery,ChargerPlatform
+
+	Log"Start of function ActiveChargerFaults_ComapareUIandOpenSearchBackEndValues"
+	Split UIDataValueList by "~~"
+	
+	repeat for each item in UIDataValueList
+		split it by "##"
+		put it into FrontEndData
+		put item 1 of FrontEndData into ChargerName
+		put item 2 of FrontEndData into ConnectorID
+		put item 3 of FrontEndData into OCPPFaultcode
+		put item 4 of FrontEndData into VendorErrorCode
+		put item 5 of FrontEndData into Priority
+		put item 6 of FrontEndData into ChargerStatus
+		put item 7 of FrontEndData into FaultName
+		Put item 8 of FrontEndData into FaultDescription
+		put item 9  of FrontEndData into TimeofFaultUI
+		put item 10 of FrontEndData into FaultDurationUI
+		put item 11 of FrontEndData into CustomerName
+		put item 12 of FrontEndData into ChargerModel
+		put item 13 of FrontEndData into UIChargingStatus
+		put item 14 of FrontEndData into Troubleshoot
+		put item 15 of FrontEndData into ChargerID
+		IF ChargerStatus is "Active"
+			Set QueryStatusValue to "Faulted"
+		else
+			Set QueryStatusValue to "Available"
+		END IF
+		
+		"OpenSearchDashboard".ClearExistingQueries
+		put "ApexPages/FDOpenSearchDashboardHandlers".OSDChargerQueryWithStatus (QueryStatusValue,OCPPFaultcode,VendorErrorCode,OCPPID,EpochStartTime,EpochEndTime) into sQuery
+		set OpensearchQuery to sQuery
+		--enter the query and get the response
+		put "OpenSearchDashboard".EnterQueryRunAndGetResponse (sQuery) into OpensearchResponse
+		put "ApexPages/FDOpenSearchDashboardHandlers".FormatJsonFile(OpensearchResponse) into FormattedResponse
+		
+		put OCPPID&"_"&VendorErrorCode&"_"&OCPPFaultcode into ResponseFileName
+		put "ApexPages/FDOpenSearchDashboardHandlers".createJSONFileAndWrite (ResponseFileName,FormattedResponse) into SaveRepsonse
+		
+		If SaveRepsonse is false then
+			Logerror "Local copy of response is not saved"
+		End If
+		
+		put "ApexPages/FDOpenSearchDashboardHandlers".getJSONValueFromJSONFile (ResponseFileName) into myRepsonse
+		put "ApexPages/FDOpenSearchDashboardHandlers".convertDateandTimeFormat (TimeofFaultUI) into TimeofFault
+		put myRepsonse.hits.(hits) into ResponseValue
+		set iValidationFlag to False
+		Repeat with each item of ResponseValue
+			put it into ResponseItems
+			
+			log ResponseItems.("_source").request.timestamp
+			If ResponseItems.("_source").request.timestamp contains  TimeofFault and ResponseItems.("_source").request.vendorErrorCode is VendorErrorCode
+				set iValidationFlag to True
+				set ItemToValidate to ResponseItems 
+				///Validate connector id
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDConnectorID (ItemToValidate, OCPPID, TimeofFaultUI) into OSDConnectorID
+				"Utilities/CommonActions".compareValues OSDConnectorID,ConnectorID 
+				///validate ocpp fault code
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDOCPPFaultCode (ItemToValidate, OCPPID, TimeofFaultUI) into OSDOCPPFaultCode
+				"Utilities/CommonActions".compareValues OSDOCPPFaultCode,OCPPFaultcode
+				///vendor error code
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDVendorErrCode (ItemToValidate, OCPPID, TimeofFaultUI) into OSDVendorErrcode
+				"Utilities/CommonActions".compareValues OSDVendorErrcode,VendorErrorCode
+				
+				///validate the status
+				
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDFaultStatus_Charger (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime,BusType) into OSDStatusCharger
+				"Utilities/CommonActions".compareValues OSDStatusCharger,Trim(ChargerStatus )
+				///Validate the FaultDuration
+				"ApexPages/FDOpenSearchDashboardHandlers".ValidateActiveFaultDuration_ChargerFault  TimeofFaultUI,FaultDurationUI,CurrentTime
+				///db validation for charger name
+				put "ApexPages/FDMySQLDatabase".FetchChargerNameFromDatabase("QA",ChargerNameModelSLNumQuery) into dbChargername
+				Replace "0" in ChargerName with "O"
+				Replace "0" in dbChargername with "O"
+				"Utilities/CommonActions".compareValues ChargerName,dbChargername
+				///db validation for chrger model
+				put "ApexPages/FDMySQLDatabase".FetchChargerModelFromDatabase("QA",ChargerNameModelSLNumQuery) into dbChargermodel
+				Replace "0" in dbChargermodel with "O"
+				Replace "0" in ChargerModel with "O"
+				Replace "o" in dbChargermodel with "O"
+				Replace "o" in ChargerModel with "O"
+				set iModelFlag to false
+				repeat for each item in ChargerModel
+					If it is dbChargermodel
+						set iModelFlag to true
+						
+					End If
+				end repeat
+				If iModelFlag is false
+					LogError "Charger model value do not match with the database value"
+				Else
+					LogSuccess "Charger model value matches with the database value"
+				End If
+				
+				///db validation for charger serial number
+				put "ApexPages/FDMySQLDatabase".FetchDispenserSerialNumberFromDatabase("QA",ChargerNameModelSLNumQuery) into dbChargerSerialnum
+				"Utilities/CommonActions".compareValues trim(dbChargerSerialnum),trim(ChargerID)
+				///db validation for customer name
+				put "ApexPages/FDMySQLDatabase".FetchCustomerNameFromDatabase("QA",ChargerNameModelSLNumQuery) into dbCustomerName
+				"Utilities/CommonActions".compareValues trim(dbCustomerName),trim(CustomerName)
+				
+				set PriorityNameDescQuery to "select  priority,name,description from  ams.scmt_diagnostics_code_charger where  error_code='"&OCPPFaultcode&"' and vendor_error_code='"&VendorErrorCode&"' and bus_platform='"&ChargerPlatform&"' ;"
+				///db validation for priority
+				put "ApexPages/FDMySQLDatabase".fetchPriorityFaultNameAndDescriptionFromDB("QA",PriorityNameDescQuery,"FaultPriority") into dbPriority
+				delete " " from dbPriority
+				delete newline from dbPriority
+				
+				delete " " from Priority
+				delete newline from Priority
+				"Utilities/CommonActions".compareValues trim(dbPriority),trim(Priority)
+				
+				///db validation for fault name
+				put "ApexPages/FDMySQLDatabase".fetchPriorityFaultNameAndDescriptionFromDB("QA",PriorityNameDescQuery,"FaultName") into dbfaultname
+				delete " " from dbfaultname
+				delete newline from dbfaultname
+				
+				delete " " from FaultName
+				delete newline from FaultName
+				"Utilities/CommonActions".compareValues trim(dbfaultname),trim(FaultName)
+				///db validation for description
+				put "ApexPages/FDMySQLDatabase".fetchPriorityFaultNameAndDescriptionFromDB("QA",PriorityNameDescQuery,"Description") into dbFaultDescription
+				delete " " from dbFaultDescription
+				delete newline from dbFaultDescription
+				
+				delete " " from FaultDescription
+				delete newline from FaultDescription
+				"Utilities/CommonActions".compareValues trim(dbFaultDescription),trim(FaultDescription)
+				///charging status
+				"Utilities/CommonActions".compareValues trim(UIChargingStatus),trim(ChargingStatus)
+			End If
+		end repeat
+	end repeat
+	Log "End of function ActiveChargerFaults_ComapareUIandOpenSearchBackEndValues"
+end ActiveChargerFaults_ComapareUIandOpenSearchBackEndValues
+
+set UIFaultDashboardData to [@"[\"SPN 516109\",\"FMI 9\",\"SourceAddress 73\",\"CustomerName Unknown\",\"TimeofFault 2022-08-10 07:11 AM\"]",@"[\"SPN 516099\",\"FMI 3\",\"SourceAddress 73\",\"CustomerName Unknown\",\"TimeofFault 2022-08-10 07:11 AM\"]",@"[\"SPN 516100\",\"FMI 6\",\"SourceAddress 73\",\"CustomerName Unknown\",\"TimeofFault 2022-08-10 07:11 AM\"]",@"[\"SPN 516201\",\"FMI 100\",\"SourceAddress 73\",\"CustomerName Unknown\",\"TimeofFault 2022-07-02 07:26 AM\"]"]
+
+Vehicle_ComapareUIandOpenSearchBackEndValuesForSpecificDatafields UIFaultDashboardData,"26b9fe644fd1","08/10/2022 7:11 AM","08/10/2022 7:27 AM","JOULEY","5GZEV337X7J141405"
+//*****************************************************
+--Description: Handler to Validate fault data with opensearch dashboard for specific datafield columns
+---Input : UIFaultDashboardData,VehicleHeaderID,GTE,LTE,BusType,VIN
+---output: 
+---Created by:Shalini V
+--created on: 17 August 2022
+//*****************************************************
+to handle Vehicle_ComapareUIandOpenSearchBackEndValuesForSpecificDatafields UIFaultDashboardData,VehicleHeaderID,GTE,LTE,BusType,VIN
+	global iTeration
+	log "starting the handler Vehicle_ComapareUIandOpenSearchBackEndValuesForSpecificDatafields"
+	
+	put "ApexPages/FDOpenSearchDashboardHandlers".convertDateandTimeFormat (GTE) into GTEValue
+	put "ApexPages/FDOpenSearchDashboardHandlers".convertDateandTimeFormat(LTE) into LTEValue
+	
+	put first 10 characters of GTE into FromDate
+	delete first 10 characters of GTE 
+	
+	put Trim(GTE) into FromTime 
+	
+	put first 10 characters of LTE into ToDate
+	delete first 10 characters of LTE 
+	
+	put Trim(LTE) into ToTime 
+	repeat for each item ValueLists in UIFaultDashboardData
+		
+		repeat for each item Datafield in ValueLists
+			If Datafield contains "SPN"
+				Delete "SPN" from Datafield
+				Delete <<">> from Datafield
+				Delete "[" from Datafield
+				Delete "]" from Datafield
+				put trim(Datafield) into SPNValue
+			End If
+			
+			If Datafield contains "FMI"
+				Delete "FMI" from Datafield
+				Delete <<">> from Datafield
+				Delete "[" from Datafield
+				Delete "]" from Datafield
+				put trim(Datafield) into FMIValue
+			End If
+			
+			If Datafield contains "SourceAddress"
+				Delete "SourceAddress" from Datafield
+				Delete <<">> from Datafield
+				Delete "[" from Datafield
+				Delete "]" from Datafield
+				put trim(Datafield) into SourceAddressValue
+			End If
+			
+			If Datafield contains "CustomerName"
+				Delete "CustomerName" from Datafield
+				Delete <<">> from Datafield
+				Delete "[" from Datafield
+				Delete "]" from Datafield
+				put trim(Datafield) into CustomerNameValue
+			End If
+			
+			If Datafield contains "TimeofFault"
+				Delete "TimeofFault" from Datafield
+				Delete <<">> from Datafield
+				Delete "[" from Datafield
+				Delete "]" from Datafield
+				put trim(Datafield) into TimeofFault
+			End If
+		end repeat
+		If SourceAddressValue contains "o" then
+			replace "o" with "0" in SourceAddress
+		End If
+		
+		
+		put CheckTimeofFaultRange (FromDate,ToDate,FromTime,ToTime,TimeofFault) into TimeRangeValidation
+		--		FromDate,ToDate,FromTime,ToTime,TimeofFault
+		If 	TimeRangeValidation is True
+			--clearing the existing query
+			"OpenSearchDashboard".ClearExistingQueries
+			put "ApexPages/FDOpenSearchDashboardHandlers".OSDVehicleQuery (VIN,VehicleHeaderID,GTEValue,LTEValue,SPNValue) into sQuery
+			set OpensearchQuery to sQuery
+			--enter the query and get the response
+			put "OpenSearchDashboard".EnterQueryRunAndGetResponse (sQuery) into OpensearchResponse
+			
+			put "ApexPages/FDOpenSearchDashboardHandlers".FormatJsonFile into FormattedResponse
+			
+			put VIN&"_"&SPNValue&"_"&FMIValue into ResponseFileName
+			put "ApexPages/FDOpenSearchDashboardHandlers".createJSONFileAndWrite (ResponseFileName,FormattedResponse) into SaveRepsonse
+			
+			If SaveRepsonse is false then
+				Logerror "Local copy of response is not saved"
+			End If
+			
+			put "ApexPages/FDOpenSearchDashboardHandlers".getJSONValueFromJSONFile (ResponseFileName) into myRepsonse
+			--	put TimeofFault into UITimeofFault
+			put first 10 characters of TimeofFault into FaultDate
+	delete first 10 characters of TimeofFault 
+			delete last 2 characters of TimeofFault
+		put Trim(TimeofFault) into FaultTime 
+		put myRepsonse.hits.(hits) into ResponseValue
+		set iValidationFlag to False
+		Repeat with each item of ResponseValue
+			put it into ResponseItems
+			
+			if ResponseItems.(_id) contains  VIN&"_"&SPNValue&"_"&FMIValue&"_"&SourceAddressValue&"_"&FaultDate&"T"&FaultTime
+				set FormattedFaultTime to FaultDate&"T"&FaultTime
+				set iValidationFlag to True
+				set ItemToValidate to ResponseItems 
+				///Validate the VIN
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDVINid (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime) into OSDVIN 
+				"Utilities/CommonActions".compareValues OSDVIN,VIN 
+				
+				///Validate the SPN
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDSPN (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime) into OSDSPN
+				"Utilities/CommonActions".compareValues OSDSPN,SPNValue 
+				///Validate the FMI
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDFMI (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime) into OSDFMI
+				"Utilities/CommonActions".compareValues OSDFMI,FMIValue 
+				
+				////Validate the source address
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDSourceAddress (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime,BusType) into sOSDSourceAdd
+				"Utilities/CommonActions".compareValues sOSDSourceAdd,SourceAddressValue
+				
+				///Validate the customer name
+				put "ApexPages/FDOpenSearchDashboardHandlers".Fetch_OSDCustomerName (ItemToValidate, VIN, SPNValue,FMI, SourceAddress,FaultDate,FaultTime,BusType) into OSDCustomerName
+				"Utilities/CommonActions".compareValues OSDCustomerName,CustomerNameValue 
+				
+				
+			End if
+			
+			
+			
+		End Repeat
+		
+		If iValidationFlag is True
+			LogSuccess "Validation is done successfully for the query "&sQuery
+		Else
+			LogError "There is no matching response in the opensearch for the given query:  "&sQuery
+		End If
+		Else
+		LogWarning "Time of fault is not within the given timerange"
+	End If
+	
+	
+	--End repeat
+end repeat
+
+log "Ending the handler Vehicle_ComapareUIandOpenSearchBackEndValuesForSpecificDatafields"
+end Vehicle_ComapareUIandOpenSearchBackEndValuesForSpecificDatafields
+//*****************************************************
+--Description: Handler to check if the time of fault within the given range(can used while validating for active faults to filter out fault that is not in the range)
+---Input : FromDate,ToDate,FromTime,ToTime,faultdateTime
+---output: iTimeValidationFlag
+---Created by:Shalini V
+--created on: 17 August 2022
+//*****************************************************
+
+to handle CheckTimeofFaultRange FromDate,ToDate,FromTime,ToTime,faultdateTime
+	try
+		global ConfigValues
+		log "Start of function CheckTimeofFaultRange"
+		If item 1 of faultdateTime is "Time of fault"
+			delete item 1 of faultdateTime --deletes the time of fault header
+		end if
+		set iTimeValidationFlag to True
+		repeat for each item of faultdateTime
+			If it is not ""
+				
+				Delete " " from it
+Put " " after character 10 of it
+				If character 14 of it is not ":"
+					Put ":" after character 13 of it
+				End If
+				
+				put  " " after  character 16 of it
+				put  first 10 characters of it into faultdate
+				delete first 10 characters of it
+				put trim(it) into faulttime
+				If 3rd  character  of faulttime is not ":"
+					delete character 3 of faulttime
+					put ":" after character 2 of faulttime
+				end if
+				
+				put formattedTime("%m/%d/%Y",faultdate) into faultdate
+				(*	set faulttime to "6:00 PM"
+			set FromTime to "7:00 PM"
+			set ToTime to "8:00 PM"*)
+				//put the time
+				put formattedTime("%H-%M-%S",  FromTime) into FromTime
+				put formattedTime("%H-%M-%S",  ToTime) into ToTime
+				put formattedTime("%H-%M-%S",  faulttime) into faulttime
+				If FromDate is empty then
+					"Utilities/GenericOperations".Error("From date is not passed to the script")
+					Exit handler
+					
+				end if
+				
+				
+				if FromDate is equal to ToDate then
+					if ToDate is equal to faultdate
+						if  faulttime is between FromTime and ToTime
+							"Utilities/GenericOperations".Success("Fault time is within selected range")
+						else 
+						
+							set iTimeValidationFlag to False
+						end if
+						
+						else
+						if faultdate is between FromDate and ToDate
+							"Utilities/GenericOperations".Success("Fault time is within selected range")
+						else 
+						
+							set iTimeValidationFlag to False
+						end if    
+					end if
+					else
+					
+					if faultdate is between FromDate and ToDate
+						If ToDate is equal to faultdate then
+							--if  faulttime is between FromTime and ToTime
+							if  faulttime is less than ToTime
+								"Utilities/GenericOperations".Success("Fault time is within selected range")
+							else if faulttime is equal to  ToTime
+								"Utilities/GenericOperations".Success("Fault time is within selected range")
+							else
+								
+								set iTimeValidationFlag to False	
+							end if
+						else
+							If FromDate is equal to faultdate then
+								--if  faulttime is between FromTime and ToTime
+								if  faulttime is greater than FromTime then
+									"Utilities/GenericOperations".Success("Fault time is within selected range")
+								else if faulttime is equal to FromTime then
+									"Utilities/GenericOperations".Success("Fault time is within selected range")
+								else 
+									"Utilities/GenericOperations".Error("Fault time is not within selected range")
+									set iTimeValidationFlag to False
+								end if
+							End If
+							
+						end if
+						
+					else
+						"Utilities/GenericOperations".Error("Fault time is not within selected range")
+						set iTimeValidationFlag to False
+					end if
+				end if
+			End if
+			
+		end repeat
+		catch exception
+		get "Utilities/GenericOperations".LogException(exception,CheckTimeofFaultRange)
+	end try
+	log "End of function CheckTimeofFaultRange"
+	return iTimeValidationFlag
+end CheckTimeofFaultRange

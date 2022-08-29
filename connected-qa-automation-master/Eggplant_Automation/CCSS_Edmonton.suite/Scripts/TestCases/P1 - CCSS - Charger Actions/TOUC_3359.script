@@ -1,0 +1,58 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 18/Apr/22
+@TC_ID: TOUC_3359
+@TC_Description: CCSS-CC-Charger Actions: Initiate Charging Alert action for Ready/Topped Up buses
+***)
+
+BeginTestCase TOUC_3359
+
+Log "###########   Started execution of Test Case--> TOUC_3359   ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Select any Bus from the IQ or search for a Bus which is not in the garage
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusIsNotInTracksFromAPI BusId, "CCSS_P1_TestData", "ChargerActions", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+--Ensure that the Needs Maintenance Checkbox is not selected and click the Recommended Run & Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+
+---Select a Run such that the 
+--Current Energy  > Threshold Energy 
+--& Current Energy  > Required Energy
+--using the Run override if the default run does not match the requirement
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "ThresholdRatio") into ThresholdRatio
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectARunWhereCurrentEnrgyGreaterThnReqEnnrgyAndThrEnrgy ThresholdRatio
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+
+--Select a Non Charger Track Position using Track Override if the default track does not match the requirement
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgActiveCharger"
+--Click the Assign Run & Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "no"
+
+--Verify Toast msg
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "ToastMsgPosition") into ToastMsgPosition
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage ToastMsgPosition
+
+--Click the Menu and select Charger Control
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+
+--Verify that the Initiate Charging Alert is not displayed in the Alerts section
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "InitiateChargingMsg") into InitiateChargingMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyAlertMessageNotPresent InitiateChargingMsg
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3359 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3359
+

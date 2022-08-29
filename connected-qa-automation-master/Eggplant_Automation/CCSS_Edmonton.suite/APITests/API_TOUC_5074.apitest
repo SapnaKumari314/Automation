@@ -1,0 +1,35 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = chargerIds;
+	    showCheckedNumber = <*BY>;
+	    value = "[[chargerId]]";
+	},
+	{
+	    checkedNumber = <*BY>;
+	    param = start;
+	    showCheckedNumber = <*BY>;
+	    value = "[[startTimestamp]]";
+	},
+	{
+	    checkedNumber = <*BY>;
+	    param = end;
+	    showCheckedNumber = <*BY>;
+	    value = "[[endTimestamp]]";
+	}
+    );
+    authenticationType = None;
+    httpVerb = GET;
+    oauth1Token = "";
+    password = "";
+    requestBody = "";
+    requestBodyFormat = "Form Url Encoded";
+    requestHeaders = "<![CDATA[x-api-key:[[xapikey]]
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "[[BaseURI]]/external/chargerMetrics?chargerIds=[[chargerId]]&start=[[startTimestamp]]&end=[[endTimestamp]]";
+    userName = "";
+}

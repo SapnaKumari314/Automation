@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		949,
+		182,
+		110,
+		42
+	],
+	"lastmodifieddate": 1656328577.3470001,
+	"createddate": 1656328577.3470001,
+	"name": "VehicleSelected",
+	"lastfounddate": 1656353268.3309999,
+	"ocrcapturestring": "Vehicle",
+	"lastfoundlocation": [
+		949,
+		182,
+		110,
+		42
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[55,21]",
+					"Tolerance": "_52",
+					"Discrepancy": "_0",
+					"SearchType": "Smoothed for Text"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "VehicleSelected.png",
+				"connectionname": "SUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					949,
+					182,
+					110,
+					42
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "Vehicle"
+			}
+	]
+}

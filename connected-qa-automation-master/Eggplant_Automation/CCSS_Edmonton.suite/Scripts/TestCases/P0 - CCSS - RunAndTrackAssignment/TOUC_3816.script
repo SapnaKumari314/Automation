@@ -1,0 +1,76 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 16/Aug/22
+@TC_ID: TOUC_3816
+@TC_Description: CCSS-RRT-Assign Run and Track: Recommended Run and Track when BEB Tracks are fully occupied
+***)
+
+BeginTestCase TOUC_3816
+
+Log "###########   Started execution of Test Case--> TOUC_3816   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+
+-----Preconditions a.k.a. Test Data scripts
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".ParkBusInTheTrack "RunAndTrackAssignmentPage\imgLastChargerColumn_1", BusId, "CCSS_P0_TestData", "RunAndTackAssignment", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "BusID3") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".ParkBusInTheTrack "RunAndTrackAssignmentPage\imgLastChargerColumn_2", BusId, "CCSS_P0_TestData", "RunAndTackAssignment", "BusId3", "customerGarageId", "RunID", "API_Bus_Details_busVins3", "tenantId"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "BusID4") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".ParkBusInTheTrack "RunAndTrackAssignmentPage\imgLastChargerColumn_3", BusId, "CCSS_P0_TestData", "RunAndTackAssignment", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins4", "tenantId"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "BusID5") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".ParkBusInTheTrack "RunAndTrackAssignmentPage\imgLastChargerColumn_4", BusId, "CCSS_P0_TestData", "RunAndTackAssignment", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins5", "tenantId"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "BusID6") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".ParkBusInTheTrack "RunAndTrackAssignmentPage\imgLastChargerColumn_5", BusId, "CCSS_P0_TestData", "RunAndTackAssignment", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins6", "tenantId"
+
+---------------------------------------------------------
+
+--Select a Bus from the Incoming Queue
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "BusID") into BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+--Uncheck the Needs Maintenance (if selected)
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+--Click Recommended Run and Track button
+--* Warning message "Unable to recommend a run. Please click Override button to select a run" is displayed to the user
+--* Recommended Run and Track details are not populated
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage "Unable to recommend a run. Please click Override button to select a run"
+
+--Click the Override Button from Run Details
+--Only Non Recommended Run are displayed
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+
+--Select a Run and confirm
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "ThresholdRatio") into ThresholdRatio
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectARunWhereCurrentEnrgyGreaterThnReqEnnrgyAndThrEnrgy ThresholdRatio
+
+--Click the Override Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+--Select a Track and confirm
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgBlackTrack"
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickConfirmButton 
+
+
+--Click Assign Run & Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton
+--Verify Toast msg
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "ToastMsg") into ToastMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage ToastMsg
+
+Log "#############  Finished execution of Test Case--> TOUC_3816 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3816
+
+
+

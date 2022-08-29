@@ -1,0 +1,61 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 04/Apr/22
+@TC_ID: TOUC_3324
+@TC_Description: CCSS-RRT-Run Details: Estimated Charge Time when charger position is not available for Not Ready Buses
+***)
+
+BeginTestCase TOUC_3324
+
+Log "###########   Started execution of Test Case--> TOUC_3324   ##############"
+Log "#######################################################"
+
+--Navigate to the CCSS Application
+"CCSS_Pages/BasePage".OpenApplication
+--Login
+"CCSS_Pages/BasePage".Login
+
+--Ensure that all the Charger Positions are occupied by Buses
+"CCSS_Pages/RunAndAssignmentTrackPage".EnsureAllChargersAreOccupied
+
+
+--Enter a Bus ID in the BEB search box such that Current Energy is less than Required Energy for a Bus which is not in the garage
+--Select the Bus from the populated list
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "BusIDNotReadyNotInGarage") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusStatusIsNotReady
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "bus_image_run_and_track_screen") into bus_image_run_and_track_screen
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusIsNotInTracksByImage bus_image_run_and_track_screen
+
+--Click the Recommended Run and Track button from the Bus Details
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedRunDetails 
+
+--Verify that the Estimated Charge Time value is displayed as 00:00
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyEstimatedChargeTime "00:00"
+
+Log "#############  Finished execution of Test Case--> TOUC_3324 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3324
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

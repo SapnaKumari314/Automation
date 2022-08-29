@@ -1,0 +1,46 @@
+{
+	"lastmodifieddate": 1657017891.849,
+	"lastfoundlocation": [
+		1863,
+		96,
+		27,
+		27
+	],
+	"originalcapturelocation": [
+		1863,
+		96,
+		27,
+		27
+	],
+	"createddate": 1657017891.849,
+	"lastfounddate": 1659110701.2969999,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[12,15]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "img_CancelDownloads.png",
+				"connectionname": "PROSUT",
+				"type": 1,
+				"capturerect": [
+					1863,
+					96,
+					27,
+					27
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com"
+			}
+	],
+	"name": "img_CancelDownloads"
+}

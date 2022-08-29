@@ -1,0 +1,55 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 07/Apr/22
+@TC_ID: TOUC_3337
+@TC_Description: CCSS-RRT-Track Details: Assigned Track Details for Maintenance Bus in Non Charger Position
+***)
+
+BeginTestCase TOUC_3337
+
+Log "###########   Started execution of Test Case--> TOUC_3337   ##############"
+Log "#######################################################"
+--Navigate to the CCSS Application
+"CCSS_Pages/BasePage".OpenApplication
+
+--Login
+"CCSS_Pages/BasePage".Login
+
+--Remove bus from Garage
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P0_TestData", "RunAndTrackComponents", "BusID", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+
+--Enter a Bus ID in the BEB search box for a Bus which is in the garage in a charger position
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "BusIDInGarage") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".CheckNeedsMaintenanceCheckBx
+
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton 
+
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack 
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgBlackTrack"
+
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "ToastMsg") into toastMsg
+put "CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage (toastMsg) into outputtoastmsg
+"Utilities/ExcelOperations".writeDataIntoExcel "TestData\CCSS_P0_TestData.xlsx","RunAndTrackReassignment","BusID",BusId,"OutputToastMsg",outputtoastmsg
+
+--Select the Bus from the populated list
+--Assigned Track Details section is displayed with Track details
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedTrackDetails
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3337 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3337
+
+
+
+
+
+
+
+
+
+

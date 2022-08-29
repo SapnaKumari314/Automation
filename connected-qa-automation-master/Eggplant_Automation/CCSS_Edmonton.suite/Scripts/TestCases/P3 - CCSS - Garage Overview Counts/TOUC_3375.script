@@ -1,0 +1,62 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 25/July/22
+@TC_ID: TOUC_3375
+@TC_Description: CCSS-GO-Counts: Charging Station counts
+***)
+
+BeginTestCase TOUC_3375
+
+Log "###########   Started execution of Test Case--> TOUC_3375  ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Pre-Req : Multiple BEBs with "Not-Ready", "Ready" and "Ready/Top Up" status should be present in Garage having runs assigned.
+"CCSS_Pages/PrerequsiteTestData/GarageOverview".RemoveBusFromAPI "CCSS_P3_TestData", "GarageOverview", "BusId", "RunID", "API_Bus_Details_busVins", "TOUC_3375"
+"CCSS_Pages/PrerequsiteTestData/GarageOverview".RemoveBusFromAPI "CCSS_P3_TestData", "GarageOverview", "BusId2","RunID2", "API_Bus_Details_busVins2", "TOUC_3375"
+
+"CCSS_Pages/PrerequsiteTestData/GarageOverview".CreateBusWithAnStatusAndAssignOnTrack "ready", "RunAndTrackAssignmentPage\imgActiveCharger" ,"CCSS_P3_TestData", "GarageOverview", "BusId2", "customerGarageId", "RunID", "API_Bus_Details_busVins", "TOUC_3375", "ToastMsg2", "no"
+
+
+--Adding Delayed bus
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "BookoutDelay", "BusID") into BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+--Select the Needs Maintenance Checkbox
+"CCSS_Pages/RunAndAssignmentTrackPage".UnCheckNeedsMaintenanceCheckBx
+--Click the Recommended Run and Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+
+--Select a Run such that the Bus would need charging
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectARunWhereCurrentEnrgyLessThnReqEnnrgy 
+
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgBlackTrack"
+
+--Click the Assign Run & Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "no"
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "BookoutDelay", "ToastMsg") into ToastMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage ToastMsg
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview", 1
+
+TypeText pageDown
+--Verify the Ready count from the BEB Bookout Status counts
+--Verify the Delay Expected (>5min) count from the BEB Bookout Status counts
+"CCSS_Pages/GarageOverview".VerifyChargingStations "Charging_InChargingStn", "0", "0","-11","-50","-30"
+"CCSS_Pages/GarageOverview".VerifyChargingStations "Active", "1", "-35","11","50","30"
+"CCSS_Pages/GarageOverview".VerifyChargingStations "Fault", "0",   "-35","11","50","30"
+"CCSS_Pages/GarageOverview".VerifyChargingStations "Inactive", "1",  "-45","11","50","30"
+TypeText pageUp
+
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3375 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3375

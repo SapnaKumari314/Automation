@@ -1,0 +1,75 @@
+{
+	"originalcapturelocation": [
+		1300,
+		235,
+		38,
+		28
+	],
+	"lastmodifieddate": 1657527546.477,
+	"createddate": 1656334760.697,
+	"name": "SearchIcon",
+	"lastfounddate": 1656354188.174,
+	"ocrcapturestring": "Q",
+	"lastfoundlocation": [
+		1304,
+		239,
+		30,
+		20
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[19,14]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "NewFolder/SearchIcon.png",
+				"connectionname": "SUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					1300,
+					235,
+					38,
+					28
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "Q"
+			},
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[4,4,34,24]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[15,10]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "NewFolder/SearchIcon.png",
+				"connectionname": "SUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					1300,
+					235,
+					30,
+					20
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "Q"
+			}
+	]
+}

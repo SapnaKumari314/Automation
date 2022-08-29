@@ -1,0 +1,103 @@
+﻿(***
+@Author: Shalini Vijayakumar
+@Date: 2/Aug/2022
+@TC_ID: TOUC_10666
+@TC_Description: Verify that when a user able to see all fault data fields in fault dashboard for the charger with critical fault in active state
+***)
+
+BeginTestCase TOUC_10666
+Log "###########   Started execution of Test Case--> TOUC_10666  ##############"
+Log "#######################################################"
+
+
+--Prereq:
+--Create an active charger fault
+
+--"1.Login as an superadmin in Apex Portal.
+
+"LoginPage".OpenApplication
+
+"LoginPage".Login "ProterraAdmin"
+Set DatasheetPath to Resourcepath("TestData\TOUC-10666.xlsx")
+--Fetch the charger id from the charger management screen forthe given ocpp id
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "OCPPID") into OCPPID
+put "ApexPages/FaultDashboardCharger".Fetch_ChargerIDWRTCPPID(OCPPID) into ChargerID
+put item 2 of split(ChargerID,":") into ChargerID
+--2.Under Historical Data on Left menu choose Fault Dashboard
+get "ApexPages/FaultDashboardSearchCriteria".NavigateTo ("HISTORICAL DATA","FAULT DASHBOARD")
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "CustomerName") into CustomerName
+get  "ApexPages/FaultDashboardSearchCriteria".AssetTypeSelection ("Charger")
+get "ApexPages/FaultDashboardSearchCriteria".SelectCustomer (CustomerName)
+--3.Select the charger option and select the customer in dropdown with the appropriate charger name,status,date and click on Get Data in sequential format and select the Critical fault in priority and click on get data
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "AssetName") into AssetID
+put "Active" into Status
+put "Red" into Priority
+get "ApexPages/FaultDashboardSearchCriteria".SelectAssetID ("Charger",AssetID)
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultPriority (Priority)
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultStatus (Status)
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDateTime") into FromDateTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDateTime") into ToDateTime
+
+If uppercase(Status) is not "ACTIVE"
+	
+	"ApexPages/FaultDashboardSearchCriteria".SelectDateRange FromDateTime,ToDateTime
+end if
+
+get "ApexPages/FaultDashboardSearchCriteria".ClickGetDataBtn
+
+put "ApexPages/FaultDashboardSearchCriteria".GetUTCTimeStamp_HM("UTC") into CurrentTime
+"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Sequential"
+--4.Verify the data fields with data from the Data base
+--Data should be exact & precise information of the customers from the Backend & fault should be shown active with exact fault occurrence & duration
+
+--4.1 validating if the fault is critical and active
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromTime") into FromTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToTime") into ToTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDate") into ToDate
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDate") into FromDate
+If uppercase(Status) is not "ACTIVE"
+	put "ApexPages/FaultDashboardCharger".Fetch_ChargerFault_TimeofFaultRowValues into faultdateTime
+	get "ApexPages/FaultDashboardCharger".VerifyTimeofFaultRange (FromDate,ToDate,FromTime,ToTime,faultdateTime)
+end if
+put "ApexPages/FaultDashboardCharger".Extract_DatafieldRowSeries_from_FD_WithReferenceValue_Charger (ChargerID,"Priority") into PriorityColRows
+"ApexPages/FaultDashboardCharger".Verify_FilteredDatafieldColumn "Priority",PriorityColRows,"Red"
+
+put "ApexPages/FaultDashboardCharger".Extract_DatafieldRowSeries_from_FD_WithReferenceValue_Charger  (ChargerID,"Status") into UIStatus
+"ApexPages/FaultDashboardCharger".Verify_FilteredDatafieldColumn "Status",UIStatus,"Active"
+
+
+--selecting all datafieldcolumns under customization
+"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "All"
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "VendorErrorcode") into VendorErrorCode
+----------------------fetching the details from the UI dashboard---------------------
+
+--put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDateTime") into ToDateTime
+(*put [] into FDUIList
+set 	iDataIteration to 0
+repeat for each item Charger in ChargerID
+	set 	iDataIteration to iDataIteration+1*)
+--"ApexPages/FaultDashboardSearchCriteria".SelectFilterDropdown "Charger ID",ChargerID,"CHARGER"
+"ApexPages/FaultDashboardSearchCriteria".SelectFilterDropdown "Vendor Error Code",VendorErrorCode,"CHARGER"
+put "ApexPages/FaultDashboardCharger".FetchUIDashboardData_Charger (ChargerID) into UIChargerData
+(*put UIDatalist into item iDataIteration of FDUIList
+end repeat*)
+"LoginPage".Logout
+-------------------------------------Backend Validation (Open Search Dashboard and MySQL Database---------------------------------------
+--launch and login open search dashboard
+"OpenSearchDashboard".OpenApplication_OpenSearch 
+"OpenSearchDashboard".OpenSearchLogin ""
+--navigate to dev tools open in opensearch dashboard
+"OpenSearchDashboard".NavigateTo "Dev Tools"
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "EpochStartTime") into EpochStartTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "EpochEndTime") into EpochEndTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ChargingStatus") into ChargingStatus
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ChargerNameModelSLNumQuery") into ChargerNameModelSLNumQuery
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ChargerPlatform") into ChargerPlatform
+"ApexPages/DataValidation".ActiveChargerFaults_ComapareUIandOpenSearchBackEndValues UIChargerData,OCPPID,EpochStartTime,EpochEndTime,ChargerID,CurrentTime,ChargingStatus,ChargerNameModelSLNumQuery,ChargerPlatform
+"OpenSearchDashboard".LogoutOpensearchDashboard
+
+Log "#############  Finished execution of Test Case--> TOUC_10666 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_10666

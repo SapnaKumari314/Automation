@@ -1,0 +1,144 @@
+﻿
+
+-----------Login Page
+(*set the SearchRectangle to ScreenPart("LoginArea")
+log 123
+log ReadText(ScreenPart("LoginArea"))*)
+(*
+set global mediumTimeout to 15
+set the suitevariables to  {BasicTimeout:"6", MediumTimeout:"12"}
+
+log suitevariables.BasicTimeout
+*)
+
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		LogoffArea:[[.80,0],[1,.290]],
+		LoginArea:[[.45,.375],[.75,.75]],
+		APILoadingIconArea:[[.25,.375],[.75,.75]],
+	}
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+End ScreenPart
+-----------------------------------------------------
+
+--Description: This handler is used to Open the application on a certain browser
+---Input : None
+---output: None
+---Created by:Vivek
+to OpenApplication
+	try
+		--To set global wait variables over the suite
+		set Global ConfigValues to {MinTimeOut:"4",BasicTimeOut:"7",MediumTimeOut:"14",LongTimeOut:"30"}
+
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "ApplicationURL"
+		Set appUrl to the result
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "BrowserName"
+		Set browserName to the result
+		"Utilities/GenericOperations".LaunchApplication browserName, appUrl
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "IternationNumber"
+		set Global Iteration to  the result
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,openApplication)
+	End try
+end openApplication
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Description: This handler is used to Login to the Apex application
+---Input : None
+---output: None
+---Created by:Himaja
+
+to  handle Login userRole
+	try
+		
+		Global ConfigValues,Iteration
+		
+		set the SearchRectangle to ScreenPart("LogoffArea")
+		Wait 5
+		if ImageFound(Image:"CommonImages/img_ProfileIcon", waitFor:ConfigValues.BasicTimeOut) Then
+			Try
+				click FoundImageLocation()
+				Click {text:"Logout", waitFor:ConfigValues.BasicTimeOut,validCharacters:"Logout"}
+				click FoundImageLocation()
+				LogSuccess "Logout clicked successfully"
+			Catch theException	
+				Log "Application logged out"
+			End try
+		end if
+		
+		set the SearchRectangle to empty
+		if userRole=""
+			"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "UserID"
+			Set UserID to the result
+			"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "Password"
+			Set Password to the result
+		else if userRole="ProterraAdmin"
+			"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "ProterraAdminUserID"
+			Set UserID to the result
+			"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "ProterraAdminPassword"
+			Set Password to the result
+		end if
+		
+		set the SearchRectangle to ScreenPart("LoginArea")
+		if  ImageFound(text:"Email", waitFor: ConfigValues.MinTimeOut) Then
+			click ImageLocation(text:"Email", WaitFor:20)+[0,20]
+			typetext controlKey, a
+			typetext UserID
+			LogSuccess "User name entered successfully" 
+			"Utilities/GenericOperations".CaptureScreenshot
+		else
+			LogError "Unable to enter User name successfully"
+			"Utilities/GenericOperations".CaptureScreenshot
+		end if
+		
+		if  ImageFound(text:"Password", waitFor: ConfigValues.BasicTimeOut) Then
+			click ImageLocation(text:"Password", WaitFor:ConfigValues.BasicTimeOut, caseSensitive:yes)
+			typetext controlKey, a
+			typetext Password
+			LogSuccess "Password entered successfully"
+			"Utilities/GenericOperations".CaptureScreenshot
+		else
+			LogError "Unable to enter Password successfully"
+			"Utilities/GenericOperations".CaptureScreenshot
+		end if	
+		if  ImageFound(text:"Sign In", waitFor: ConfigValues.MinTimeOut) Then
+			click item 2 of EveryImageLocation(text:"Sign In", waitfor:ConfigValues.BasicTimeOut)
+			LogSuccess "Sign In clicked successfully"
+			"Utilities/GenericOperations".CaptureScreenshot
+		else
+			LogError  "Unable to click on Sign In"
+			"Utilities/GenericOperations".CaptureScreenshot
+		end if
+		set the SearchRectangle to empty
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Login)
+	End try
+end Login
+
+--Description: Handler to logout of Apex Application
+---Input : None
+---output: None
+---Created by:Himaja
+to Logout 
+	try 
+		Global ConfigValues,Iteration
+		set the SearchRectangle to ScreenPart("LogoffArea")
+		if ImageFound(Image:"CommonImages/img_ProfileIcon", waitFor:ConfigValues.BasicTimeOut)
+			click FoundImageLocation()
+			Click {text:"Logout", waitFor:ConfigValues.BasicTimeOut,validCharacters:"Logout"}
+			click FoundImageLocation()
+			LogSuccess "Logout clicked successfully"
+		else
+			LogError "Unable to click Logout"
+		end if
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Logout)
+	End try
+end Logout

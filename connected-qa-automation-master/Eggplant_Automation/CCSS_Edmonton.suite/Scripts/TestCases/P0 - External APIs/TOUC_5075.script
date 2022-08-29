@@ -1,0 +1,31 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 19/July/22
+@TC_ID: TOUC_5075
+@TC_Description: (EXTERNAL_API): Bus Readings: Verify /busReadings API
+***)
+
+BeginTestCase TOUC_5075
+
+Log "###########   Started execution of Test Case--> TOUC_5075   ##############"
+Log "#######################################################"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "TOUC_5075", "date") into date
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "TOUC_5075", "buses") into buses
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "TOUC_5075", "signalNames") into signalNames
+
+
+put  "CCSS_Pages/API".RunAPIForTestScript( "TOUC_5075", buses, date, "", signalNames) into responseBody
+log responseBody
+
+--Fetch response to validate
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "TOUC_5075", "ResponseToValidate") into ResponseToValidate
+log responseToValidate
+
+"CCSS_Pages/API".CompareJsonResponses responseToValidate, responseBody
+
+
+Log "#############  Finished execution of Test Case--> TOUC_5075 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_5075

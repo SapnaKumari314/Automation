@@ -1,0 +1,8 @@
+
+RunID:12201
+RunStatus:Not Assigned
+EstimatedCharge:Estimated Chaise Time
+N/A
+BookOutDate:Apr 03,14:16
+RequiredEnergy:486
+Distance:304

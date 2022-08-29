@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<statistics>
+ <script name="ApexPages/FaultDashboardVehicle">
+  <LastStatus>Success</LastStatus>
+  <NumberOfRuns>24</NumberOfRuns>
+  <NumberOfFails>3</NumberOfFails>
+  <FirstRun>2022-06-27 15:23:38 +0530</FirstRun>
+  <LastRun>2022-06-30 21:31:22 +0530</LastRun>
+  <TotalTimeOnSuccess>114.936000</TotalTimeOnSuccess>
+ </script>
+ <script name="TestCases/S3_TC15_TOUC-10568">
+  <LastStatus>Success</LastStatus>
+  <NumberOfRuns>8</NumberOfRuns>
+  <NumberOfFails>6</NumberOfFails>
+  <FirstRun>2022-07-12 13:00:38 +0530</FirstRun>
+  <LastRun>2022-07-12 17:06:47 +0530</LastRun>
+  <TotalTimeOnSuccess>1114.195000</TotalTimeOnSuccess>
+ </script>
+</statistics>

@@ -1,0 +1,44 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 15/Jul/22
+@Description: This script is the Test Data automation for LCQ scripts
+***)
+
+to handle ReadTestDataSheet sheetName, columnNameToRead
+	Log "*****Reading test data file - Prerequisite_TestData and test data for BEB Search"
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\Prerequisite_TestData_BEBSearch.xlsx", sheetName, columnNameToRead) into columnValue
+	return columnValue
+end ReadTestDataSheet
+
+to handle RemoveBusFromAPI xlsFileName, SheetName, BusID, RunID, API_Bus_Details_busVins, preReqTDSheetName
+	Log "****Removing bus from the tracks"
+	--put "Utilities/GetAuthorizationToken".getAutherizationTokenForAPI into authToken
+	put "Utilities\exceloperations".ReadFromFile  ("authtoken", "token") into authToken
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, BusID) into BusId
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, customerGarageId) into customerGarageId
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, RunID) into RunID
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, API_Bus_Details_busVins) into API_Bus_Details_busVins
+	--	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, tenantId) into tenantId
+	put ReadTestDataSheet(preReqTDSheetName, tenantId ) into tenantId
+	put ReadTestDataSheet(preReqTDSheetName, garageId ) into garageId
+	
+	put QA_RemoveBusFromTrack() into findBusAPI
+	put findBusAPI.responsebody into respbody1
+	put jsonvalue (respbody1) into responsebody2 
+	if responsebody2.message = "Bus "&BusId&" has been successfully set In Maintenance but not assigned to a position in the garage"
+		LogSuccess "Bus "&BusId&" is removed from the track"
+	else
+		LogError "Bus "&BusId&" is not removed from the track"
+	end if
+	
+end RemoveBusFromAPI
+
+to handle ParkBusInTheTrack BusId
+	"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+	
+	--Ensure that the Needs Maintenance Checkbox is not selected and click the Recommended Run & Track button
+	"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "no"
+	
+end ParkBusInTheTrack

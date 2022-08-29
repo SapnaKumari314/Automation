@@ -1,0 +1,575 @@
+﻿function SearchRect AreaName
+	set screenPortions to {
+		ExportButtonArea:[844,672,1307,754],
+		//DailyProcessingArea:[1632,77,1913,173],
+		//ProcessingArea:[1593,79,1910,171],
+		DailyProcessingArea:[1640,93,1900,159],
+		
+		ExportToCSVDownload:[1347,48,1908,408],
+		ExportDataPrompt:[645,404,1270,762],
+	
+	}
+	return screenPortions.(AreaName)
+	
+end SearchRect
+
+
+//Description: Handler to create a vehicle Specific Time of day query
+---Input: 
+---Output: Returns vehicle daily query 
+---Created By/date: Himaja R (2-Aug-2022)
+
+to VehicleSpecificTimeofDayQuery BusVIN,From,To
+	(*	set BusVIN to "7JZTH13J7KS000151"
+	set From to "2022-07-25T17:56:00.000Z"
+	set To to "2022-07-25T17:56:02.000Z"*)
+	try
+		Global  ConfigValues
+		
+		
+		put <<GET bus_data_pcan_roadrunner_*/_search
+		{"size":10000,"query":{"bool":{"must":[{"query_string":{"query":"busName:(>>&BusVIN&<<)","fields":[],"type":"best_fields","default_operator":"or","max_determinized_states":10000,"enable_position_increments":true,"fuzziness":"AUTO","fuzzy_prefix_length":0,"fuzzy_max_expansions":50,"phrase_slop":0,"escape":false,"auto_generate_synonyms_phrase_query":true,"fuzzy_transpositions":true,"boost":1.0}}],"filter":[{"range":{"@timestamp":{"from":">>&From&<<","to":">>&To&<<","include_lower":true,"include_upper":true,"boost":1.0}}}],"adjust_pure_negative":true,"boost":1.0}},"sort":[{"@timestamp":{"order":"asc"}}]}>> into   VehicleSpecificTimeofDayQuery
+		
+		
+		return VehicleSpecificTimeofDayQuery
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,VehicleSpecificTimeofDayQuery)
+	End try
+	
+end VehicleSpecificTimeofDayQuery
+
+
+
+//Description:To Validate  correctness
+---Input: 
+---Output: 
+---Created By/date: Himaja R (03-Aug-2022)
+
+to ValidateDataCorrectness BusVIN,CSVData,Response,RowNum,Metric,ResponseHandler,DataFieldColumnName
+
+	try
+		Global  ConfigValues
+		
+		put "Handlers/FileOperations".getColumnDataBasedOnHeaderLineFromCSV( DataFieldColumnName,RowNum,CSVData) into CSV_Data
+		put "Handlers/ReportHandlers".getRoundTheDecimalValuesFromCSV(CSV_Data) into CSV_Data
+		put  "Handlers/VehicleSpecificTimeofDay".(ResponseHandler)(BusVIN,Response,Metric) into OpenSearch_Data
+		log "CSV value --->>"&CSV_Data
+		log "OpenSearch_Data value --->>"&OpenSearch_Data
+		if CSV_Data is OpenSearch_Data
+			LogSuccess DataFieldColumnName&" --->  Column Values in the downloaded CSV matches with open search index response "
+			
+		else
+			LogError DataFieldColumnName&" --->  Column Values in the downloaded CSV DOESN'T MATCH with open search index response "
+		end if
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,ValidateDataCorrectness)
+	End try
+	
+end ValidateDataCorrectness
+
+//Description: Function to Validate the format of the file downloaded and download the file
+---Input: 
+---Output: 
+---Created By/date: Himaja R (28-Jul-2022)
+to validateSpecificTimeofDayFileDownloaded AssetType,TimeType,TimeStampList
+	try
+		
+		Global  ConfigValues
+		log TimeStampList
+		(*set TimeType to "Specific Time of Day"
+		set AssetType to  "Vehicle"
+		set TimeStampList to ["2022-08-08_11-24-49","2022-08-08_11-24-50","2022-08-08_11-24-51","2022-08-08_11-24-52"]*)
+		Repeat with each item  of TimeStampList
+			put it into TimeStamp
+			replace "O" with "0" in it
+			delete  "_" in it
+			delete "-" in it
+			put characters 1 to 4 of it into Chars
+			delete characters 1 to 4 of it
+			Put Chars&newline&it into val
+			
+			Set DownloadedFileName to AssetType&"_"&TimeType&"_"&val&".csv"
+			log DownloadedFileName
+			replace "O" with "0" in TimeType
+			if ImageFound(Text:"Today", waitFor:ConfigValues.BasicTimeOut,Validwords:"Today",searchRectangle:SearchRect(DownloadsPanelArea))
+				put FoundImageLocation() into Loc
+				Put Loc+[-10,10] into Pos1
+				Put Loc+[370,100] into Pos2
+				put ReadText(Pos1,Pos2) into val1
+				replace "O" with "0" in val1
+				delete " " in val1
+				delete  "_" in val1
+				delete "-" in val1
+				delete "—" in val1
+				log val1
+				insert AssetType into list 
+				insert  TimeType into list 
+				insert Chars into list 
+				insert it into list
+				
+				set flag to true
+				
+				repeat with each item of list
+					
+					if val1 contains it
+						logsuccess "Found it:"&it
+					else
+						logwarning "Couldnot find : "& it
+						Set flag to false
+					end if
+					
+				end repeat
+				put empty list into list
+				
+			else
+				LogError "Downloads screen is not shown"
+				
+			end if
+			
+			if flag is true  then
+				put repeatindex() into index
+				put  TimeStamp  into TimeStampval
+				set flag1 to true
+			end if
+			
+		End repeat
+		
+		if flag1 is true  then
+			LogSuccess " Downloaded file is available in the downloads pannel in the specified format"
+			log "TimeStamp:"&TimeStampval
+			Click {Text:"Download", waitFor:ConfigValues.BasicTimeOut,Validwords:"Download",searchRectangle:[Pos1,Pos2]}
+			"Utilities/GenericOperations".Success  "Clicked on Download successfully!!"
+		else
+			"Utilities/GenericOperations".Error " Downloaded file is not available in the specified format"
+		end if
+		return TimeStampval
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,validateFileDownloaded)
+	End try	
+end validateSpecificTimeofDayFileDownloaded
+
+//Description: Function to get the Customer Vehicle Name
+---Input: 
+---Output: 
+---Created By/date: Himaja R (3-Aug-2022)
+to getCustomerVehicleName BusVin,Response
+	try 
+		
+		put response.hits.(hits) into val
+		
+		put item 1 of val into val
+		put val.(_id) into timestamp
+		if val.(_id) contains BusVin then
+			
+			put val.(_source).(busMetadata) into busAlias
+			if busAlias.keys contains "busAlias" then
+				
+				put val.(_source).(busMetadata).busAlias into busAlias
+				log "Customer:busAlias:"&busAlias
+				LogSuccess "Index - busAlias found for bus and time stamp "&timestamp&&"value is:"&busAlias
+				set Flag to true
+			else
+				set odometerReading to "No Index"
+				LogWarning "Index filed - busAlias not found bus and time stamp"&timestamp&":"&busAlias
+				
+			end if
+		end if
+		
+		log  "Open Search -->CustomerVehicleName--->"&busAlias
+		
+		return busAlias
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getCustomerVehicleName)
+	End try
+end getCustomerVehicleName
+
+//Description: Function to get the Vehicle Identification Number from open search
+---Input: 
+---Output: 
+---Created By/date: Himaja R (03-Aug-2022)
+to getVehicleIdentificationNumber BusVin,Response
+	try 
+		
+		put response.hits.(hits) into val
+		put item 1 of val into val
+		put val.(_id) into timestamp
+		
+		if val.(_id) contains BusVin then
+			
+			put val.(_source).(busMetadata) into vinNum
+			if vinNum.keys contains "vinNum" then
+				//log sucess
+				
+				put val.(_source).(busMetadata).vinNum into vinNum
+				
+				log "Customer:vinNum:"&vinNum
+				LogSuccess "Index - vinNum found for bus and time stamp "&timestamp&&"value is-->"&vinNum
+				insert vinNum into vinNumList
+				set Flag to true
+			else
+				set odometerReading to "No Index"
+				LogWarning "Index filed - vinNum not found bus and time stamp"&timestamp&"-->"&vinNum
+				
+				
+			end if
+		end if
+		
+		log  "Open Search -->Vehicle Identification Number--->"&vinNum
+		
+		return vinNum
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getVehicleIdentificationNumber)
+	End try
+end getVehicleIdentificationNumber
+
+
+//Description: Function to get the Vehicle Model
+---Input: 
+---Output: 
+---Created By/date: Himaja R (04-Aug-2022)
+to getVehicleModel BusVin,Response
+	try 
+		
+		put response.hits.(hits) into val
+		
+		put item 1 of val into val
+		put val.(_id) into timestamp
+		if val.(_id) contains BusVin then
+			
+			put val.(_source).(busMetadata) into busModel
+			if busModel.keys contains "busModel" then
+				//log sucess
+				
+				put val.(_source).(busMetadata).busModel into busModel
+				
+				log "Customer:busModel:"&busModel
+				LogSuccess "Index - busModel found for bus and time stamp "&timestamp&&"value is--->"&busModel
+				
+				set Flag to true
+			else
+				set odometerReading to "No Index"
+				LogWarning "Index filed - busModel not found bus and time stamp"&timestamp&"---->"&busModel
+				
+			end if
+		end if
+		
+		log  "Open Search -->Vehicle Model--->"&busModel
+		
+		return busModel
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getVehicleModel)
+	End try
+end getVehicleModel
+
+//Description: Function to get the Vehicle Model
+---Input: 
+---Output: 
+---Created By/date: Himaja R (04-Aug-2022)
+to getLastDataTransmission BusVin,Response
+	try 
+		
+		put response.hits.(hits) into val
+		
+		put item 1 of val into val
+		put val.(_id) into timestamp
+		if val.(_id) contains BusVin then
+			
+			put val.(_source) into busModel
+			if busModel.keys contains "@timestamp" then
+				//log sucess
+				
+				put val.(_source)."@timestamp" into LastDataTransmission
+				
+				log "LastDataTransmission-->"&LastDataTransmission
+				LogSuccess "Index - LastDataTransmission -@timestamp found for bus and time stamp "&timestamp&&"value is--->"&LastDataTransmission
+				
+				set Flag to true
+			else
+				set odometerReading to "No Index"
+				LogWarning "Index filed - @timestamp not found bus and time stamp"&timestamp&"---->"&LastDataTransmission
+				
+			end if
+		end if
+		
+		log  "Open Search -->Last Data Transmission--->"&LastDataTransmission
+		
+		return LastDataTransmission
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getLastDataTransmission)
+	End try
+end getLastDataTransmission
+
+//Description: Function to get Odometer value from Open search
+---Input: 
+---Output: 
+---Created By/date: Himaja R (04-Aug-2022)
+to getOdometerValue BusVin,Response,Metric
+	try 
+		
+		put response.hits.(hits) into val
+		
+		put item 1 of val into val
+		put val.(_id) into timestamp
+		
+		if val.(_id) Contains BusVin then
+			
+			put val.(_source) into odometerReading
+			
+			if odometerReading.keys contains "PCtc_udi_Odometer_mi" then
+				//log sucess
+				
+				put val.(_source).PCtc_udi_Odometer_mi into odometerReading
+				if Metric is "Yes" then
+					put (1.6093)*odometerReading into odometerReading
+					//put odometerReading rounded to 4 places  into odometerReading
+				end if 
+				put odometerReading rounded to 4 places  into odometerReading
+				log "Odometer Value-->PCtc_udi_Odometer_mi--->"&odometerReading
+				LogSuccess "Index - odometerReading found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&odometerReading
+				
+				set Flag to true
+			else
+				set odometerReading to "No Index"
+				LogWarning "Index filed - odometerReading not found bus and time stamp"&BusVin&"_"&Date&":"&odometerReading
+				
+			end if
+		end if
+		
+		log odometerReading
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(odometerReading) into odometerReading
+		log  "Open Search -->Odometer Value  --->"&odometerReading
+		log  "Open Search -->Odometer value at specific time of the day--->"&odometerReading
+		return odometerReading
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getOdometerValue)
+	End try
+end getOdometerValue
+
+
+//Description: FUnction to get  BatteryStateofCharge  from open search response
+---Input: BusVin,Response
+---Output: 
+---Created By/date: Himaja R (04-Aug-2022)
+to getBatteryStateofCharge BusVin,Response
+	try 
+		
+		put response.hits.(hits) into val
+		put item 1 of val into val
+		put val.(_id) into timestamp
+		
+		if val.(_id) Contains BusVin then
+			
+			put val.(_source) into dashSOC
+			if dashSOC.keys contains "PCes_usi_DashSoC_pct" then
+				
+				put val.(_source).PCes_usi_DashSoC_pct into dashSOC
+				
+				log "Battery State of Charge--->PCes_usi_DashSoC_pct--->"&dashSOC
+				LogSuccess "Index - PCes_usi_DashSoC_pct found for bus and time stamp "&timestamp&&"value is:"&dashSOC
+				set Flag to true
+			else
+				set dashSOC to "No Index"
+				LogWarning "Index filed - PCes_usi_DashSoC_pct not found bus and time stamp"&timestamp&":"&dashSOC
+			end if
+		end if
+		
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(dashSOC) into dashSOC
+		log  "Open Search -->Battery State of Charge  --->"&dashSOC
+		
+		put dashSOC rounded to 4 places  into dashSOC
+		log  "Open Search -->Energy in the battery at a specific time --->"&dashSOC
+		return dashSOC
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getBatteryStateofCharge)
+	End try
+end getBatteryStateofCharge
+
+
+
+
+//Description: Function to get Efficiency (Distance driven per kWh) from Open search
+---Input: 
+---Output: 
+---Created By/date: Himaja R (04-Aug-2022)
+to getEfficiencyDistancedrivenperkWh BusVin,Response,DatesList,Metric
+	try 
+		
+		
+		put response.hits.(hits) into val
+		put item 1 of val into val
+		put val.(_id) into timestamp
+		
+		if val.(_id) Contains BusVin then
+			
+			put val.(_source) into efficiencyKWHPerMileV2
+			if efficiencyKWHPerMileV2.keys contains "PCbo_usi_AvgEff_kwhpmi" then
+				//log suces
+				
+				put val.(_source).PCbo_usi_AvgEff_kwhpmi into efficiencyKWHPerMileV2
+				
+				log "Efficiency (Distance driven per kWh)-->PCbo_usi_AvgEff_kwhpmi-->"&efficiencyKWHPerMileV2
+				LogSuccess "Index - PCbo_usi_AvgEff_kwhpmi found for bus and time stamp "&timestamp&&"value is:"&efficiencyKWHPerMileV2
+				set Flag to true
+			else
+				set efficiencyKWHPerMileV2 to "No Index"
+				LogWarning "Index filed - PCbo_usi_AvgEff_kwhpmi not found bus and time stamp"&timestamp&":"&efficiencyKWHPerMileV2
+				
+				
+			end if
+		end if
+		
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(efficiencyKWHPerMileV2) into efficiencyKWHPerMileV2
+		
+		log  "Open Search -->Efficiency Distance driven per kWh --->"&efficiencyKWHPerMileV2
+		put efficiencyKWHPerMileV2 rounded to 4 places  into efficiencyKWHPerMileV2
+		log  "Open Search -->Efficiency at a specific time --->"&efficiencyKWHPerMileV2
+		return efficiencyKWHPerMileV2
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getEfficiencyDistancedrivenperkWh)
+	End try
+end getEfficiencyDistancedrivenperkWh
+
+//Description: Function to get the Vehicle Status
+---Input: 
+---Output: 
+---Created By/date: Himaja R (04-Aug-2022)
+to getVehicleStatus BusVin,Response,DatesList
+	try 
+		
+		put response.hits.(hits) into val
+		
+		put item 1 of val into val
+		put val.(_id) into timestamp
+		
+		if val.(_id) Contains BusVin then
+			
+			put val.(_source).(busMetadata) into inServiceFlag
+			if inServiceFlag.keys contains "rt_PCvi_en_VehicleState" then
+				//log sucess
+				
+				put it.(_source).(busMetadata).rt_PCvi_en_VehicleState into inServiceFlag
+				if inServiceFlag is "0"
+					Replace 0 with "Inactive" in inServiceFlag
+				else
+					if  inServiceFlag is "1"
+						Replace 1 with "Active" in inServiceFlag
+					else 
+						logerror "Invaid value"
+					end if
+				end if
+				log "Customer:inServiceFlag:"&inServiceFlag
+				LogSuccess "Index - inServiceFlag found for bus and time stamp "&BusVin&"_"&Date&&"value is:"&inServiceFlag
+				
+				set Flag to true
+			else
+				set inServiceFlag to "No Index"
+				LogWarning "Index filed - inServiceFlag not found bus and time stamp"&BusVin&"_"&Date&":"&inServiceFlag
+				
+				
+			end if
+		end if
+		
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(inServiceFlag) into inServiceFlag
+		
+		log  "Open Search -->Vehicle Status --->"&inServiceFlag
+		return inServiceFlag
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getVehicleStatus)
+	End try
+end getVehicleStatus
+
+//Description: FUnction to get CabinTemperature from open search response
+---Input: 
+---Output: 
+---Created By/date: Himaja R (04-Aug-2022)
+to getCabinTemperature BusVin,Response,Metric
+	try 
+		
+		put response.hits.(hits) into val
+		
+		put item 1 of val into val
+		put val.(_id) into timestamp
+		
+		if val.(_id) Contains BusVin then
+			
+			put val.(_source) into CabinTempInCVal
+			if CabinTempInCVal.keys contains "PCac_usi_CabinTemp_c" then
+				put val.(_source).PCac_usi_CabinTemp_c into CabinTempInC
+				
+				if Metric is "Yes" then
+					put CabinTempInC  into CabinTempInC
+					
+				else
+					put (CabinTempInC*9/5) + 32 into CabinTempInC
+				end if 
+				put CabinTempInC rounded to 4 places  into CabinTempInC
+				log "Cabin Temperature-->PCac_usi_CabinTemp_c--->"&CabinTempInC
+				LogSuccess "Index - PCac_usi_CabinTemp_c found for bus and time stamp "&timestamp&&"value is:"&CabinTempInC
+				
+				set Flag to true
+			else 
+				
+				set CabinTempInC to "No Index"
+				Logwarning "Index filed - PCac_usi_CabinTemp_c not found bus and time stamp"&timestamp&":"&CabinTempInC
+			end if
+		end if
+		
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(CabinTempInC) into CabinTempInC
+		log CabinTempInC
+		log  "Open Search -->Cabin Temperature --->"&CabinTempInC
+		//return CabinTempInC
+		return CabinTempInC
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getCabinTemperature)
+	End try
+end getCabinTemperature
+
+
+
+//Description: FUnction to get AmbientTemperature from open search response
+---Input: 
+---Output: 
+---Created By/date: Himaja R (04-Aug-2022)
+to getAmbientTemperature BusVin,Response,Metric
+	try 
+		
+		put response.hits.(hits) into val
+		
+		put item 1 of val into val
+		put val.(_id) into timestamp
+		
+		if val.(_id) Contains BusVin then
+			
+			put val.(_source) into AmbientTempInCVal
+			if AmbientTempInCVal.keys contains "PCac_usi_AmbientTemp_c" then
+				put val.(_source).PCac_usi_AmbientTemp_c into AmbientTempInC
+				
+				if Metric is "Yes" then
+					put AmbientTempInC  into AmbientTempInC
+					
+				else
+					put (AmbientTempInC*9/5) + 32 into AmbientTempInC
+				end if 
+				put AmbientTempInC rounded to 4 places  into AmbientTempInC
+				log "Ambient Temperature-->PCac_usi_AmbientTemp_c--->"&AmbientTempInC
+				LogSuccess "Index - PCac_usi_AmbientTemp_c found for bus and time stamp "&timestamp&&"value is:"&AmbientTempInC
+				
+				set Flag to true
+			else 
+				
+				set AmbientTempInC to "No Index"
+				Logwarning "Index filed - PCac_usi_AmbientTemp_c not found bus and time stamp"&timestamp&":"&AmbientTempInC
+			end if
+		end if
+		
+		Put  "Handlers/ReportHandlers".HandleSpecialValuesInExportedCSV(AmbientTempInC) into AmbientTempInC
+		log AmbientTempInC
+		log  "Open Search -->Ambient Temperature --->"&AmbientTempInC
+		
+		return AmbientTempInC
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getAmbientTemperature)
+	End try
+end getAmbientTemperature

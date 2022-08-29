@@ -1,0 +1,68 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 01/Aug/22
+@TC_ID: TOUC_2481
+@TC_Description: CCSS-Notifications: Notification for Needs Maintenance Bus with Override Track
+***)
+
+BeginTestCase TOUC_2481
+
+Log "###########   Started execution of Test Case--> TOUC_2481   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+--Select any Bus from the IQ or search for a Bus which is not in the garage
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "AlertsAndNotifications", "BusID") into BusId
+"CCSS_Pages/PrerequsiteTestData/AlertsAndNotfications".RemoveBusFromAPI "CCSS_P2_TestData", "AlertsAndNotifications", "BusId", "RunID", "API_Bus_Details_busVins", "TOUC_2385"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "AlertsAndNotifications", "BusID") into BusId
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "AlertsAndNotifications", "API_Bus_Details_id") into API_Bus_Details_id
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "AlertsAndNotifications", "API_Bus_Details_busVins") into API_Bus_Details_busVins
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".CheckNeedsMaintenanceCheckBx
+
+--API Call
+--"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetails BusId, API_Bus_Details_id, API_Bus_Details_busVins
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+
+--Override track
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgBlackTrack"
+
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "no"
+--Verify Toast msg
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "AlertsAndNotifications", "ToastMsgPos") into ToastMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage ToastMsg
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "AlertsAndNotifications", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".CreatePositionNumber "CCSS_P2_TestData", "AlertsAndNotifications", "BusID",BusId
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "AlertsAndNotifications", "ToastMsgPosWithRunNumber") into NotificationMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyNotificationMessage NotificationMsg,"has been successfully assigned to position", "position"
+
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "AlertsAndNotifications", "MaintenanceBus") into imgBus
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetailsInTooltip imgBus, "Required Energy:", "N/A"
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "AlertsAndNotifications", "MaintenanceBus") into imgBus
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetailsInTooltip imgBus, "Current Energy:", "N/A"
+
+
+Log "#############  Finished execution of Test Case--> TOUC_2481 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_2481
+
+
+
+
+
+
+
+
+
+
+
+

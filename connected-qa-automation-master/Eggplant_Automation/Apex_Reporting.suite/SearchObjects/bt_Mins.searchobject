@@ -1,0 +1,39 @@
+{
+	"lastmodifieddate": 1659535542.2059999,
+	"originalcapturelocation": [
+		1374,
+		335,
+		20,
+		18
+	],
+	"createddate": 1659535542.2059999,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Tolerance": "_45",
+					"HotSpot": "[46,139]",
+					"Scale": "    1",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "bt_Mins.png",
+				"connectionname": "PROSUT",
+				"type": 1,
+				"capturerect": [
+					1374,
+					335,
+					20,
+					18
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com"
+			}
+	],
+	"name": "bt_Mins"
+}

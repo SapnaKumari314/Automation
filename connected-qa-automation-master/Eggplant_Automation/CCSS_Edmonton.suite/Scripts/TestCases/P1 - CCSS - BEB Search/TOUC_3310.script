@@ -1,0 +1,29 @@
+﻿(***
+@Author: Vivek Mamgain 
+@Date: 21/March/22
+@TC_ID: TOUC_3310
+@TC_Description: CCSS-RRT-BEB Search: List of buses in the auto populate
+***)
+
+BeginTestCase TOUC_3310
+
+Log "###########   Started execution of Test Case--> TOUC_3310   ##############"
+Log "#######################################################"
+
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+
+-----Find a Bus is dislayed in Garage 
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "P1_BEBSarch", "PartialBusId") into PartialBusId
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "P1_BEBSarch", "BusId") into BusId
+
+--"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyAutoPopulatedBusesListInBEBSearch PartialBusId, BusId
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3310 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3310

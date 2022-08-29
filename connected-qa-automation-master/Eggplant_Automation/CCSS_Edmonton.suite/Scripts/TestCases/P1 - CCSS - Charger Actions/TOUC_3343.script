@@ -1,0 +1,62 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 12/Apr/22
+@TC_ID: TOUC_3343
+@TC_Description: CCSS-Tooltip: Estimated Charge Time for Bus parked behind another Bus and Charger is available
+***)
+
+BeginTestCase TOUC_3343
+
+Log "###########   Started execution of Test Case--> TOUC_3343   ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Select any Bus from the IQ or search for a Bus which is not in the garage
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusIsNotInTracksFromAPI BusId, "CCSS_P1_TestData", "ChargerActions", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+--Ensure that the Needs Maintenance Checkbox is not selected and click the Recommended Run & Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+
+--Select a Run such that the 
+--Current Energy < Required Energy
+--using the Run override if the default run does not match the requirement
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectARunWhereCurrentEnrgyLessThnReqEnnrgy
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+
+--Select a Non Charger Track Position using Track Override if the default track does not match the requirement
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgBlackTrack"
+--Click the Assign Run & Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "no"
+
+--Verify Toast msg
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "ToastMsg") into ToastMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage ToastMsg
+
+--Verify that the Check Alert is displayed in the Alerts section
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".CreateChargerName "CCSS_P1_TestData", "ChargerActions", "BusID",BusId
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "Alert") into Alert
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyAlertMessage Alert
+
+--Click the Check alert button
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "CheckAlertBtn") into CheckAlertBtn
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "CheckAlertMsg") into CheckAlertMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickCheckAlertButton CheckAlertBtn, CheckAlertMsg
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3343 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3343
+

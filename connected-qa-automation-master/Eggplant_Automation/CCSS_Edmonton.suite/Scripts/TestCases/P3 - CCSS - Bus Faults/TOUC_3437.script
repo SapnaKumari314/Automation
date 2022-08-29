@@ -1,0 +1,36 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 05/Aug/22
+@TC_ID: TOUC_3437
+@TC_Description: CCSS-Bus Faults: Electric Bus Faults Data export to PDF
+***)
+
+BeginTestCase TOUC_3437
+
+Log "###########   Started execution of Test Case--> TOUC_3437  ##############"
+Log "#######################################################"
+
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Navigate to Garage Overview screen by selecting 'Garage Overview' link from main menu
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+
+
+--Click on ellipsis / Menu should be disabled
+"CCSS_Pages/GarageOverview".SelectMenuOptionFrom "ElectricBusFaultsArea", "Export to PDF"
+
+--Click on Main Menu and navigate to 'Charger Control' screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control", 2
+
+--Click on ellipsis / Menu should be disabled
+"CCSS_Pages/GarageOverview".SelectMenuOptionFrom "ElectricBusFaultsArea", "Export to PDF"
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3437 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3437

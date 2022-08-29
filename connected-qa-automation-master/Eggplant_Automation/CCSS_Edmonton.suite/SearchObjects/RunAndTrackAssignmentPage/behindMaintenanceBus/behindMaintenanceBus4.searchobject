@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		302,
+		648,
+		55,
+		326
+	],
+	"lastmodifieddate": 1658323527.0120001,
+	"createddate": 1658323527.0120001,
+	"name": "RunAndTrackAssignmentPage/behindMaintenanceBus/behindMaintenanceBus4",
+	"lastfounddate": 1658323529.8610001,
+	"ocrcapturestring": "Z) Z) D Z)",
+	"lastfoundlocation": [
+		302,
+		648,
+		55,
+		326
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[21,296]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/behindMaintenanceBus/behindMaintenanceBus4.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com",
+				"capturerect": [
+					302,
+					648,
+					55,
+					326
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "Z) Z) D Z)"
+			}
+	]
+}

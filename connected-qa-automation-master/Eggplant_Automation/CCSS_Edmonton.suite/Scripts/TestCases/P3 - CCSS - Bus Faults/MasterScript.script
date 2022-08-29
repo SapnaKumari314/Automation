@@ -1,0 +1,15 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 10/Aug/22
+@TC_ID: Master Script for Bus Faults
+@TC_Description: 
+***)
+
+
+"CCSS_Pages/PrerequsiteTestData/ChargerSimulator".StartSimulator
+"CCSS_Pages/PrerequsiteTestData/ChargerSimulator".GenerateFault
+run "/TestCases/P1 - CCSS - LCQ/TOUC_3436"
+run "/TestCases/P1 - CCSS - LCQ/TOUC_3437"
+run "/TestCases/P1 - CCSS - LCQ/TOUC_3438"
+"CCSS_Pages/PrerequsiteTestData/ChargerSimulator".EndSimulator
+run "/TestCases/P1 - CCSS - LCQ/TOUC_3439"

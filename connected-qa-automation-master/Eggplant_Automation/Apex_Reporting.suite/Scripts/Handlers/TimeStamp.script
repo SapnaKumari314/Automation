@@ -1,0 +1,17 @@
+﻿to GetUTCTimeStamp TimeZone
+
+	put  the long common time into DateAndTime
+	//log  DateAndTime
+	put formattedTime("%Y-%m-%d_%H-%M-%S",DateAndTime) into timerVal
+	
+	if Global TimeZone is "UTC" or TimeZone  is "UTC"
+		
+		subtract 5 hours 30 minutes from timerVal
+		Add 14 seconds to timerVal
+		
+		log "UTC TimeStamp:"&timerVal
+	end if
+	return timerVal
+end GetUTCTimeStamp
+
+

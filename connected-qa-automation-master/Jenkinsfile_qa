@@ -1,0 +1,27 @@
+def myapp
+node ('master') {
+ withEnv(['registry=493000495847.dkr.ecr.us-east-1.amazonaws.com/exp-ams',
+ 'ECRCRED=ecr:us-east-1:AWS-ECR-Jenkins'
+ ]) {
+ 
+ stage('Clone repository') {
+ 
+ checkout scm
+ }
+ 
+ stage('Build') {
+ 
+ sh '''#!/bin/bash 
+ 
+ '''
+ }
+ 
+ 
+ 
+ 
+     
+	
+
+ }
+ 
+ }

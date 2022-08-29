@@ -1,0 +1,15 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 10/Aug/22
+@TC_ID: Master Script for Charger Faults 
+@TC_Description: 
+***)
+
+"CCSS_Pages/PrerequsiteTestData/ChargerSimulator".StartSimulator
+"CCSS_Pages/PrerequsiteTestData/ChargerSimulator".GenerateFault
+"CCSS_Pages/PrerequsiteTestData/ChargerSimulator".NavigateToApplicationTab
+run "/TestCases/P1 - CCSS - LCQ/TOUC_3432"
+run "/TestCases/P1 - CCSS - LCQ/TOUC_3433"
+run "/TestCases/P1 - CCSS - LCQ/TOUC_3434"
+"CCSS_Pages/PrerequsiteTestData/ChargerSimulator".EndSimulator
+run "/TestCases/P1 - CCSS - LCQ/TOUC_3435"

@@ -1,0 +1,49 @@
+{
+	"originalcapturelocation": [
+		277,
+		455,
+		1605,
+		52
+	],
+	"lastmodifieddate": 1657021511.5539999,
+	"createddate": 1656751074.1240001,
+	"name": "eooi7JZTH13J9KSOOO152521500OGr",
+	"lastfounddate": 1656752254.4809999,
+	"ocrcapturestring": "eooi 7JZTH13J9KSOOO152 521500 O Green Active 2022-07-01T06:05:42Z 18:45:04",
+	"lastfoundlocation": [
+		277,
+		455,
+		1605,
+		52
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"deleted": true,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[802,26]",
+					"Tolerance": "_59",
+					"Discrepancy": "_0",
+					"SearchType": "Smoothed for Text"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "eooi7JZTH13J9KSOOO152521500OGr.png",
+				"connectionname": "SUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					277,
+					455,
+					1605,
+					52
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "eooi 7JZTH13J9KSOOO152 521500 O Green Active 2022-07-01T06:05:42Z 18:45:04"
+			}
+	]
+}

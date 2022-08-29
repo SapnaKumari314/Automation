@@ -1,0 +1,35 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 04/Apr/22
+@TC_ID: TOUC_3313
+@TC_Description: CCSS-RRT-Bus Details: Current Energy after Bus Assignment
+***)
+
+BeginTestCase TOUC_3313
+
+Log "###########   Started execution of Test Case--> TOUC_3313   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackReassignment", "BusID") into BusId
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackReassignment", "API_Bus_Details_id") into API_Bus_Details_id
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackReassignment", "API_Bus_Details_busVins") into API_Bus_Details_busVins
+
+--API Call
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetails BusId, API_Bus_Details_id, API_Bus_Details_busVins
+
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectARunWhereThrEnrgyIsGreaterThnCurrentEnrgyGreaterThnReqEnnrgy  "0.1"
+
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyCurrentEnergyFromTrackSetupAPI
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3313 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3313

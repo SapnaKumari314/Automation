@@ -1,0 +1,94 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 14/July/22
+@TC_ID: TOUC_3405
+@TC_Description: CCSS-RRT-LCQ Algorithm: LCQ algorithm to prioritize Buses in the charging queue
+***)
+
+BeginTestCase TOUC_3405
+
+Log "###########   Started execution of Test Case--> TOUC_3405  ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--1. Update API - Battery Capacity and Threshold ratio
+"CCSS_Pages/PrerequsiteTestData/LCQ".UpdateBatteryCapacityAndThresholdRatio "TOUC_3405"
+
+--2. Update Active Charger limit
+"CCSS_Pages/PrerequsiteTestData/LCQ".UpdateActiveChargerLimit "TOUC_3405"
+
+--Pre-Req : Multiple BEBs with "Not-Ready", "Ready" and "Ready/Top Up" status should be present in Garage having runs assigned.
+"CCSS_Pages/PrerequsiteTestData/LCQ".RemoveBusFromAPI "CCSS_P1_TestData", "LCQ", "BusId", "RunID", "API_Bus_Details_busVins", "TOUC_3405"
+"CCSS_Pages/PrerequsiteTestData/LCQ".RemoveBusFromAPI "CCSS_P1_TestData", "LCQ", "BusId2","RunID2", "API_Bus_Details_busVins2", "TOUC_3405"
+--Adding bus as "Not Ready" on track
+--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "BusID") into BusId
+"CCSS_Pages/PrerequsiteTestData/LCQ".CreateBusWithAnStatusAndAssignOnTrack "not ready", "RunAndTrackAssignmentPage\imgActiveCharger" ,"CCSS_P1_TestData", "LCQ", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "TOUC_3405", "ToastMsg", "no"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "BusID2") into BusId
+"CCSS_Pages/PrerequsiteTestData/LCQ".CreateBusWithAnStatusAndAssignOnTrack "topped up", "RunAndTrackAssignmentPage\imgActiveCharger" ,"CCSS_P1_TestData", "LCQ", "BusId2", "customerGarageId", "RunID", "API_Bus_Details_busVins", "TOUC_3405", "ToastMsg2", "no"
+
+--Navigate to the Proterra CCSS Home Page
+--Click on a Bus at Incoming Queue at 'Run & Track Assignment' screen
+--Navigate to Garage Overview screen by selecting 'Garage Overview' link from main menu
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+
+--Navigate to Logical Charge Queue section
+"CCSS_Pages/GarageOverview".NavigateToElement "Logical Charge Queue", "LogicalChargeQueueArea"
+
+--"List out all buses of same group in the following order:
+--“Not Ready”: 1st priority (current energy < required energy)
+--“Ready”: 2nd priority (required energy <= current energy < energy threshold)
+--“Ready/Top Up”: 3rd priority (current energy >= energy threshold)"
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "BusID") into BusId
+"CCSS_Pages/GarageOverview".VerifyPriorityOfBusIs "highest", BusId
+--Verify the LCQ
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "BusID2") into BusId2
+"CCSS_Pages/GarageOverview".VerifyPriorityOfBusIs "lowest", BusId2
+
+--Navigate to Garage Overview screen by selecting 'Run & Track Assignment' link from main menu
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Run & Track Assignment", "Run & Track Assignment",1
+
+--Pre-Req : Multiple BEBs with "Not-Ready", "Ready" and "Ready/Top Up" status should be present in Garage having runs assigned.
+"CCSS_Pages/PrerequsiteTestData/LCQ".RemoveBusFromAPI "CCSS_P1_TestData", "LCQ", "BusId", "RunID", "API_Bus_Details_busVins", "TOUC_3405"
+"CCSS_Pages/PrerequsiteTestData/LCQ".RemoveBusFromAPI "CCSS_P1_TestData", "LCQ", "BusId2","RunID2", "API_Bus_Details_busVins2", "TOUC_3405"
+
+"CCSS_Pages/PrerequsiteTestData/LCQ".CreateBusWithAnStatusAndAssignOnTrack "not ready", "RunAndTrackAssignmentPage\imgActiveCharger" ,"CCSS_P1_TestData", "LCQ", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "TOUC_3405", "ToastMsg", "no"
+
+"CCSS_Pages/PrerequsiteTestData/LCQ".CreateBusWithAnStatusAndAssignOnTrack "not ready", "RunAndTrackAssignmentPage\imgActiveCharger" ,"CCSS_P1_TestData", "LCQ", "BusId2", "customerGarageId", "RunID", "API_Bus_Details_busVins", "TOUC_3405", "ToastMsg2", "no"
+
+--Navigate to Garage Overview screen by selecting 'Garage Overview' link from main menu
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+
+--Navigate to Logical Charge Queue section
+"CCSS_Pages/GarageOverview".NavigateToElement "Logical Charge Queue", "LogicalChargeQueueArea"
+
+--Now make Buses in sorted order based on their Book-out time: the more recent the book-out time, the higher priority/position it will be on the list
+"CCSS_Pages/GarageOverview".VerifyPriorityOfBusAccordingToTimeStamp 
+
+
+--After the buses are sorted by their book-out time, if the buses have the same book-out time, then bus requiring less energy to be charged to achieve required energy, will be on top
+"CCSS_Pages/GarageOverview".VerifyPriorityOfBusAccordingToRequiredEnergyIfBookoutTimeIsSame 
+
+
+--Select and add another Bus from the Incoming Queue such that this Bus should have a lower priority than the previous Bus
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control", 2
+
+--Navigate to Logical Charge Queue section
+"CCSS_Pages/GarageOverview".NavigateToElement "Logical Charge Queue", "LogicalChargeQueueArea"
+
+--Now make Buses in sorted order based on their Book-out time: the more recent the book-out time, the higher priority/position it will be on the list
+"CCSS_Pages/GarageOverview".VerifyPriorityOfBusAccordingToTimeStamp 
+
+
+--After the buses are sorted by their book-out time, if the buses have the same book-out time, then bus requiring less energy to be charged to achieve required energy, will be on top
+"CCSS_Pages/GarageOverview".VerifyPriorityOfBusAccordingToRequiredEnergyIfBookoutTimeIsSame 
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3405 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3405

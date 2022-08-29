@@ -1,0 +1,46 @@
+{
+	"lastmodifieddate": 1656336684.5679998,
+	"lastfoundlocation": [
+		1851,
+		87,
+		38,
+		38
+	],
+	"originalcapturelocation": [
+		1851,
+		87,
+		38,
+		38
+	],
+	"createddate": 1656336684.5679998,
+	"lastfounddate": 1656420315.5089998,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[21,23]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "CommonImages/img_ProfileIcon.png",
+				"connectionname": "PROSUT",
+				"type": 1,
+				"capturerect": [
+					1851,
+					87,
+					38,
+					38
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com"
+			}
+	],
+	"name": "CommonImages/img_ProfileIcon"
+}

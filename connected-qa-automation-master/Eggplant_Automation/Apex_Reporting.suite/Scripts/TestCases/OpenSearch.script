@@ -1,0 +1,312 @@
+﻿
+//set FileName to "TOUC_11040_Response"
+set FileName to "new"
+set Response to JSONValue (file ResourcePath( "ResponseData/"&FileName&".JSON"))
+put response.(aggregations).(stats_query).(buckets) into val
+repeat  with each item of val
+	put it.(key_as_string) into Response
+	log Response
+end repeat
+
+set FileName to "TOUC_11040_Response"
+set Response to JSONValue (file ResourcePath( "ResponseData/"&FileName&".JSON"))
+put response.(hits).(hits) into val
+
+repeat  with each item of val
+	put it.(_source).(OCPPRequestTypes) into val1
+	
+	if it.(_source).OCPPRequestTypes is "startTransaction" then
+		put it.(_source).("response") into result
+		put it.(_source).("response").(transactionId) into res
+		log res
+	end if
+end repeat
+
+
+
+
+"Utilities/ExcelOperations".readTestDataRowFrom Resourcepath("Configurations\Config.xlsx"), "QA_Env", "UserID",2
+
+
+
+put  "Utilities/ExcelOperations".readColumDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "Total Distance Driven") into items
+repeat with each item of items
+	put it rounded to 4 places  into RoundedVal
+	Log RoundedVal
+end repeat
+
+
+hgjhg
+
+typetext <<GET aggregated_data_pcan/_search
+{"size":10000,"query":{"bool":{"must":[{"query_string":{"query":"busName:(7JZTH13J7KS000151)","fields":[],"type":"best_fields","default_operator":"or","max_determinized_states":10000,"enable_position_increments":true,"fuzziness":"AUTO","fuzzy_prefix_length":0,"fuzzy_max_expansions":50,"phrase_slop":0,"escape":false,"auto_generate_synonyms_phrase_query":true,"fuzzy_transpositions":true,"boost":1.0}}],"filter":[{"range":{"reportStartDate":{"from":1654732800000,"to":1655423999000,"include_lower":true,"include_upper":true,"boost":1.0}}}],"adjust_pure_negative":true,"boost":1.0}}}>>
+
+typetext <<GET pcan_historical_faults/_search
+{"query" : {"bool" : {"must": [{"match": {"busName":  "7JZTH12J1KS000079"}},{"match": {"hdrUid": "04ab2eabf176"}},{"range": {"firstOcurrenceInFile": {"gte": "2022-02-01T18:48:00","lte": "2022-07-18T19:48:00"}}}],"minimum_should_match": 1,      "should" : [ {"match" : {"spnSignalFaultValue": "521181"}}]}}}>>
+
+put remoteclipboard() into response
+put jsonvalue (response) into response 
+
+put response.hits.(hits) into val
+//log val
+repeat with each item of val
+	if it.(_id) is "7JZTH13J7KS000151_2022-06-12" then
+		put it.(_source).(endStates).ambientTempInC into ambientTempInC
+		log ambientTempInC
+		set Flag to true
+	end if
+end repeat
+if Flag is  true then
+	
+	
+end if
+
+put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "FromDateDay") into FromDateDay
+put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "FromDateMon") into FromDateMon
+put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "FromDateYear") into FromDateYear
+
+put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "ToDateDay") into ToDateDay
+put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "ToDateMon") into ToDateMon
+put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "ToDateYear") into ToDateYear
+put FromDateDay&&FromDateMon&&FromDateYear into FromDateVal
+put ToDateDay&&ToDateMon&&ToDateYear into ToDateVal
+
+//put formattedTime("%Y-%m-%d",FromDateVal) into FromDateVal
+//put formattedTime("%Y-%m-%d",ToDateVal) into ToDateVal
+log FromDateVal
+log ToDateVal
+
+put  (FromDateVal .. ToDateVal) into list
+//put  ("07/12/2022" .. "07/15/2022") into val
+repeat with each item of list
+	//log it
+	insert formattedTime("%Y-%m-%d",it) into listVal
+end repeat
+log listVal
+
+
+
+typetext <<GET aggregated_data_pcan/_search
+{"size":10000,"query":{"bool":{"must":[{"query_string":{"query":"busName:(7JZTH13J2LS000303)","fields":[],"type":"best_fields","default_operator":"or","max_determinized_states":10000,"enable_position_increments":true,"fuzziness":"AUTO","fuzzy_prefix_length":0,"fuzzy_max_expansions":50,"phrase_slop":0,"escape":false,"auto_generate_synonyms_phrase_query":true,"fuzzy_transpositions":true,"boost":1.0}}],"filter":[{"range":{"reportStartDate":{"from":1655683200000,"to":1655942340000,"include_lower":true,"include_upper":true,"boost":1.0}}}],"adjust_pure_negative":true,"boost":1.0}}}>>
+
+
+
+//Time Logic
+put  ("8:00 AM" .. "9:00 PM")  into list
+set time1 to "8:00 AM"  
+set time2 to "9:00 PM"
+put formattedTime("%H-%M",  time1) into time1
+put formattedTime("%H-%M",  time2) into time2
+put  (time1 .. time2)  into list
+repeat with each item of list
+	log it
+	split(it) by "-"
+if 
+//insert formattedTime("%Y-%m-%d",it) into listVal
+end repeat
+log listVal
+
+
+
+///Read from file
+//open file  resourcePath("Response.JSON")
+
+
+set Response to JSONValue (file ResourcePath("ResponseData/TOUC_10672_response.JSON"))
+log Response 
+
+
+set Response to JSONValue (file ResourcePath("ResponseData/new.JSON"))
+log Response
+put remoteclipboard() into Response
+
+repeat with each line of  Response
+	
+	if it is <<""",>>
+		delete it  from Response
+		//delete it  from Response
+	end if
+	
+end repeat
+put  Response into res1
+
+repeat with each line of  res1
+	if it contains <<""">>
+		replace <<""">> with <<">> in(* it of *)res1
+		put <<">> after line repeatindex() of res1
+		//delete it  from Response
+	end if
+end repeat
+log   res1
+
+
+
+to handle WriteIntoFile fileName, MyWrite
+	set Response to JSONValue (file ResourcePath("Response.JSON"))
+	set fileName to "DailyIntervalResponse"
+	set MyWrite to Response
+	put resourcePath("\ResponseData\"&fileName&".JSON") into MyFileVar// creates a variable with a path to a file
+	open file MyFileVar// opens the file	
+	write MyWrite to file MyFileVar
+	close file MyFileVar
+end WriteIntoFile
+
+
+
+
+//To convert to csv
+set fileName to "Test3"
+put remoteclipboard() into MyWrite
+try 
+	delete file  resourcePath( "\OutputData\outputdata"&fileName&".csv")
+catch  e
+	log "file is not found to delete"
+end try
+
+put the abbrev time into ti
+log ti
+replace every occurrence of ":" with "-" in ti 
+log ti
+create new file resourcePath ( "\OutputData\"&fileName&".csv")
+
+put resourcePath("\OutputData\"&filename&".csv") into MyFileVar// creates a variable with a path to a file
+open file MyFileVar
+write MyWrite to file MyFileVar
+close file MyFileVar
+
+
+put  "Utilities/ExcelOperations".ApexreadTestDataFrom(Resourcepath("OutputData/outputdataTest1.csv"), "outputdataTest1", "3","odometerReading") into ToDateDay
+log ToDateDay
+
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+to ReadFromCSVFile
+	set MyFileVar to  resourcePath("\OutputData\outputdataTest1.csv")
+	open file MyFileVar// opens the file
+	read from file  MyFileVar until eof  into val
+	close file MyFileVar
+	return val
+end ReadFromCSVFile
+//log val
+//put the number of lines of val into index
+
+to Validate  ColumnHeader
+	put  "Total Distance Driven"  into ColumnHeader 
+	put ReadFromCSVFile() into val
+	put line 2 of val into Header
+	//log val
+	repeat with each item of Header
+		
+		if it.value is ColumnHeader then 
+			put repeatIndex() into index
+			repeat  with each line of val
+				set data  to  line  repeatindex() of val
+				put  item index of  data into ColumnData
+				insert ColumnData.value into Columnlist 
+				//log  item 7 of  data
+			end repeat
+			set Flag to true
+		end if 
+	end repeat
+	if Flag is "true" then
+		log Columnlist
+	else
+		logerror "Column Header/Column not found in the exported CSV"&ColumnHeader
+	end if
+end Validate
+
+
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
+
+
+put RemoteClipboard() into val
+set line1 to first line of val
+set line2 to second line of val
+put the number of items in line1 
+put the last item of line1
+log  item 16 of line2
+log val
+
+//put cellRange("6","8") of worksheet1 into
+set file1 to  resourcePath("\OutputData\outputdataTest5.xlsx")
+create new file file1
+open file file1
+write Val to file file1
+
+
+
+
+//---------------------------------------FaultDashboard
+
+put   everyimagelocation(text:"7JZTH13J9KSOOO152", waitFor:2,SearchRectangle:[479,453,660,831]) into val
+repeat with each item of val
+	log it
+	put  it into Loc
+	//put FoundImageLocation() into Loc
+	Put Loc+[220,-20] into Pos1
+	Put Loc+[300,20] into Pos2
+	put ReadText(Pos1,Pos2) into val1
+	log val1
+	if val1 is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into val1
+		
+	end if
+	
+	return val1
+end repeat
+
+
+put   Everyimagelocation(text:"7JZTH13J9KSOOO152", waitFor:2,SearchRectangle:[479,453,660,831]) into val
+repeat with each item of val
+	log it
+	put  it into Loc
+	//put FoundImageLocation() into Loc
+	Put Loc+[980,-20] into Pos1
+	Put Loc+[1120,20] into Pos2
+	put ReadText(Pos1,Pos2) into val1
+	replace <<"_>> with ":"in val1
+	log val1
+	if val1 is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into val1
+		replace <<"_>> with ":"in val1
+		log val1
+	end if
+	
+	//return val1
+end repeat
+
+
+put   Everyimagelocation(text:"7JZTH13J9KSOOO152", waitFor:2,SearchRectangle:[479,453,660,831]) into val
+log val
+scrollright 
+put [[551,480],[551,532],[551,584],[551,636],[551,688],[551,740],[551,792]] into val
+repeat with each item of val
+	log it
+	put  it into Loc
+	//put FoundImageLocation() into Loc
+	Put Loc+[980,-20] into Pos1
+	Put Loc+[1120,20] into Pos2
+	put ReadText(Pos1,Pos2) into val1
+	replace <<"_>> with ":"in val1
+	log val1
+	if val1 is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into val1
+		replace <<"_>> with ":"in val1
+		log val1
+	end if
+	
+	//return val1
+end repeat
+
+//---------------------------
+put ["No Index","35775.0625","36009.0062"] into odometerReadingList
+repeat with each item of odometerReadingList
+	if it is "No index" or  It is "Null" 
+		replace  it by empty in odometerReadingList
+		
+	end if
+end repeat
+log odometerReadingList
+

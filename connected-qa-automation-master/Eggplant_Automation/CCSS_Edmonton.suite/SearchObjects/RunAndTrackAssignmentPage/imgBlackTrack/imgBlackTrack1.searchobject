@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		23,
+		862,
+		109,
+		110
+	],
+	"lastmodifieddate": 1648747521.0669999,
+	"createddate": 1648743453.0190001,
+	"name": "RunAndTrackAssignmentPage/imgBlackTrack/imgBlackTrack1",
+	"lastfounddate": 1648747433.1900001,
+	"ocrcapturestring": "1 2 1",
+	"lastfoundlocation": [
+		32,
+		862,
+		65,
+		110
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"deleted": true,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[61,82]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/imgBlackTrack/imgBlackTrack1.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"capturerect": [
+					23,
+					862,
+					109,
+					110
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com"
+			}
+	]
+}

@@ -1,0 +1,4 @@
+
+requiredenergy::526
+bookouttime::Aug 04,11:02
+currentEnergy::348

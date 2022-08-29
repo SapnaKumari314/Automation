@@ -1,0 +1,46 @@
+{
+	"lastmodifieddate": 1650371653.836,
+	"lastfoundlocation": [
+		1608,
+		984,
+		27,
+		30
+	],
+	"originalcapturelocation": [
+		1595,
+		994,
+		27,
+		30
+	],
+	"createddate": 1650371653.836,
+	"lastfounddate": 1650694826.4400001,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[13,15]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/imgMaintenanceCharger.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"capturerect": [
+					1595,
+					994,
+					27,
+					30
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com"
+			}
+	],
+	"name": "RunAndTrackAssignmentPage/imgMaintenanceCharger"
+}

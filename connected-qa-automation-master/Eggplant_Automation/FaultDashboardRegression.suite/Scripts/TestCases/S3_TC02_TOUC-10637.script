@@ -1,0 +1,92 @@
+﻿(***
+@Author: Shalini Vijayakumar
+@Date: 14/July/2022
+@TC_ID: TOUC_10637
+@TC_Description: Verify user able to select the priority as Red in Fault Priority Filter for vehicle
+***)
+
+BeginTestCase TOUC_10637
+Log "###########   Started execution of Test Case--> TOUC_10637  ##############"
+Log "#######################################################"
+--"1.Login as an superadmin in Apex Portal.
+
+"LoginPage".OpenApplication
+
+"LoginPage".Login "ProterraAdmin"
+Set DatasheetPath to Resourcepath("TestData\S3_TC02_TOUC-10637.xlsx")
+--2.Under Historical Data on Left menu choose Fault Dashboard
+"ApexPages/FaultDashboardSearchCriteria".NavigateTo "HISTORICAL DATA","FAULT DASHBOARD"
+
+--3.Select the charger in toggle and select the options as below
+--customer dropdown = multiple
+--charger name = Single 
+--Fault status = Inactive and select the from & to date 
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "CustomerName") into CustomerName
+"ApexPages/FaultDashboardSearchCriteria".SelectCustomer CustomerName
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "AssetName") into AssetID
+
+get  "ApexPages/FaultDashboardSearchCriteria".AssetTypeSelection ("Vehicle")
+get "ApexPages/FaultDashboardSearchCriteria".SelectAssetID ("Vehicle",AssetID)
+
+--4. Select the priority as Red in Fault Priority Filter column and click on Get data ,
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultPriority ("Red")
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultStatus ("Inactive")
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDateTime") into FromDateTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDateTime") into ToDateTime
+
+"ApexPages/FaultDashboardSearchCriteria".SelectDateRange FromDateTime,ToDateTime
+get "ApexPages/FaultDashboardSearchCriteria".ClickGetDataBtn
+
+
+--verify the data fields in sequential view
+"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Sequential"
+put "ApexPages/FaultDashboardVehicle".Fetch_VehicleFault_TimeofFaultRowValues into faultdateTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDate") into FromDate
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDate") into ToDate
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromTime") into FromTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToTime") into ToTime
+"ApexPages/FaultDashboardCharger".VerifyTimeofFaultRange FromDate,ToDate,FromTime,ToTime,faultdateTime
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "SequentialHeaders") into DatafieldColnames
+"ApexPages/FaultDashboardVehicle".ValidateDatafieldColumnNames_Vehicle DatafieldColnames
+
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "VIN") into RefDataFieldName
+
+
+///fetch Status coloumn values and verify
+put "ApexPages/FaultDashboardVehicle".Extract_DatafieldRowSeries_from_FD_WithReferenceValue (RefDataFieldName,"Status") into StatusColRows
+
+
+"ApexPages/FaultDashboardCharger".Verify_FilteredDatafieldColumn "Status",StatusColRows,"Inactive"
+
+///fetch priority coloumn values and verify
+put "ApexPages/FaultDashboardVehicle".Extract_DatafieldRowSeries_from_FD_WithReferenceValue (RefDataFieldName,"Priority") into PriorityColRows
+"ApexPages/FaultDashboardCharger".Verify_FilteredDatafieldColumn "Priority",PriorityColRows,"Red"
+
+//to verify the VIN
+"ApexPages/FaultDashboardSearchCriteria".verifyDataEntryForGivenFaultSearch "VIN",RefDataFieldName,"VEHICLE"
+
+
+--Click on Group by fault and verify the Data
+"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Group by Fault"
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "GroupbyfaultHeaders") into GBFHeader
+"ApexPages/FaultDashboardVehicle".ValidateDatafieldColumnNames_Vehicle GBFHeader
+
+
+///fetch priority coloumn values and verify
+put "ApexPages/FaultDashboardVehicle".Extract_DatafieldRowSeries_from_FD_WithReferenceValue (RefDataFieldName,"Priority") into PriorityColRows
+"ApexPages/FaultDashboardCharger".Verify_FilteredDatafieldColumn "Priority",PriorityColRows,"Red"
+
+//to verify the number of VIN entries in the dashboard
+"ApexPages/FaultDashboardSearchCriteria".verifyDataEntryForGivenFaultSearch "VIN",RefDataFieldName,"VEHICLE"
+
+"LoginPage".Logout
+
+Log "#############  Finished execution of Test Case--> TOUC_10637 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_10637
+

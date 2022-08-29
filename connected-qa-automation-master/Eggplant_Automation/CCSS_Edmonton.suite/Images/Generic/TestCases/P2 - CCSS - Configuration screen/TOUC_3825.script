@@ -1,0 +1,30 @@
+﻿(***
+@Author: Mohammed Gouse
+@Date: 22/March/22
+@TC_ID: TOUC_3825
+@TC_Description: CCSS-Config: Config Screen for Non COE Admin
+***)
+
+BeginTestCase TOUC_3825
+
+Log "###########   Started execution of Test Case--> TOUC_3825   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login "NonCoeUser"
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "CCSS Configuration", "CCSS Configuration", 1
+
+"CCSS_Pages/CCSSConfiguration".VerifyAllEditableAndNonEditableGlobalFields
+"CCSS_Pages/CCSSConfiguration".VerifyButtonIsEnabledOrDisabled "Apply"
+"CCSS_Pages/CCSSConfiguration".VerifyButtonIsEnabledOrDisabled "Cancel"
+
+"CCSS_Pages/CCSSConfiguration".ClickOnGarageTab
+"CCSS_Pages/CCSSConfiguration".VerifyAllEditableAndNonEditableGarageFields 
+"CCSS_Pages/CCSSConfiguration".VerifyButtonIsEnabledOrDisabled "Apply"
+"CCSS_Pages/CCSSConfiguration".VerifyButtonIsEnabledOrDisabled "Cancel"
+
+Log "#############  Finished execution of Test Case--> TOUC_3825 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3825

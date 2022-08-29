@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		1852,
+		84,
+		38,
+		25
+	],
+	"lastmodifieddate": 1657525786.881,
+	"createddate": 1656664977.9619999,
+	"name": "CloseFaultDetailsPopup",
+	"lastfounddate": 1656686614.6670001,
+	"ocrcapturestring": "X",
+	"lastfoundlocation": [
+		1852,
+		84,
+		38,
+		25
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[19,12]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "IndividualPopup/CloseFaultDetailsPopup.png",
+				"connectionname": "SUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					1852,
+					84,
+					38,
+					25
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "X"
+			}
+	]
+}

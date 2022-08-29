@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		284,
+		284,
+		70,
+		29
+	],
+	"lastmodifieddate": 1657125602.773,
+	"createddate": 1657125602.773,
+	"name": "bt_VehicleToggle_Selected",
+	"lastfounddate": 1659110572.0310001,
+	"ocrcapturestring": "Vehicle",
+	"lastfoundlocation": [
+		284,
+		284,
+		70,
+		29
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[35,14]",
+					"Tolerance": "_52",
+					"Discrepancy": "_0",
+					"SearchType": "Smoothed for Text"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "bt_VehicleToggle_Selected.png",
+				"connectionname": "PROSUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					284,
+					284,
+					70,
+					29
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "Vehicle"
+			}
+	]
+}

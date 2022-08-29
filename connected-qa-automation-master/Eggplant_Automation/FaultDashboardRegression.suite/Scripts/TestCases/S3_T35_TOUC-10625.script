@@ -1,0 +1,75 @@
+﻿(***
+@Author: Shalini Vijayakumar
+@Date: 12/July/2022
+@TC_ID: TOUC_10625
+@TC_Description:  Verify user is able to select the fault details for the particular charger for charger
+***)
+
+BeginTestCase TOUC_10625
+Log "###########   Started execution of Test Case--> TOUC_10568  ##############"
+Log "#######################################################"
+--"1.Login as an superadmin in Apex Portal.
+
+"LoginPage".OpenApplication
+
+"LoginPage".Login "ProterraAdmin"
+
+Set DatasheetPath to Resourcepath("TestData\S3_T35_TOUC-10625.xlsx")
+--2.Under Historical Data on Left menu choose Fault Dashboard
+"ApexPages/FaultDashboardSearchCriteria".NavigateTo "HISTORICAL DATA","FAULT DASHBOARD"
+
+--3.Select the particular customer with charger name and verify the data fields 
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "CustomerName") into CustomerName
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "AssetName") into AssetID
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FaultStatus") into FaultStatus
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "DataFieldHeaders") into DataFieldHeaders
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDateTime") into FromDateTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDateTime") into ToDateTime
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDate") into FromDate
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDate") into ToDate
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromTime") into FromTime
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToTime") into ToTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ChargerID") into ChargerID
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "DatafieldHeaders") into DatafieldColnames
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "VendorErrCode") into DatafieldFilterValue
+"ApexPages/FaultDashboardSearchCriteria".SelectCustomer CustomerName
+"ApexPages/FaultDashboardSearchCriteria".AssetTypeSelection "Charger"
+"ApexPages/FaultDashboardSearchCriteria".SelectAssetID "Charger",AssetID
+"ApexPages/FaultDashboardSearchCriteria".SelectFaultStatus FaultStatus
+"ApexPages/FaultDashboardSearchCriteria".SelectDateRange FromDateTime,ToDateTime
+get "ApexPages/FaultDashboardSearchCriteria".ClickGetDataBtn
+--select the layout
+"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Sequential"
+put "ApexPages/FaultDashboardCharger".Fetch_ChargerFault_TimeofFaultRowValues into faultdateTime
+
+"ApexPages/FaultDashboardCharger".VerifyTimeofFaultRange FromDate,ToDate,FromTime,ToTime,faultdateTime
+
+"ApexPages/FaultDashboardCharger".ValidateDatafieldColumnNames_Charger  DatafieldColnames
+--verify the fault dashboard has data'
+--4.Apply the filters for particular error code and verify the field values in sequential view
+"ApexPages/FaultDashboardSearchCriteria".SelectFilterDropdown "Vendor Error Code",DatafieldFilterValue,"CHARGER"
+
+put "ApexPages/FaultDashboardCharger".Fetch_ChargerFault_RowValues_wrtColumn("VendorErrcodeWithFilter") into VendorErrorCodeRowValues
+
+"ApexPages/FaultDashboardCharger".Verify_FilteredDatafieldColumn "Vendor Error Code", VendorErrorCodeRowValues,DatafieldFilterValue
+
+--5.Verify the below restricted fields 
+--First Occurrence
+--Number of Occurrences User should not see the fields that are First Occurrence Number of Occurrences
+"ApexPages/FaultDashboardCharger".chargerRestrictedFieldsValidation "FD_HorizontalScrollRight","Number Of Occurences","FaultDashboard"
+"ApexPages/FaultDashboardCharger".chargerRestrictedFieldsValidation "FD_HorizontalScrollRight","First Occurence","FaultDashboard"
+
+"LoginPage".Logout
+
+Log "#############  Finished execution of Test Case--> TOUC_10625 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_10625
+
+
+
+

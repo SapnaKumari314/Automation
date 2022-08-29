@@ -1,0 +1,46 @@
+{
+	"lastmodifieddate": 1647224023.3759999,
+	"lastfoundlocation": [
+		585,
+		449,
+		21,
+		8
+	],
+	"originalcapturelocation": [
+		355,
+		647,
+		27,
+		12
+	],
+	"createddate": 1647223992.8730001,
+	"lastfounddate": 1658406249.543,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[13,6]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/bus_8027_GarageOverview.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"capturerect": [
+					355,
+					647,
+					27,
+					12
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com"
+			}
+	],
+	"name": "bus_8027_GarageOverview"
+}

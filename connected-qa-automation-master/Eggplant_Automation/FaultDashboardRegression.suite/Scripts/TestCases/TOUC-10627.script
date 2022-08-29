@@ -1,0 +1,93 @@
+﻿(***
+@Author: Shalini Vijayakumar
+@Date: 2/Aug/2022
+@TC_ID: TOUC_10627
+@TC_Description: S3_TC32_Verify user is able to select the multiple data field columns and view the same in data field columns for charger
+***)
+
+BeginTestCase TOUC_10627
+Log "###########   Started execution of Test Case--> TOUC_10627  ##############"
+Log "#######################################################"
+
+--1.Login as an superadmin in Apex Portal.
+
+"LoginPage".OpenApplication
+
+"LoginPage".Login "ProterraAdmin"
+Set DatasheetPath to Resourcepath("TestData\TOUC-10627.xlsx")
+--2.Under Historical Data on Left menu choose Fault Dashboard
+get "ApexPages/FaultDashboardSearchCriteria".NavigateTo ("HISTORICAL DATA","FAULT DASHBOARD")
+--3.Select the charger in toggle and select the options as below
+--customer dropdown = single
+--charger name = multiple 
+--Fault status = all and select the from & to date 
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "CustomerName") into CustomerName
+get  "ApexPages/FaultDashboardSearchCriteria".AssetTypeSelection ("Charger")
+get "ApexPages/FaultDashboardSearchCriteria".SelectCustomer (CustomerName)
+put "All" into Status
+Put "All" into Priority
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "AssetName") into AssetID
+get "ApexPages/FaultDashboardSearchCriteria".SelectAssetID ("Charger",AssetID)
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultPriority (Priority)
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultStatus (Status)
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDateTime") into FromDateTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDateTime") into ToDateTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromTime") into FromTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToTime") into ToTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDate") into ToDate
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDate") into FromDate
+
+If uppercase(Status) is not "ACTIVE"
+	"ApexPages/FaultDashboardSearchCriteria".SelectDateRange FromDateTime,ToDateTime
+end if
+
+get "ApexPages/FaultDashboardSearchCriteria".ClickGetDataBtn
+put "ApexPages/FaultDashboardSearchCriteria".GetUTCTimeStamp_HM("UTC") into CurrentTime
+--select the layout
+"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Sequential"
+If uppercase(Status) is not "ACTIVE"
+	put "ApexPages/FaultDashboardCharger".Fetch_ChargerFault_TimeofFaultRowValues into faultdateTime
+	get "ApexPages/FaultDashboardCharger".VerifyTimeofFaultRange (FromDate,ToDate,FromTime,ToTime,faultdateTime)
+end if
+
+--4.Click on get data and Filter the OCPP Fault Code and verify the data fields in the Sequential view ->the selected data fields should be displayed in data field column 
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ChargerID") into ChargerID
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "OCPPFaultCode") into OCPPFaultCode
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "VendorErrorcode") into VendorFaultCode
+
+
+Repeat for each item Faultcode in OCPPFaultCode
+	"ApexPages/FaultDashboardSearchCriteria".SelectFilterDropdown "Charger ID",item repeatindex() of ChargerID,"CHARGER"
+	"ApexPages/FaultDashboardSearchCriteria".SelectFilterDropdown "OCPP Fault Code",Faultcode,"CHARGER"
+	--verify if the data is filtered with given occp fault code
+	put "ApexPages/FaultDashboardCharger".Extract_DatafieldRowSeries_from_FD_WithReferenceValue_Charger  (item repeatindex() of ChargerID,"OCPP Fault Code") into UIOCPPValue
+	"ApexPages/FaultDashboardCharger".Verify_FilteredDatafieldColumn "OCPP Fault Code",UIOCPPValue,Faultcode
+	
+	"ApexPages/FaultDashboardSearchCriteria".ClearFilterSpecificDatafieldDropdown "OCPP Fault Code","CHARGER"
+	"ApexPages/FaultDashboardSearchCriteria".ClearFilterSpecificDatafieldDropdown "Charger ID","CHARGER"
+end repeat
+
+
+--5.Click on Group by fault and Filter the Vendor Fault Code and verify the data fields->the selected data fields should be displayed in data field column 
+"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Group by Fault"
+
+Repeat for each item Err in VendorFaultCode
+	"ApexPages/FaultDashboardSearchCriteria".SelectFilterDropdown "Charger ID",item repeatindex() of ChargerID,"CHARGER"
+	"ApexPages/FaultDashboardSearchCriteria".SelectFilterDropdown "Vendor Error Code",Err,"CHARGER"
+	--verify if the data is filtered with given occp fault code
+	put "ApexPages/FaultDashboardCharger".Extract_DatafieldRowSeries_from_FD_WithReferenceValue_Charger  (item repeatindex() of ChargerID,"Vendor Error Code") into UIVendorErrorValue
+	"ApexPages/FaultDashboardCharger".Verify_FilteredDatafieldColumn "Vendor Error Code",UIVendorErrorValue,Err
+	
+	"ApexPages/FaultDashboardSearchCriteria".ClearFilterSpecificDatafieldDropdown "Vendor Error Code","CHARGER"
+	"ApexPages/FaultDashboardSearchCriteria".ClearFilterSpecificDatafieldDropdown "Charger ID","CHARGER"
+End repeat
+
+--logout from the application
+"LoginPage".Logout
+Log "#############  Finished execution of Test Case--> TOUC_10627 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_10627
+
+

@@ -1,0 +1,51 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 15/Apr/22
+@TC_ID: TOUC_4718
+@TC_Description: CCSS-CC-Charger Actions: Charger Action warning not displayed for high LCQ priority Buses
+***)
+
+
+(***
+prerequisite: Multiple buses should be parked in the charger positions
+***)
+
+BeginTestCase TOUC_4718
+
+Log "###########   Started execution of Test Case--> TOUC_4718  ##############"
+Log "#######################################################"
+
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Set Charger Limit to 0 from the Energy Management Screen
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "API_SetChargerLimit_id") into API_SetChargerLimit_id
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "API_SetChargerLimit_chargerLimit") into API_SetChargerLimit_chargerLimit
+"CCSS_Pages/RunAndAssignmentTrackPage".SetChargerLimitFromAPI API_SetChargerLimit_id, API_SetChargerLimit_chargerLimit
+
+--Park buses in the Track
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".ParkBusInTheTrack "RunAndTrackAssignmentPage\imgActiveCharger", BusId, "CCSS_P1_TestData", "ChargerActions", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "BusID2") into BusId2
+"CCSS_Pages/RunAndAssignmentTrackPage".ParkBusInTheTrack "RunAndTrackAssignmentPage\imgActiveCharger", BusId2, "CCSS_P1_TestData", "ChargerActions", "BusId2", "customerGarageId", "RunID2", "API_Bus_Details_busVins2", "tenantId"
+
+--Click Menu and click Charger Control screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+
+--Right Click on the Active Charger Icon where a Bus with the lowest LCQ priority is parked
+--Click the Initiate Charging action
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "InitiateChargingBtn") into InitiateChargingBtn
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "InitiateChargingMsg7") into InitiateChargingMsg7
+
+"CCSS_Pages/ChargerControl".RightClickOnIconAndSelectOption "high", InitiateChargingBtn, InitiateChargingMsg7
+
+
+
+Log "#############  Finished execution of Test Case--> TOUC_4718 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_4718

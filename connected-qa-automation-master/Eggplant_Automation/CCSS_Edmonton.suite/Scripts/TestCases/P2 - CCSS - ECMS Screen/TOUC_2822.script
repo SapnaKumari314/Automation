@@ -1,0 +1,37 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 29/March/22
+@TC_ID: TOUC_2822
+@TC_Description: CCSS-ECMS-Cumulative Bookout Delay: Cumulative Bookout Delay when Buses have any infinite delay
+***)
+
+
+(***Preconditions
+There are 2 scenarios here:-
+1. Make charger limit on ECMS to 0 and Assign a Bus to run and track such that Current Energy < Required Energy
+2. Charger Limit on ECMS > 0, Park 2 buses
+Bus 1 Maintenance - Track Position - 6-1
+Bus 2 With Run and Track - Track Position - 6-2
+both these scenarios will give infinite delay
+***)
+
+BeginTestCase TOUC_2822
+
+Log "###########   Started execution of Test Case--> TOUC_2822  ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login "COEAdmin"
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Energy Management", "Energy Management", 1
+
+"CCSS_Pages/EnergyManagement".CheckFieldIsEditable "Cumulative Book Out Delay", 0,0,0,80
+"CCSS_Pages/EnergyManagement".VerifyBookoutDelayTime "Cumulative Book Out Delay", 0,0,0,80
+
+Log "#############  Finished execution of Test Case--> TOUC_2822 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_2822
+
+
+

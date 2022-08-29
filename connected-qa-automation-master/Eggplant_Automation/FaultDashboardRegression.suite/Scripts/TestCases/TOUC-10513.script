@@ -1,0 +1,113 @@
+﻿(***
+@Author: Shalini Vijayakumar
+@Date: 16/August/2022
+@TC_ID: TOUC_10513
+@TC_Description:Verify data fields for vehicle in Fault dashboard screen by selecting the Vehicle details with Active faults
+@Prerequisite: Create a 5 min file that has faults across the Critical, Medium and Low priorities with existing vehicle. Upload the 5 min file into S3 ,Search for "qa2-toucan-data.proterra.com" S3 bucket.
+***)
+
+BeginTestCase TOUC_10513
+Log "###########   Started execution of Test Case--> TOUC_10513  ##############"
+Log "#######################################################"
+--"1.Login as an superadmin in Apex Portal.
+Set DatasheetPath to Resourcepath("TestData\TOUC-10513.xlsx")
+"LoginPage".OpenApplication
+
+"LoginPage".Login "ProterraAdmin"
+
+--2.Under Historical Data on Left menu choose Fault Dashboard
+"ApexPages/FaultDashboardSearchCriteria".NavigateTo "HISTORICAL DATA","FAULT DASHBOARD"
+
+--3.Select the vehicle in toggle and select the options as below
+--customer dropdown = all
+--Vehicle name = all 
+--Fault status = Active and select the from & to date and Get Data
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "CustomerName") into CustomerName
+"ApexPages/FaultDashboardSearchCriteria".SelectCustomer CustomerName
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "AssetName") into AssetID
+get  "ApexPages/FaultDashboardSearchCriteria".AssetTypeSelection ("Vehicle")
+get "ApexPages/FaultDashboardSearchCriteria".SelectAssetID ("Vehicle",AssetID)
+
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultPriority ("All")
+
+SET FaultStatus to "Active"
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultStatus (FaultStatus)
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDateTime") into FromDateTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDateTime") into ToDateTime
+If uppercase(FaultStatus) is not "ACTIVE"
+	
+	"ApexPages/FaultDashboardSearchCriteria".SelectDateRange FromDateTime,ToDateTime
+End if
+
+get "ApexPages/FaultDashboardSearchCriteria".ClickGetDataBtn
+"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Sequential"
+--5.Click on Customize and select below fileds,apply Source Address Customer Name,Vehicle
+"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "Source Address"
+"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "Customer name"
+"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "Model"
+
+
+--6.Verify the below restricted fields 
+--First Occurrence
+--Number of Occurrences
+"ApexPages/FaultDashboardVehicle".VehicleRestrictedFieldsValidation "FD_HorizontalScrollRight","First occurrence","FaultDashboard"
+"ApexPages/FaultDashboardVehicle".VehicleRestrictedFieldsValidation "FD_HorizontalScrollRight","Number of occurences","FaultDashboard"
+--4.Verify the below data fields in UI and compare the values with the Open search response
+(*Vehicle Name
+VIN
+SPN
+FMI
+Priority
+Status
+Fault Name
+Fault Description
+Time of Fault
+Fault Duration(should be Firstoccurance - Updated TS)
+Source Address
+Customer Name
+Vehicle (replaces vehicle model)*)
+"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "All"
+(*
+Set DatasheetPath to Resourcepath("TestData\TOUC-10513.xlsx")
+set global iIteration to 1
+set Global ConfigValues to {MinTimeOut:"4",BasicTimeOut:"15",MediumTimeOut:"20",LongTimeOut:"35"}*)
+
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom ( DatasheetPath, "TestData", "VIN") into VINID
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "SPN") into SPN
+put [] into FDUIList
+set 	iDataIteration to 0
+repeat for each item VINNumber in VINID
+	set 	iDataIteration to iDataIteration+1
+	
+	"ApexPages/FaultDashboardSearchCriteria".SelectFilterDropdown "VIN",VINNumber,"VEHICLE"
+	"ApexPages/FaultDashboardSearchCriteria".SelectFilterDropdown "SPN",item repeatindex() of SPN,"VEHICLE"
+	put "ApexPages/FaultDashboardVehicle".Extract_DatafieldRowSeries_from_FD_WithReferenceValue (VINNumber,"SPN_ALL") into SPNRows
+	"ApexPages/FaultDashboardCharger".Verify_FilteredDatafieldColumn "SPN",SPNRows,item repeatindex() of SPN
+	
+	---Fetch the data field values from front end
+	put "ApexPages/FaultDashboardVehicle".FetchUIDashboardData ("FDDashboardFiltered",VINNumber) into UIDatalist
+	put UIDatalist into item iDataIteration of FDUIList
+end repeat
+log FDUIList
+"LoginPage".Logout
+
+-------------------------------------Backend Validation (Open Search Dashboard and database)---------------------------------------------------------
+--launch and login open search dashboard
+"OpenSearchDashboard".OpenApplication_OpenSearch 
+"OpenSearchDashboard".OpenSearchLogin ""
+--navigate to dev tools open in opensearch dashboard
+"OpenSearchDashboard".NavigateTo "Dev Tools"
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "HeaderID") into VehicleHeaderID
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "BustPlatform") into BustPlatform
+repeat for each item UIData in FDUIList
+	"ApexPages/DataValidation".Vehicle_ComapareUIandOpenSearchBackEndValues UIData,VehicleHeaderID,FromDateTime,ToDateTime,BustPlatform
+End repeat
+
+"OpenSearchDashboard".LogoutOpensearchDashboard
+Log "#############  Finished execution of Test Case--> TOUC_10513 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_10513

@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		856,
+		764,
+		30,
+		24
+	],
+	"lastmodifieddate": 1657034762.0139999,
+	"createddate": 1657034762.0139999,
+	"name": "FD_LeftScrollbar",
+	"lastfounddate": 1657037308.0180001,
+	"ocrcapturestring": "—",
+	"lastfoundlocation": [
+		463,
+		877,
+		30,
+		24
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[0,12]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "FD_LeftScrollbar.png",
+				"connectionname": "SUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					856,
+					764,
+					30,
+					24
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "—"
+			}
+	]
+}

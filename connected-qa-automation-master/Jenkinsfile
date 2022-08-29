@@ -1,0 +1,43 @@
+pipeline{
+
+    agent any
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '15'))
+    }
+
+    stages {
+        stage('Clone repository') {
+            steps{
+                git credentialsId: 'imsparvathaneni', url: 'git@github.com:proterra-inc/connected-qa-automation.git'
+            }
+        }
+         stage('Build') {
+             steps{
+
+                 dir('APEX/UI/Proterra_APEX_UI_API_Automation'){
+                    withMaven(jdk: 'java11', maven: 'Maven 3') {
+
+                         sh '''#!/bin/bash
+                         echo "Maven Clean install with test cases..."
+                         mvn clean install test -Denv.Name=prod2 -Dtestng.dtd.http=true -Dapi.Key=8Jhkl2xSCXaTjitdNTAde4SKvPpiGlaM6G1Qd0EC -Dtest.Type=API -Dgarage.Name=Centennial -DsuiteXmlFile=externalAPI.xml
+
+                         '''
+                     }
+                 }
+
+
+             }
+         }
+
+
+  }
+
+        post{
+            always{
+                emailext attachmentsPattern: 'APEX/UI/Proterra_APEX_UI_API_Automation/extent_report/Extent_Report_Proterra.html', subject: 'EDMONTON EXTERNAL API TEST RESULT', body: "" ,to: EMAIL_RECEPIENTS
+
+                cleanWs()
+            }
+        }
+
+}

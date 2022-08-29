@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		1164,
+		525,
+		43,
+		24
+	],
+	"lastmodifieddate": 1657525806.135,
+	"createddate": 1656698498.2410002,
+	"name": "Notes_A",
+	"lastfounddate": 1656700836.7709999,
+	"ocrcapturestring": "Notes",
+	"lastfoundlocation": [
+		1164,
+		571,
+		43,
+		24
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[10,24]",
+					"Tolerance": "_59",
+					"Discrepancy": "_0",
+					"SearchType": "Smoothed for Text"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "IndividualPopup/Notes_A.png",
+				"connectionname": "SUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					1164,
+					525,
+					43,
+					24
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "Notes"
+			}
+	]
+}

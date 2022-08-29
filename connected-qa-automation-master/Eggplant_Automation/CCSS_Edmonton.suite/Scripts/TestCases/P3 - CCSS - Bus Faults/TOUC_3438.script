@@ -1,0 +1,49 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 05/Aug/22
+@TC_ID: TOUC_3438
+@TC_Description: CCSS-Bus Faults: Electric Bus Faults Data export to CSV
+***)
+
+BeginTestCase TOUC_3438
+
+Log "###########   Started execution of Test Case--> TOUC_3438  ##############"
+Log "#######################################################"
+
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+-----------------------------Start - Pre-requisites
+--Park buses in the Track
+--"CCSS_Pages/PrerequsiteTestData/LCQ".RemoveBusFromAPI "CCSS_P1_TestData", "LCQ", "BusId", "RunID", "API_Bus_Details_busVins", "TOUC_3429"
+--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "BusID") into BusId
+--"CCSS_Pages/PrerequsiteTestData/LCQ".ParkBusInTheTrack BusId
+
+
+--Navigate to Garage Overview screen by selecting 'Garage Overview' link from main menu
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+
+
+--Navigate to Logical Charge Queue section
+--"CCSS_Pages/GarageOverview".NavigateToElement "Logical Charge Queue", "LogicalChargeQueueArea"
+--Click on ellipsis / Menu should be disabled
+"CCSS_Pages/GarageOverview".SelectMenuOptionFrom "ElectricBusFaultsArea", "Export to CSV"
+
+
+--Click on Main Menu and navigate to 'Charger Control' screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control", 2
+
+--Click on ellipses of the LCQ component
+--Navigate to Logical Charge Queue section
+--"CCSS_Pages/ChargerControl".NavigateToElement "Logical Charge Queue", "LogicalChargeQueueArea"
+--Click on ellipsis / Menu should be disabled
+"CCSS_Pages/GarageOverview".SelectMenuOptionFrom "ElectricBusFaultsArea", "Export to CSV"
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3438 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3438

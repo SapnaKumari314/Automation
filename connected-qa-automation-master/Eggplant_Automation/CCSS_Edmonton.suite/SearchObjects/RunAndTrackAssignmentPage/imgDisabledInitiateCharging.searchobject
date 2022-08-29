@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		27,
+		594,
+		155,
+		41
+	],
+	"lastmodifieddate": 1659010749.6719999,
+	"createddate": 1659009151.2220001,
+	"name": "RunAndTrackAssignmentPage/imgDisabledInitiateCharging",
+	"lastfounddate": 1659021237.1389999,
+	"ocrcapturestring": "Initiate Charging",
+	"lastfoundlocation": [
+		29,
+		621,
+		133,
+		28
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[77,20]",
+					"Tolerance": "_52",
+					"Discrepancy": "_0",
+					"SearchType": "Smoothed for Text"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/imgDisabledInitiateChargingBtn.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com",
+				"capturerect": [
+					27,
+					594,
+					155,
+					41
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "Initiate Charging"
+			}
+	]
+}

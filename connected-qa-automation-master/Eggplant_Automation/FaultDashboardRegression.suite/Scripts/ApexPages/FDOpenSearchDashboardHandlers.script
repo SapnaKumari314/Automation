@@ -1,0 +1,1186 @@
+﻿--readonly/LLdKVEz!b+WfPn4+
+--put OSDVehicleQuery ("JH4KA7551MC045888","26b9fe644fd1","2022-06-13T07:11:00","2022-07-18T07:14:00","516099") into val
+(*put OSDVehicleQuery ("5GZEV337X7J141405","26b9fe644fd1","2022-07-02T07:11:00","2022-07-02T07:14:00","516213") into val
+
+typetext val*)
+//*****************************************************
+--Description: Handler to generate the vehicle Open search dashboard query
+---Input : None
+---output: None
+---Created by:Shalini V
+--created on: 20 July 2022
+//*****************************************************
+to handle OSDVehicleQuery BusVIN,VehicleHeader,gte,lte,SPN
+	//set BusVIN to "7JZTH13J7KS000151"
+	
+	//set From to "1654732800000"
+	//set To to "1655423999000"
+	try
+		Global  ConfigValues
+		
+		put <<GET pcan_historical_faults/_search
+{"query" : {"bool" : {"must": [{"match": {"busName":  ">>&BusVIN&<<"}},{"match": {"hdrUid": ">>&VehicleHeader&<<"}},{"range": {"firstOcurrenceInFile": {"gte": ">>&gte&<<","lte": ">>&lte&<<"}}}],"minimum_should_match": 1,      "should" : [ {"match" : {"spnSignalFaultValue": ">>&SPN&<<"}}]}}}>> into VehicleFaultQuery
+		return VehicleFaultQuery
+		
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,OSDVehicleQuery)
+	End try
+	
+end OSDVehicleQuery
+//*****************************************************
+--Description: Handler to generate the charger Open search dashboard query
+---Input : None
+---output: None
+---Created by:Shalini V
+--created on: 02 August 2022
+//*****************************************************
+to handle OSDChargerQuerywithRequestTimestamp RequestTimestamp,ErrorCode,vendorErrorCode,OCPPID,gte,lte
+	//set BusVIN to "7JZTH13J7KS000151"
+	
+	//set From to "1654732800000"
+	//set To to "1655423999000"
+	try
+		Global  ConfigValues
+		
+		put <<	GET ocpp_data*/_search
+{"query" : { "bool" : {"filter" : [ {"terms" : {"request.timestamp" : [ ">>&RequestTimestamp&<<" ]}},{"terms" : {"request.errorCode" : [ ">>&ErrorCode&<<" ] }	},{"terms" : {"request.vendorErrorCode" : [ ">>&vendorErrorCode&<<" ]}},{"terms" : {"chargerName" : [ ">>&OCPPID&<<" ]}}, {"terms" : { "OCPPRequestTypes" : [ "statusNotification" ]}}, {"range" : {"request.timestamp" : {"gte" : >>&gte&<<,"lte" : >>&lte&<<}}}]}}, "from" : 0,"size" : 10,"sort" : [ {"@timestamp" : {"order" : "asc"}}]}>> into ChargerFaultQuery
+		return ChargerFaultQuery
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,OSDChargerQuerywithRequestTimestamp)
+	End try
+	
+end OSDChargerQuerywithRequestTimestamp
+
+//*****************************************************
+--Description: Handler to generate the charger Open search dashboard query
+---Input : None
+---output: None
+---Created by:Shalini V
+--created on: 02 August 2022
+//*****************************************************
+to handle OSDChargerQueryWithStatus FaultStatus,ErrorCode,vendorErrorCode,OCPPID,gte,lte
+	//set BusVIN to "7JZTH13J7KS000151"
+	
+	//set From to "1654732800000"
+	//set To to "1655423999000"
+	try
+		Global  ConfigValues
+		
+		put <<	GET ocpp_data*/_search
+{"query" : { "bool" : {"filter" : [ {"terms" : {"request.status" : [ ">>&FaultStatus&<<" ]}},{"terms" : {"request.errorCode" : [ ">>&ErrorCode&<<" ] }	},{"terms" : {"request.vendorErrorCode" : [ ">>&vendorErrorCode&<<" ]}},{"terms" : {"chargerName" : [ ">>&OCPPID&<<" ]}}, {"terms" : { "OCPPRequestTypes" : [ "statusNotification" ]}}, {"range" : {"request.timestamp" : {"gte" : >>&gte&<<,"lte" : >>&lte&<<}}}]}}, "from" : 0,"size" : 10,"sort" : [ {"@timestamp" : {"order" : "asc"}}]}>> into ChargerFaultQuery
+		return ChargerFaultQuery
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,OSDChargerQueryWithStatus)
+	End try
+	
+end OSDChargerQueryWithStatus
+
+to createJSONFileAndWrite FileName,DataToWrite
+	try
+	(*put remoteclipboard() into DataToWrite
+        set FileName to "TOUC_10672_Response"*)
+		try 
+			delete file  resourcePath( "\ResponseData\"&FileName&".JSON")
+		catch  e
+			log "file is not found to delete"
+		end try
+		
+		create new file resourcePath ( "\ResponseData\"&FileName&".JSON")
+		put resourcePath("\ResponseData\"&FileName&".JSON") into MyFileVar// creates a variable with a path to a file
+		open file MyFileVar
+		write DataToWrite to file MyFileVar
+		close file MyFileVar
+		log "Succesfully written open search data into file:"&FileName
+		return true
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,createJSONFileAndWrite)
+	End try
+end createJSONFileAndWrite
+
+
+//Description: Handler to get the JSON value from JSON file
+---Input: FileName
+---Output: returns JSON value of the open search response
+---Created By/date: Himaja R (15-Jul-2022)
+to getJSONValueFromJSONFile  FileName
+	try
+		set FileName to "ResponseData/"&FileName&".JSON"
+		
+		set Response to JSONValue (file ResourcePath(FileName))
+		//log Response
+		return Response
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getJSONValueFromJSONFile)
+	End try
+end getJSONValueFromJSONFile
+
+//*****************************************************
+--Description: Handler to format the json file
+---Input : None
+---output: None
+---Created by:Shalini V
+--created on: 18 July 2022
+//*****************************************************
+To handle FormatJsonFile 
+
+	log "Start of function FormatJsonFile"
+	
+	put remoteclipboard() into Response
+	(*open file  resourcePath("\OutputData\"&MyFileVar)
+	repeat forever	
+		read from file  resourcePath("\OutputData\"&MyFileVar) until return-- reads one line
+		if it is empty then exit repeat-- we've reached the end of the file
+		delete newline from it
+		put it-- or do other processing with 'it' here
+		(*
+		if it is <<""",>>
+			--	delete it  from Response
+			
+			put <<">> after line repeatindex() of res1
+			//delete it  from Response
+	end if*)
+		replace <<""">> with <<">> in it
+	end repeat
+	
+	close file resourcePath("\OutputData\"&MyFileVar)
+	*)
+	
+	repeat with each line of  Response
+		
+		if it is <<""",>>
+			--	delete it  from Response
+			delete it  from line repeatindex() of Response
+			put <<">> after line repeatindex()-1 of Response
+			--replace <<""">> with <<">> in it
+			//delete it  from Response
+		end if
+		
+	end repeat
+	put  Response into res1
+	
+	repeat with each line of  res1
+		if it contains <<""">>
+			--replace <<""">> with <<">> in(* it of *)res1
+			replace <<""">> with <<">> in res1 
+			
+			--put <<">> after line repeatindex() of res1
+			
+			//delete it  from Response
+		end if
+	end repeat
+	(*	put res1 into res2
+	repeat with each line of  res2
+		if it contains <<""">>
+			--replace <<""">> with <<">> in(* it of *)res1
+			replace <<""">> with <<">> in it 
+			--put <<">> after line repeatindex() of res2
+			
+			//delete it  from Response
+		end if
+	end repeat
+	replace <<""">> with <<">> in res2 *)
+	Log "End of function FormatJsonFile"
+	return   res1
+End FormatJsonFile
+
+put FormatJsonFile() into FormattedResponse
+get createJSONFileAndWrite ("Response",FormattedResponse)
+--typetext "LLdKVEz!b+WfPn4+"
+put getJSONValueFromJSONFile("Response") into response
+
+put response.hits.(hits) into OpensearchResponse
+log val
+
+--OpensearchResponse,"5GZEV337X7J141405","516213","9","73","2022-07-02","07:11"
+//*****************************************************
+--Description: Handler to fetch the vin id from open search dashboard
+---Input : val, BusVIN, SPN,FMI, SourceAddress,Date,Time
+---output: vin id
+---Created by:Shalini V
+--Created on: 18 July 2022
+//*****************************************************
+to handle Fetch_OSDVINid OpensearchResponse, BusVIN, SPN,FMI, SourceAddress,Date,Time
+	log "Start of function Fetch_OSDVINid"
+	try
+		--put formattedTime("%Y-%m-%d",Date) into Date
+		
+		--put formattedTime("%H:%M",  Time) into Time
+		--set iDataFlag to false
+		--repeat with each item of OpensearchResponse
+		--if it.(_id) contains  BusVIN&"_"&SPN&"_"&FMI&"_"&SourceAddress&"_"&Date&"T"&Time
+		--get vin
+		
+		put OpensearchResponse.(_source).busMetadata.vinNum into OSDVIN
+		--set iDataFlag to True
+		--end if
+		--end repeat
+		If OSDVIN is not ""
+			"Utilities/GenericOperations".Success "VIN ID is fetched from Open search dashboard"&&OSDVIN
+		Else
+			Logerror "VIN ID is not fetched from the opensearch dashboard for the given query "&BusVIN&"_"&SPN&"_"&FMI&"_"&SourceAddress&"_"&Date&"T"&Time
+		End If
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_OSDVINid)
+	End try
+	log "End of function Fetch_OSDVINid"
+	return OSDVIN
+end Fetch_OSDVINid
+//*****************************************************
+--Description: Handler to fetch the bus name from open search dashboard
+---Input : val, BusVIN, SPN,FMI, SourceAddress,Date,Time
+---output: bus name
+---Created by:Shalini V
+--Created on: 18 July 2022
+//*****************************************************
+
+to handle Fetch_OSDBusName OpensearchResponseHits, BusVIN, SPN,FMI, SourceAddress,Date,Time
+	log "Start of function Fetch_OSDBusName"
+	try
+		--put formattedTime("%Y-%m-%d",Date) into Date
+		
+		--put formattedTime("%H:%M",  Time) into Time
+		--set iDataFlag to false
+		--repeat with each item of OpensearchResponse
+		--	if it.(_id) contains  BusVIN&"_"&SPN&"_"&FMI&"_"&SourceAddress&"_"&Date&"T"&Time
+		--get busname
+		
+		put OpensearchResponse.(_source).busName into sOSDBusname
+		--	set iDataFlag to True
+		--end if
+		--end repeat
+		If sOSDBusname is not  ""
+			"Utilities/GenericOperations".Success "Bus name is fetched from Open search dashboard"&&sOSDBusname
+		Else
+			Logwarning "Bus name is not fetched from the opensearch dashboard for"&BusVIN&"_"&SPN&"_"&FMI&"_"&SourceAddress&"_"&Date&"T"&Time
+		End If
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,sOSDBusname)
+	End try
+	log "End of function Fetch_OSDBusName"
+	return sOSDBusname
+	
+end Fetch_OSDBusName
+//*****************************************************
+--Description: Handler to fetch the SPN from open search dashboard
+---Input : val, BusVIN, SPN,FMI, SourceAddress,Date,Time
+---output: spn
+---Created by:Shalini V
+--Created on: 18 July 2022
+//*****************************************************
+to handle Fetch_OSDSPN OpensearchResponse, BusVIN, SPN,FMI, SourceAddress,Date,Time
+	log "Start of function Fetch_OSDSPN"
+	try
+		--put formattedTime("%Y-%m-%d",Date) into Date
+		
+		--put formattedTime("%H:%M",  Time) into Time
+		--set iDataFlag to false
+		--repeat with each item of OpensearchResponse
+		--	if it.(_id) contains  BusVIN&"_"&SPN&"_"&FMI&"_"&SourceAddress&"_"&Date&"T"&Time
+		--get spn
+		
+		put OpensearchResponse.(_source).spnSignalfaultValue into sOSDSPN
+		--set iDataFlag to True
+		--end if
+		--end repeat
+		If sOSDSPN is not ""
+			"Utilities/GenericOperations".Success "SPN  is fetched from Open search dashboard"&&sOSDSPN
+		Else
+			Logerror "SPN is not fetched from the opensearch dashboard for"&BusVIN&"_"&SPN&"_"&FMI&"_"&SourceAddress&"_"&Date&"T"&Time
+			
+		End If
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_OSDSPN)
+	End try
+	log "End of function Fetch_OSDSPN"
+	return sOSDSPN
+end Fetch_OSDSPN
+//*****************************************************
+--Description: Handler to fetch the FMI from open search dashboard
+---Input : val, BusVIN, SPN,FMI, SourceAddress,Date,Time
+---output: fmi
+---Created by:Shalini V
+--Created on: 18 July 2022
+//*****************************************************
+
+to handle Fetch_OSDFMI OpensearchResponse, BusVIN, SPN,FMI, SourceAddress,Date,Time
+	log "Start of function Fetch_OSDSPN"
+	try
+		
+		put OpensearchResponse.(_source).fmiSignalFaultValue into sOSDFMI
+		
+		
+		If sOSDFMI is not ""
+			"Utilities/GenericOperations".Success "FMI  is fetched from Open search dashboard"&&sOSDFMI
+		Else
+			Logerror "FMI is not fetched from the opensearch dashboard for"&BusVIN&"_"&SPN&"_"&FMI&"_"&SourceAddress&"_"&Date&"T"&Time
+		End If
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_OSDFMI)
+	End try
+	log "End of function Fetch_OSDFMI"
+	return sOSDFMI
+end Fetch_OSDFMI
+//*****************************************************
+--Description: Handler to fetch the first ocurrence from open search dashboard
+---Input : val, BusVIN, SPN,FMI, SourceAddress,Date,Time
+---output: first ocurrence
+---Created by:Shalini V
+--Created on: 18 July 2022
+//*****************************************************
+to handle Fetch_OSDFirstOcurrence OpensearchResponse, BusVIN, SPN,FMI, SourceAddress,Date,Time
+	log "Start of function Fetch_OSDFirstOcurrence"
+	try
+		
+		put OpensearchResponse.(_source).firstOcurrenceInFile into sOSDFirstOcurrence
+		
+		
+		If sOSDFirstOcurrence is not ""
+			"Utilities/GenericOperations".Success "First Ocurrence  is fetched from Open search dashboard"&&sOSDFirstOcurrence
+		Else
+			Logerror "First Ocurrence is not fetched from the opensearch dashboard for"&BusVIN&"_"&SPN&"_"&FMI&"_"&SourceAddress&"_"&Date&"T"&Time
+		End If
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_OSDFirstOcurrence)
+	End try
+	log "End of function Fetch_OSDFirstOcurrence"
+	return sOSDFirstOcurrence
+end Fetch_OSDFirstOcurrence
+//*****************************************************
+--Description: Handler to fetch the fault status from open search dashboard
+---Input : val, BusVIN, SPN,FMI, SourceAddress,Date,Time
+---output: fault status
+---Created by:Shalini V
+--Created on: 18 July 2022
+//*****************************************************
+
+to handle Fetch_OSDFaultStatus OpensearchResponse, BusVIN, SPN,FMI, SourceAddress,Date,Time
+	log "Start of function Fetch_OSDFaultStatus"
+	try
+	(*put formattedTime("%Y-%m-%d",Date) into Date
+		
+		put formattedTime("%H:%M",  Time) into Time
+		set iDataFlag to False
+		repeat with each item of OpensearchResponse
+			if it.(_id) contains  BusVIN&"_"&SPN&"_"&FMI&"_"&SourceAddress&"_"&Date&"T"&Time
+				--get status
+				vinNum*)
+		put OpensearchResponse.(_source).resolved into sOSDFaultStatus
+		(*set iDataFlag to True
+	end if
+end repeat*)
+		If sOSDFaultStatus is True
+			Put "Inactive" into sOSDFaultStatus
+		else
+			put "Active" into sOSDFaultStatus
+		end if
+		
+		If sOSDFaultStatus is not ""
+			"Utilities/GenericOperations".Success "Fault status  is fetched from Open search dashboard"&&sOSDFaultStatus
+		Else
+			LogError "Fault status is not fetched from the opensearch dashboard for"&BusVIN&"_"&SPN&"_"&FMI&"_"&SourceAddress&"_"&Date&"T"&Time
+		End If
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,sOSDFaultStatus)
+	End try
+	log "End of function Fetch_OSDFaultStatus"
+	return sOSDFaultStatus
+end Fetch_OSDFaultStatus
+//*****************************************************
+--Description: Handler to fetch the  fault name from open search dashboard
+---Input : val, BusVIN, SPN,FMI, SourceAddress,Date,Time
+---output: fault name
+---Created by:Shalini V
+--Created on: 18 July 2022
+//*****************************************************
+to handle Fetch_OSDFaultName OpensearchResponse, BusVIN, SPN,FMI, SourceAddress,Date,Time
+	log "Start of function Fetch_OSDFaultName"
+	try
+		--put formattedTime("%Y-%m-%d",Date) into Date
+		
+		--put formattedTime("%H:%M",  Time) into Time
+		--set iDataFlag to False
+		--repeat with each item of OpensearchResponse
+		--if it.(_id) contains  BusVIN&"_"&SPN&"_"&FMI&"_"&SourceAddress&"_"&Date&"T"&Time
+		--get status
+		put OpensearchResponse.(_source).faultName into sOSDFaultName
+		--	set iDataFlag to True
+		--	end if
+		--	end repeat
+		If sOSDFaultName is not ""
+			"Utilities/GenericOperations".Success "Fault name  is fetched from Open search dashboard"&&sOSDFaultName
+		Else
+			LogWarning "Fault name is not fetched from the opensearch dashboard for"&BusVIN&"_"&SPN&"_"&FMI&"_"&SourceAddress&"_"&Date&"T"&Time
+		End If
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_OSDFaultName)
+	End try
+	log "End of function Fetch_OSDFaultName"
+	return sOSDFaultName
+end Fetch_OSDFaultName
+//*****************************************************
+--Description: Handler to fetch the  fault description from open search dashboard
+---Input : val, BusVIN, SPN,FMI, SourceAddress,Date,Time
+---output: fault description
+---Created by:Shalini V
+--Created on: 18 July 2022
+//*****************************************************
+
+to handle Fetch_OSDFaultDescription OpensearchResponse, BusVIN, SPN,FMI, SourceAddress,Date,Time
+	log "Start of function Fetch_OSDFaultDescription"
+	try
+		
+		put OpensearchResponse.(_source).faultDescription into sOSDFaultDescription
+		
+		If sOSDFaultDescription is not ""
+			"Utilities/GenericOperations".Success "Fault description  is fetched from Open search dashboard"&&sOSDFaultDescription
+		Else
+			LogWarning "Fault description is not fetched from the opensearch dashboard for"&BusVIN&"_"&SPN&"_"&FMI&"_"&SourceAddress&"_"&Date&"T"&Time
+		End If
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,sOSDFaultDescription)
+	End try
+	log "End of function Fetch_OSDFaultDescription"
+	return sOSDFaultDescription
+end Fetch_OSDFaultDescription
+
+//*****************************************************
+--Description: Handler to fetch the  source address from open search dashboard
+---Input : val, BusVIN, SPN,FMI, SourceAddress,Date,Time
+---output: source address
+---Created by:Shalini V
+--Created on: 18 July 2022
+//*****************************************************
+
+to handle Fetch_OSDSourceAddress OpensearchResponse, BusVIN, SPN,FMI, SourceAddress,Date,Time
+	log "Start of function Fetch_OSDSourceAddress"
+	try
+		
+		put OpensearchResponse.(_source).faultSourceValue into sOSDSourceAddress
+		
+		If sOSDSourceAddress is not ""
+			"Utilities/GenericOperations".Success "Fault description  is fetched from Open search dashboard"&&sOSDSourceAddress
+		Else
+			Logwarning "Fault description is not fetched from the opensearch dashboard for"&BusVIN&"_"&SPN&"_"&FMI&"_"&SourceAddress&"_"&Date&"T"&Time
+		End If
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_OSDSourceAddress)
+	End try
+	log "End of function Fetch_OSDSourceAddress"
+	return sOSDSourceAddress
+end Fetch_OSDSourceAddress
+//*****************************************************
+--Description: Handler to fetch the  source address from open search dashboard
+---Input : val, BusVIN, SPN,FMI, SourceAddress,Date,Time
+---output: source address
+---Created by:Shalini V
+--Created on: 18 July 2022
+//*****************************************************
+
+to handle Fetch_OSDTroubleshoot OpensearchResponse, BusVIN, SPN,FMI, SourceAddress,Date,Time
+	log "Start of function Fetch_OSDTroubleshoot"
+	try
+		
+		
+		put OpensearchResponse.(_source).faultTroubleshoot into sOSDTroubleshoot
+		
+		If sOSDTroubleshoot is not ""
+			"Utilities/GenericOperations".Success "Fault troubleshoot  is fetched from Open search dashboard"&&sOSDTroubleshoot
+		Else
+			LogWarning "Fault troubleshoot is not fetched from the opensearch dashboard for"&BusVIN&"_"&SPN&"_"&FMI&"_"&SourceAddress&"_"&Date&"T"&Time
+		End If
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_OSDTroubleshoot)
+	End try
+	log "End of function Fetch_OSDTroubleshoot"
+	return sOSDTroubleshoot
+end Fetch_OSDTroubleshoot
+
+//*****************************************************
+--Description: Handler to fetch the customer name from open search dashboard
+---Input : val, BusVIN, SPN,FMI, SourceAddress,Date,Time
+---output: fleet name(customer name)
+---Created by:Shalini V
+--Created on: 18 July 2022
+//*****************************************************
+to handle Fetch_OSDCustomerName OpensearchResponse, BusVIN, SPN,FMI, SourceAddress,Date,Time
+	log "Start of function Fetch_OSDCustomerName"
+	try
+		put OpensearchResponse.(_source).busMetadata.fleetName into OSDCutomerName
+		
+		If OSDCutomerName is not ""
+			"Utilities/GenericOperations".Success "customer name is fetched from Open search dashboard"&&OSDCutomerName
+		Else
+			LogWarning "customer name is not fetched from the opensearch dashboard for " &BusVIN&"_"&SPN&"_"&FMI&"_"&SourceAddress&"_"&Date&"T"&Time
+		End If
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_OSDCustomerName)
+	End try
+	log "End of function Fetch_OSDCustomerName"
+	return OSDCutomerName
+end Fetch_OSDCustomerName
+
+//*****************************************************
+--Description: Handler to fetch the fault duration 
+---Input : val, BusVIN, SPN,FMI, SourceAddress,Date,Time
+---output: fault duration
+---Created by:Shalini V
+--Created on: 18 July 2022
+//*****************************************************
+
+"2022-07-21T05:50:03Z"
+to handle Fetch_FaultDuration	OpensearchResponse, BusVIN, SPN,FMI, SourceAddress,Date,Time
+	log "Start of function Fetch_FaultDuration"
+	(*try*)
+	
+	If OpensearchResponse.(_source).resolved is true then
+		put OpensearchResponse.(_source).firstOcurrenceInFile into firstocc
+		
+		put OpensearchResponse.(_source).resolvedTimestamp into OSDResolvedTimestamp
+		
+		--replace "T" in OSDResolvedTimestamp by " "
+		(*--put formattedTime("%Y-%m-%d",firstocc) into Date
+		
+		--put formattedTime("%H:%M",  Time) into Time
+		subtract firstocc from OSDResolvedTimestamp
+		put OSDResolvedTimestamp into secondsvalue
+		delete "seconds" from secondsvalue
+		put formattedTime("%H:%M:%S",  "00:00:"&secondsvalue) into FaultDuration
+		set iDataFlag to True
+		Else
+		Log "The fault is not resolved"
+		set FaultDuration to "00:00:00"
+		set iDataFlag to True
+		end if*)
+		replace "T" in firstocc by "_"
+		replace ":" in firstocc by "-"
+		--put OpensearchResponse.(_source).resolvedTimestamp into OSDResolvedTimestamp
+		replace "T" in OSDResolvedTimestamp by "_"
+		replace ":" in OSDResolvedTimestamp by "-"
+		--	put formattedTime("%Y-%m-%d",firstocc) into Date
+		delete "Z" from firstocc
+		delete "Z" from OSDResolvedTimestamp
+		--put formattedTime("%H:%M",  Time) into Time
+		--put formattedTime("%Y-%m-%d_%H-%M-%S",  "2022-07-02_07-11-14") into date1
+		--put formattedTime("%Y-%m-%d_%H-%M-%S",  "2022-07-02_07-16-14") into date2
+		put formattedTime("%Y-%m-%d_%H-%M-%S",  firstocc) into firstocc
+		put formattedTime("%Y-%m-%d_%H-%M-%S",  OSDResolvedTimestamp) into OSDResolvedTimestamp
+		subtract firstocc from OSDResolvedTimestamp
+		put OSDResolvedTimestamp into secondsvalue
+		delete "seconds" from secondsvalue
+		--put getTimeDifferenceFromOpenSearch (firstocc,OSDResolvedTimestamp) into FaultDuration
+	Else
+		put OpensearchResponse.(_source).firstOcurrenceInFile into firstocc
+		put OpensearchResponse.(_source).updatedTimestamp into OSDResolvedTimestamp
+		replace "T" in firstocc by "_"
+		replace ":" in firstocc by "-"
+		--put OpensearchResponse.(_source).resolvedTimestamp into OSDResolvedTimestamp
+		replace "T" in OSDResolvedTimestamp by "_"
+		replace ":" in OSDResolvedTimestamp by "-"
+		--	put formattedTime("%Y-%m-%d",firstocc) into Date
+		delete "Z" from firstocc
+		delete "Z" from OSDResolvedTimestamp
+		--put formattedTime("%H:%M",  Time) into Time
+		--put formattedTime("%Y-%m-%d_%H-%M-%S",  "2022-07-02_07-11-14") into date1
+		--put formattedTime("%Y-%m-%d_%H-%M-%S",  "2022-07-02_07-16-14") into date2
+		put formattedTime("%Y-%m-%d_%H-%M-%S",  firstocc) into firstocc
+		put formattedTime("%Y-%m-%d_%H-%M-%S",  OSDResolvedTimestamp) into OSDResolvedTimestamp
+		subtract firstocc from OSDResolvedTimestamp
+		put OSDResolvedTimestamp into secondsvalue
+		delete "seconds" from secondsvalue
+		
+		--put "0" into secondsvalue
+	End if
+	
+	(*Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_FaultDuration)
+	End try*)
+	log "End of function Fetch_FaultDuration"
+	
+	return secondsvalue
+end Fetch_FaultDuration
+
+set firstocc to "2022-06-15T07:11:14Z"
+set OSDResolvedTimestamp to "2022-07-21T05:45:03Z"
+replace "T" in firstocc by "_"
+replace ":" in firstocc by "-"
+--put OpensearchResponse.(_source).resolvedTimestamp into OSDResolvedTimestamp
+replace "T" in OSDResolvedTimestamp by "_"
+replace ":" in OSDResolvedTimestamp by "-"
+--	put formattedTime("%Y-%m-%d",firstocc) into Date
+delete "Z" from firstocc
+delete "Z" from OSDResolvedTimestamp
+--put formattedTime("%H:%M",  Time) into Time
+--put formattedTime("%Y-%m-%d_%H-%M-%S",  "2022-07-02_07-11-14") into date1
+--put formattedTime("%Y-%m-%d_%H-%M-%S",  "2022-07-02_07-16-14") into date2
+put formattedTime("%Y-%m-%d_%H-%M-%S",  firstocc) into firstocc
+put formattedTime("%Y-%m-%d_%H-%M-%S",  OSDResolvedTimestamp) into OSDResolvedTimestamp
+subtract firstocc from OSDResolvedTimestamp
+put OSDResolvedTimestamp into secondsvalue
+delete "seconds" from secondsvalue
+
+
+
+
+//*****************************************************
+--Description: Handler to fetch the Bus model
+---Input : val, BusVIN, SPN,FMI, SourceAddress,Date,Time
+---output: fault duration
+---Created by:Shalini V
+--Created on: 22 July 2022
+//*****************************************************
+to handle Fetch_BusModelFromOpensearch OpensearchResponse, BusVIN, SPN,FMI, SourceAddress,Date,Time
+	log "Start of function Fetch_BusModelFromOpensearch"
+	try
+		put  OpensearchResponse.(_source).busMetadata into MetaData
+		--log ItemToValidate.(_source).busMetadata
+		--set val to {busAlias:"5GZEV337X7J141405", busName:"5GZEV337X7J141405", fleetName:"Unknown", timezone:"UTC", vinNum:"5GZEV337X7J141405"}
+		repeat for each item in keys of MetaData
+			log it
+			If it contains "busModel"
+				put OpensearchResponse.(_source).busMetadata.busModel into BusModel
+			Else
+				set BusModel to " "
+				LogWarning "BusModel index lable is not found in  the open search dashboard"
+			End If
+		end repeat
+		
+	catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_BusModelFromOpensearch)
+	end try
+	log "End of function Fetch_BusModelFromOpensearch"
+	return BusModel
+end Fetch_BusModelFromOpensearch
+
+//*****************************************************
+--Description: Handler to fetch the fault priority
+---Input : val, BusVIN, SPN,FMI, SourceAddress,Date,Time
+---output: fault duration
+---Created by:Shalini V
+--Created on: 22 July 2022
+//*****************************************************
+to handle Fetch_FaultPriorityFromOpensearch OpensearchResponse, BusVIN, SPN,FMI, SourceAddress,Date,Time,BustType
+	log "Start of function Fetch_BusModelFromOpensearch"
+	
+	
+	If Uppercase(BustType) is "JOULEY" then
+		If  OpensearchResponse.(_source).ril is True
+			set FaultPriority to "Red"
+			return FaultPriority
+		Else if OpensearchResponse.(_source).mil is True
+			
+			set FaultPriority to "Yellow"
+			return FaultPriority
+		Else if OpensearchResponse.(_source).ail is True
+			set FaultPriority to "Yellow"
+			return FaultPriority
+			
+		Else if OpensearchResponse.(_source).pil is True
+			set FaultPriority to "Yellow"
+			return FaultPriority
+		Else 
+			set FaultPriority to "Green"
+			return FaultPriority
+			
+		End If
+	else if Uppercase(BustType) is "CATALYST" then
+		If  OpensearchResponse.(_source).faultPriority is between 1 and 4
+			set FaultPriority to "Red"
+			return FaultPriority
+		else if OpensearchResponse.(_source).faultPriority is between 5 and 8 then
+			set FaultPriority to "Yellow"
+			return FaultPriority
+		else
+			If OpensearchResponse.(_source).faultPriority is not "" 
+				set FaultPriority to "Green"
+				
+				return FaultPriority
+			else
+				LogError "Fault priority is not fetched from opensearch dashboard"
+			end if
+		end if
+		
+	else if Uppercase(BustType) is "BE35" then
+		
+		If  OpensearchResponse.(_source).faultPriority is between 1 and 6
+			set FaultPriority to "Red"
+			return FaultPriority
+		else if OpensearchResponse.(_source).faultPriority is between 7 and 8 then
+			set FaultPriority to "Yellow"
+			return FaultPriority
+		else
+			If OpensearchResponse.(_source).faultPriority is not "" 
+				set FaultPriority to "Green"
+				
+				return FaultPriority
+			else
+				LogError "Fault Priority is not fetched from opensearch dashboard"
+			end if
+			
+		end if
+		
+	else if Uppercase(BustType) is "ZX5" then
+		
+		If  OpensearchResponse.(_source).ril is True
+			set FaultPriority to "Red"
+			return FaultPriority
+		Else if OpensearchResponse.(_source).mil is True
+			
+			set FaultPriority to "Yellow"
+			return FaultPriority
+		Else if OpensearchResponse.(_source).ail is True
+			set FaultPriority to "Yellow"
+			return FaultPriority
+			
+		Else if OpensearchResponse.(_source).pil is True
+			set FaultPriority to "Yellow"
+			return FaultPriority
+		Else 
+			If OpensearchResponse.(_source).faultPriority is not "" 
+				set FaultPriority to "Green"
+				
+				return FaultPriority
+			else
+				LogError "Fault Priority is not fetched from opensearch dashboard"
+			end if
+		End If
+	End If
+	try
+		
+	catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_FaultPriorityFromOpensearch)
+	end try
+	log "End of function Fetch_FaultPriorityFromOpensearch"
+	return BusModel
+end Fetch_FaultPriorityFromOpensearch
+
+(*set firstocc to "2022-07-02T07:11:14Z"
+set OSDResolvedTimestamp to "2022-07-05T07:16:14Z"
+to handle getTimeDifferenceFromOpenSearch firstocc,OSDResolvedTimestamp
+	replace "T" in firstocc by "_"
+	replace ":" in firstocc by "-"
+	--put OpensearchResponse.(_source).resolvedTimestamp into OSDResolvedTimestamp
+	replace "T" in OSDResolvedTimestamp by "_"
+	replace ":" in OSDResolvedTimestamp by "-"
+	--	put formattedTime("%Y-%m-%d",firstocc) into Date
+	
+	--put formattedTime("%H:%M",  Time) into Time
+	--put formattedTime("%Y-%m-%d_%H-%M-%S",  "2022-07-02_07-11-14") into date1
+	--put formattedTime("%Y-%m-%d_%H-%M-%S",  "2022-07-02_07-16-14") into date2
+	put formattedTime("%Y-%m-%d_%H-%M-%S",  firstocc) into firstocc
+	put formattedTime("%Y-%m-%d_%H-%M-%S",  OSDResolvedTimestamp) into OSDResolvedTimestamp
+	subtract firstocc from OSDResolvedTimestamp
+	put OSDResolvedTimestamp into secondsvalue
+	
+	
+	delete "seconds" from secondsvalue
+	put formattedTime("%H:%M:%S",  "00:00:"&secondsvalue) into FaultDuration
+	set iDataFlag to True
+	--Else
+	Log "The fault is not resolved"
+	set FaultDuration to "00:00:00"
+	set iDataFlag to True
+	--end if
+end getTimeDifferenceFromOpenSearch*)
+(*set firstocc to "2022-07-02T07:11:14Z"
+set OSDResolvedTimestamp to "2022-07-05T07:16:14Z"
+--If OpensearchResponse.(_source).resolved is true then
+--put OpensearchResponse.(_source).firstOcurrenceInFile into firstocc
+replace "T" in firstocc by " "
+--put OpensearchResponse.(_source).resolvedTimestamp into OSDResolvedTimestamp
+replace "T" in OSDResolvedTimestamp by " "
+--	put formattedTime("%Y-%m-%d",firstocc) into Date
+
+--put formattedTime("%H:%M",  Time) into Time
+subtract firstocc from OSDResolvedTimestamp
+put OSDResolvedTimestamp into secondsvalue
+delete "seconds" from secondsvalue
+put formattedTime("%H:%M:%S",  "00:00:"&secondsvalue) into FaultDuration
+set iDataFlag to True
+--Else
+Log "The fault is not resolved"
+set FaultDuration to "00:00:00"
+set iDataFlag to True*)
+--end if
+
+(*
+
+
+
+set firstocc to "2022-07-02T07:11:14Z"
+set OSDResolvedTimestamp to "2022-07-03T07:16:14Z"
+
+replace "T" in firstocc by "_"
+replace ":" in firstocc by "-"
+--put OpensearchResponse.(_source).resolvedTimestamp into OSDResolvedTimestamp
+replace "T" in OSDResolvedTimestamp by "_"
+replace ":" in OSDResolvedTimestamp by "-"
+delete "Z" from firstocc
+delete "Z" from OSDResolvedTimestamp
+--	put formattedTime("%Y-%m-%d",firstocc) into Date
+
+--put formattedTime("%H:%M",  Time) into Time
+--put formattedTime("%Y-%m-%d_%H-%M-%S",  "2022-07-02_07-11-14") into date1
+--put formattedTime("%Y-%m-%d_%H-%M-%S",  "2022-07-02_07-16-14") into date2
+put formattedTime("%Y-%m-%d_%H-%M-%S",  firstocc) into firstocc
+put formattedTime("%Y-%m-%d_%H-%M-%S",  OSDResolvedTimestamp) into OSDResolvedTimestamp
+subtract firstocc from OSDResolvedTimestamp
+put OSDResolvedTimestamp into secondsvalue
+log secondsvalue
+set secondsvalue to "86755"
+delete "seconds" from secondsvalue
+divide secondsvalue by 3600 --gives hours
+put secondsvalue into hoursvalue
+
+delete "seconds" from hoursvalue
+if hoursvalue contains "."
+	split hoursvalue by "."
+	put  ("0."&item 2 of hoursvalue)  * 60 into minutesval  ----gives minutes
+	
+	put round(item 1 of minutesval) into minutesvalue
+	put item 1 of hoursvalue into hoursvalue
+end if 
+delete "seconds" from minutesvalue
+set seconds to "00"
+If minutesvalue contains "."
+	split minutesvalue by "."
+	
+	multiply ("0."&item 2 of minutesvalue)  by 60 --multiply by 60 seconds
+	put item 2 of minutesvalue into  seconds
+	put item 1 of minutesvalue into minutesvalue
+End If
+
+log hoursvalue&":"&minutesvalue&":"&seconds
+
+*)
+(*ConvertUITimeofFaultToSeconds "00:10:00"*)
+ConvertUITimeofFaultToSeconds "22:31:12"
+to handle ConvertUITimeofFaultToSeconds UITimeofFault
+
+	
+	split UITimeofFault by ":"
+	
+	if item 1 of UITimeofFault is not "00"
+		
+		put item 1 of UITimeofFault *3600 into HSeconds
+	else
+		set HSeconds to "00"
+	end if
+	
+	If item 2 of UITimeofFault is not "00"
+		put item 2 of UITimeofFault *60 into MSeconds
+	else
+		set MSeconds to "00"
+	End If
+	
+	
+	put (HSeconds+MSeconds+item 3 of UITimeofFault) into UIFaultDurationinSeconds
+	log UIFaultDurationinSeconds
+	return UIFaultDurationinSeconds
+end ConvertUITimeofFaultToSeconds
+
+--*multiply by 3600 hours - 86400
+--*60 for seconds
+
+To handle convertDateandTimeFormat DateTime
+	log "Start of function convertDateandTimeFormat"
+	If DateTime is not ""
+		put first 10 characters of DateTime into Date
+		delete first 10 characters of DateTime 
+		delete last 2 characters of DateTime
+		put Trim(DateTime) into Time
+		
+		put formattedTime("%Y-%m-%d",Date) into Date
+		
+		put formattedTime("%H:%M",  Time) into Time
+		put Date&"T"&Time into OSDDatetime
+		log OSDDatetime
+	else
+		LogError "Date and time is not given for conversion"
+	End If
+	log "End  of function convertDateandTimeFormat"
+	return OSDDatetime
+	
+End convertDateandTimeFormat
+#######################################CHARGER PART#########################
+//*****************************************************
+--Description: Handler to fetch the connector id from open search dashboard
+---Input : OpensearchResponse,OCPPID, RequestedTimeofFault
+---output: connector id
+---Created by:Shalini V
+--Created on: 02 August 2022
+//*****************************************************
+to handle Fetch_OSDConnectorID OpensearchResponse, OCPPID, RequestedTimeofFault
+	log "Start of functionFetch_OSDConnectorIDFetch_OSDVINid"
+	try
+		
+		put OpensearchResponse.("_source").request.connectorId into OSDConnectorID
+		
+		If OSDConnectorID is not ""
+			"Utilities/GenericOperations".Success "Connector ID is fetched from Open search dashboard"&&OSDConnectorID
+		Else
+			Logerror "Connector ID is not fetched from the opensearch dashboard for the given query "& OCPPID&","&RequestedTimeofFault
+		End If
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_OSDConnectorID)
+	End try
+	log "End of function Fetch_OSDConnectorID"
+	return OSDConnectorID
+end Fetch_OSDConnectorID
+
+
+
+//*****************************************************
+--Description: Handler to fetch the OCpp fault code from open search dashboard
+---Input : OpensearchResponse,OCPPID, RequestedTimeofFault
+---output: OSDOCPPFaultCode
+---Created by:Shalini V
+--Created on: 02 August 2022
+//*****************************************************
+to handle Fetch_OSDOCPPFaultCode OpensearchResponse, OCPPID, RequestedTimeofFault
+	log "Start of Fetch_OSDOCPPFaultCode"
+	try
+		
+		put OpensearchResponse.("_source").request.errorCode into OSDOCPPFaultCode
+		
+		If OSDOCPPFaultCode is not ""
+			"Utilities/GenericOperations".Success "OCPP fault code is fetched from Open search dashboard"&&OSDOCPPFaultCode
+		Else
+			Logerror "OCPP fault code is not fetched from the opensearch dashboard for the given query "& OCPPID&","&RequestedTimeofFault
+		End If
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_OSDOCPPFaultCode)
+	End try
+	log "End of function Fetch_OSDOCPPFaultCode"
+	return OSDOCPPFaultCode
+end Fetch_OSDOCPPFaultCode
+
+
+
+//*****************************************************
+--Description: Handler to fetch the vendor error code from open search dashboard
+---Input : OpensearchResponse,OCPPID, RequestedTimeofFault
+---output: OSDOCPPVendorErrCode
+---Created by:Shalini V
+--Created on: 02 August 2022
+//*****************************************************
+to handle Fetch_OSDVendorErrCode OpensearchResponse, OCPPID, RequestedTimeofFault
+	log "Start of Fetch_OSDVendorErrCode"
+	try
+		
+		put OpensearchResponse.("_source").request.VendorErrorCode into OSDOCPPVendorErrCode
+		
+		If OSDOCPPVendorErrCode is not ""
+			"Utilities/GenericOperations".Success "Vendor error code is fetched from Open search dashboard"&&OSDOCPPVendorErrCode
+		Else
+			Logerror "Vendor error code is not fetched from the opensearch dashboard for the given query "& OCPPID&","&RequestedTimeofFault
+		End If
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_OSDVendorErrCode)
+	End try
+	log "End of function Fetch_OSDVendorErrCode"
+	return OSDOCPPVendorErrCode
+end Fetch_OSDVendorErrCode
+
+
+//*****************************************************
+--Description: Handler to fetch the fault status from open search dashboard
+---Input : OpensearchResponse,OCPPID, RequestedTimeofFault
+---output: fault status
+---Created by:Shalini V
+--Created on: 02 August 2022
+//*****************************************************
+to handle Fetch_OSDFaultStatus_Charger OpensearchResponse, OCPPID, RequestedTimeofFault
+	log "Start of Fetch_OSDFaultStatus_Charger"
+	try
+		
+		put OpensearchResponse.("_source").request.status into FaultStatus
+		
+		If FaultStatus is not ""
+			"Utilities/GenericOperations".Success "status is fetched from Open search dashboard"&&FaultStatus
+		Else
+			Logerror "status is not fetched from the opensearch dashboard for the given query "& OCPPID&","&RequestedTimeofFault
+		End If
+		If FaultStatus is "Faulted"
+			set FaultStatusValue to "Active"
+		Else
+			set FaultStatusValue to "Inactive"
+		End If
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_OSDFaultStatus)
+	End try
+	log "End of function Fetch_OSDFaultStatus_Charger"
+	return FaultStatusValue
+end Fetch_OSDFaultStatus_Charger
+
+
+//*****************************************************
+--Description: Handler to fetch the time of fault from open search dashboard
+---Input : OpensearchResponse,OCPPID, RequestedTimeofFault
+---output: time of fault
+---Created by:Shalini V
+--Created on: 02 August 2022
+//*****************************************************
+to handle Fetch_OSDTimeofFault OpensearchResponse, OCPPID, RequestedTimeofFault
+	log "Start of Fetch_OSDTimeofFault"
+	try
+		
+		put OpensearchResponse.("_source").request.timestamp into TimeofFault
+		
+		If TimeofFault is not ""
+			"Utilities/GenericOperations".Success "Time of fault is fetched from Open search dashboard"&&TimeofFault
+		Else
+			Logerror "Time of fault is not fetched from the opensearch dashboard for the given query "& OCPPID&","&RequestedTimeofFault
+		End If
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_OSDTimeofFault)
+	End try
+	log "End of function Fetch_OSDTimeofFault"
+	return TimeofFault
+end Fetch_OSDTimeofFault
+
+
+
+//*****************************************************
+--Description: Handler to fetch the time of fault from open search dashboard
+---Input : OpensearchResponse,OCPPID, RequestedTimeofFault
+---output: time of fault
+---Created by:Shalini V
+--Created on: 02 August 2022
+//*****************************************************
+to handle Fetch_OSDFirstOccurence OpensearchResponse, OCPPID, RequestedTimeofFault
+	log "Start of Fetch_OSDFirstOccurence"
+	try
+		
+		put OpensearchResponse.("_source").request.timestamp into FirstOccurence
+		
+		If FirstOccurence is not ""
+			"Utilities/GenericOperations".Success "First occurence is fetched from Open search dashboard"&&FirstOccurence
+		Else
+			Logerror "First occurence is not fetched from the opensearch dashboard for the given query "& OCPPID&","&RequestedTimeofFault
+		End If
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Fetch_OSDFirstOccurence)
+	End try
+	log "End of function Fetch_OSDFirstOccurence"
+	return FirstOccurence
+end Fetch_OSDFirstOccurence
+
+(*
+set FaultDurationCalculated to "0 Days:22 Hours:25 Minutes:0 Seconds"
+put CalculateLogicForFaultDurationCharger (FaultDurationCalculated) into CalculatedSec
+set FaultDurationCalculated to "22:24:02"
+put CalcluateFaultDurationfromUI (FaultDurationCalculated) into UISeconds
+CompareFaultDurationCharger UISeconds,CalculatedSec
+
+To handle CalculateLogicForFaultDurationCharger FaultDurationCalculated
+	Log "Start of function CalculateLogicForFaultDurationCharger"
+	Delete "Days" from FaultDurationCalculated
+	Delete "Hours" from FaultDurationCalculated
+	Delete "Minutes" from FaultDurationCalculated
+	Delete "Seconds" from FaultDurationCalculated
+	
+	Split  FaultDurationCalculated by ":"
+	put (trim(item 1 of FaultDurationCalculated) multiplied by 24) into Day 
+	put trim(item 2 of FaultDurationCalculated) into hours
+	put Day + hours into Totalhours
+	put (Totalhours multiplied by 3600) into hours ---hours
+	put (trim(item 3 of FaultDurationCalculated) multiplied by 60) into minutes ---min
+	put (Trim(item 4 of FaultDurationCalculated)) into sec
+	add Day to sec
+	add hours to sec
+	add minutes to sec
+	log sec
+	set CalculatedSec to sec
+	Log "End  of function CalculateLogicForFaultDurationCharger"
+	return CalculatedSec
+End CalculateLogicForFaultDurationCharger
+
+--106680
+--106984
+set FaultDurationCalculated to " 29:54:39"
+CalcluateFaultDurationfromUI FaultDurationCalculated
+To handle CalcluateFaultDurationfromUI FaultDurationCalculated
+	Log "Start of function CalcluateFaultDurationfromUI"
+	
+	
+	Split  FaultDurationCalculated by ":"
+	
+	put (trim(item 1 of FaultDurationCalculated) multiplied by 3600) into hours ---hours
+	put (trim(item 2 of FaultDurationCalculated) multiplied by 60) into minutes ---min
+	put (Trim(item 3 of FaultDurationCalculated)) into sec
+	
+	add hours to sec
+	add minutes to sec
+	set UISeconds to sec
+	Log "End  of function CalcluateFaultDurationfromUI"
+	return UISeconds
+End CalcluateFaultDurationfromUI 
+
+
+To handle CompareFaultDurationCharger UISeconds,CalculatedSec
+	subtract CalculatedSec from UISeconds
+	log it
+	Delete "-" from it
+	If it is greater than 500
+		Logerror
+	else
+		logsuccess
+	End If
+	
+End CompareFaultDurationCharger*)
+
+put "ApexPages/FaultDashboardSearchCriteria".GetUTCTimeStamp_HM("UTC") into CurrentTime--2022-08-02 17-26
+ValidateActiveFaultDuration_ChargerFault "08/01/2022 10:36 AM","46:02:34",CurrentTime
+to handle ValidateActiveFaultDuration_ChargerFault TimeofFaultUI,UIFaultDuration,CurrentTime
+
+	set firstocc to TimeofFaultUI
+	put first 10 characters of firstocc into FaultDate
+	delete first 10 characters of firstocc 
+	--delete last 2 characters of firstocc
+	put Trim(firstocc) into FaultTime 
+	
+	
+	If FaultTime contains "AM"
+		delete "AM" from FaultTime
+	else if  FaultTime contains "PM"
+		Delete "PM" from FaultTime
+		add 12 hours to FaultTime 
+	End If
+	
+	put formattedTime("%Y-%m-%d",FaultDate) into FaultDate
+	put formattedTime("%H:%M",FaultTime) into FaultTime
+	
+	put FaultDate&&FaultTime into TimeofFault
+	put formattedTime("%Y-%m-%d %H:%M",TimeofFault) into TimeofFault
+	log TimeofFault
+	
+	subtract TimeofFault  from CurrentTime
+	log CurrentTime
+	put ConvertUITimeofFaultToSeconds( UIFaultDuration) into UITimeofFaultinSeconds
+	wait 4
+	subtract UITimeofFaultinSeconds from CurrentTime
+	delete "-" from CurrentTime
+	Delete "seconds" from CurrentTime
+	If CurrentTime is less than 200
+		LogSuccess "Fault duration is correctly shown in the application - This might be approximate and not exact. There might be 3 minutes variation."
+	Else 
+		LogError "Fault duration is not shown correctly"
+	End If
+end ValidateActiveFaultDuration_ChargerFault
+put "2022-08-12_15-29-49" into firstocc
+
+
+put "2022-08-12_15-31-41" into OSDResolvedTimestamp
+
+
+put formattedTime("%Y-%m-%d_%H-%M-%S",  firstocc) into firstocc
+put formattedTime("%Y-%m-%d_%H-%M-%S",  OSDResolvedTimestamp) into OSDResolvedTimestamp
+subtract firstocc from OSDResolvedTimestamp
+put OSDResolvedTimestamp into secondsvalue
+delete "seconds" from secondsvalue
+

@@ -1,0 +1,60 @@
+﻿(***
+@Author: Vivek
+@Date: 17/March/22
+@TC_ID: TOUC_3386
+@TC_Description: CCSS-RRT-Drag and Drop: Drag and Drop Bus which is Charging
+***)
+
+BeginTestCase TOUC_3386
+
+Log "###########   Started execution of Test Case--> TOUC_3386   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "DragAndDrop", "BusID") into BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+--API Call
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetails BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+--API - Verify Run and Trackdetails
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedRunDetails
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton
+--Verify Toast msg
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "DragAndDrop", "ToastMsg") into ToastMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage ToastMsg
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "DragAndDrop", "NotificationMsg") into NotificationMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyNotificationMessage NotificationMsg, NotificationMsg
+
+
+
+------Automation Step-11, Click the Initiate Charging from the Alerts
+"CCSS_Pages/RunAndAssignmentTrackPage".clickInitiateChargingButtonInAlerts
+
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyChargerStatusIsCharging
+
+"CCSS_Pages/RunAndAssignmentTrackPage".DragAndDropBusInTrack "RunAndTrackAssignmentPage/bus_8027"
+--Drag and Drop the bus to other location
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyDragAndDropIsDiabled
+
+Log "#############  Finished execution of Test Case--> TOUC_3386 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3386
+
+
+
+
+
+
+
+
+
+
+
+

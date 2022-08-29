@@ -1,0 +1,41 @@
+{
+	"lastmodifieddate": 1657567994.5599999,
+	"ocrcapturestring": "LJ",
+	"originalcapturelocation": [
+		1633,
+		494,
+		22,
+		18
+	],
+	"createddate": 1657567994.5599999,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Tolerance": "_45",
+					"HotSpot": "[11,9]",
+					"Scale": "    1",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "ScrollImages/Cus.png",
+				"connectionname": "SUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					1633,
+					494,
+					22,
+					18
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "LJ"
+			}
+	],
+	"name": "ScrollImages/Cus"
+}

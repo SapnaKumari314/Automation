@@ -1,0 +1,38 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 19/Apr/22
+@TC_ID: TOUC_3353
+@TC_Description: CCSS-RRT-Charger Actions: Emergency Stop All action
+***)
+
+BeginTestCase TOUC_3353
+
+Log "###########   Started execution of Test Case--> TOUC_3353  ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Click the Menu and select Charger Control
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+
+
+--Click the Emergency Stop All button from the garage legend
+--Click Cancel
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickEmergencyStopAllButton "Cancel"
+
+
+--Click the Emergency Stop All button from the garage legend
+--Click Yes
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickEmergencyStopAllButton "Yes"
+
+--Verify the statuses of each of the chargers
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyAllChargerStatusAre "inactive"
+
+Log "#############  Finished execution of Test Case--> TOUC_3353 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3353
+

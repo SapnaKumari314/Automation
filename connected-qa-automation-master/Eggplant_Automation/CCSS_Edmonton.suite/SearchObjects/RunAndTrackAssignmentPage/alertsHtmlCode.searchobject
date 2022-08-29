@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		1214,
+		152,
+		50,
+		41
+	],
+	"lastmodifieddate": 1657094177.299,
+	"createddate": 1657094115.066,
+	"name": "RunAndTrackAssignmentPage/alertsHtmlCode",
+	"lastfounddate": 1659530473.8329999,
+	"ocrcapturestring": "07: ►<p",
+	"lastfoundlocation": [
+		1237,
+		616,
+		22,
+		9
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[25,20]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/alertsHtmlCode.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com",
+				"capturerect": [
+					1214,
+					152,
+					50,
+					41
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "► <o"
+			}
+	]
+}

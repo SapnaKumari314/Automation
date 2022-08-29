@@ -1,0 +1,239 @@
+﻿
+
+//Description: Handler to get the specified column data list
+---Input: Column header, LineNum :(Column header line number)
+---Output: returns specified column data list
+---Created By/date: Himaja R (15-Jul-2022)
+
+to getColumnDataAsAListFromCSV  ColumnHeader,ColumnLineNum,ReadCSVData
+	try
+	(*put  "Odometer Value"  into ColumnHeader 
+		set ColumnLineNum to 2
+		put ReadFromCSVFile ("TOUC_10672") into ReadCSVData*)
+		
+		put line ColumnLineNum of ReadCSVData into Header
+		
+		repeat with each item of Header
+			
+			if it.value is ColumnHeader then 
+				put repeatIndex() into index
+				repeat  with each line of ReadCSVData
+					set data  to  line  repeatindex() of ReadCSVData
+					put  item index of  data into ColumnData
+					insert ColumnData.value into Columnlist 
+				end repeat
+				set Flag to true
+			end if 
+		end repeat
+		if Flag is "true" then
+			log Columnlist
+		else
+			logerror "Column Header/Column"&ColumnHeader&" not found in the exported CSV:"
+		end if
+		return  Columnlist
+	Catch exception
+		get  "Utilities/GenericOperations".LogException(exception,getColumnDataAsAListFromCSV)
+	End try
+end getColumnDataAsAListFromCSV
+
+
+//Description: Handler to get the specified column-row(cell) data 
+---Input: Column header, ColumnLineNum :(Column header line number),RowNum: Line Num or row number
+---Output: returns specified column data list
+---Created By/date: Himaja R (15-Jul-2022)
+
+to getCellDataFromCSV  ColumnHeader,ColumnLineNum,RowNum,ReadCSVData
+	try
+	(*put  "Total Distance Driven"  into ColumnHeader 
+		set ColumnLineNum to 2
+		set RowNum to 5
+		put ReadFromCSVFile("TOUC_10672") into ReadCSVData*)
+		
+		put line ColumnLineNum of ReadCSVData into Header
+		
+		repeat with each item of Header
+			
+			if it.value is ColumnHeader then 
+				put repeatIndex() into index
+				set data  to  line RowNum  of ReadCSVData
+				put  item index of  data into CellData
+				set Flag to true
+			end if 
+		end repeat
+		if Flag is "true" then
+			log "Cell Value:"&CellData
+		else
+			logerror "Column Header/Column"&ColumnHeader&" not found in the exported CSV:"
+		end if
+		return  CellData
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getColumnDataAsAListFromCSV)
+	End try
+end getCellDataFromCSV
+
+
+put ReadFromCSVFile("TOUC_10672") into ReadCSVData
+//Description: Handler to read from specified CSV file
+---Input: 
+---Output: returns read data from the file
+---Created By/date: Himaja R (15-Jul-2022)
+to ReadFromCSVFile FileName
+	try
+		
+		set MyFileVar to  resourcePath( "\OutputData\"&FileName&".csv")
+		open file MyFileVar// opens the file
+		read from file  MyFileVar until eof  into readData
+		close file MyFileVar
+		return readData
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,ReadFromCSVFile)
+	End try
+end ReadFromCSVFile
+
+
+
+//Description: Handler to delete the specified existing CSV file if present and then create and write the content to it
+---Input: FileName,DataToWrite
+---Output: returns true or false
+---Created By/date: Himaja R (15-Jul-2022)
+to createCSVFileAndWrite FileName,DataToWrite
+	try
+	(*put remoteclipboard() into DataToWrite
+		set FileName to "TOUC_10672"*)
+		try 
+			delete file  resourcePath( "\OutputData\"&FileName&".csv")
+		catch  e
+			log "file is not found to delete"
+		end try
+		create new file resourcePath ( "\OutputData\"&FileName&".csv")
+		put resourcePath("\OutputData\"&FileName&".csv") into MyFileVar// creates a variable with a path to a file
+		open file MyFileVar
+		write DataToWrite to file MyFileVar
+		close file MyFileVar
+		log "Succesfully written data into file:"&FileName
+		return true
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,createCSVFileAndWrite)
+	End try
+end createCSVFileAndWrite
+
+//Description: Handler to delete the specified existing JSON file if present and then create and write the content to it
+---Input: FileName,DataToWrite
+---Output: returns true or false
+---Created By/date: Himaja R (15-Jul-2022)
+to createJSONFileAndWrite FileName,DataToWrite
+	try
+	(*put remoteclipboard() into DataToWrite
+		set FileName to "TOUC_11040_Response"*)
+		try 
+			delete file  resourcePath( "\ResponseData\"&FileName&".JSON")
+		catch  e
+			log "file is not found to delete"
+end try
+		create new file resourcePath ( "\ResponseData\"&FileName&".JSON")
+		put resourcePath("\ResponseData\"&FileName&".JSON") into MyFileVar// creates a variable with a path to a file
+		open file MyFileVar
+		write DataToWrite to file MyFileVar
+		close file MyFileVar
+		log "Succesfully written open search data into file:"&FileName
+		return true
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,createJSONFileAndWrite)
+	End try
+end createJSONFileAndWrite
+
+
+//Description: Handler to get the JSON value from JSON file
+---Input: FileName
+---Output: returns JSON value of the open search response
+---Created By/date: Himaja R (15-Jul-2022)
+to getJSONValueFromJSONFile  FileName
+	try
+		//set FileName to "TOUC_11040_Response"
+		set Response to JSONValue (file ResourcePath( "ResponseData/"&FileName&".JSON"))
+		//log Response
+		return Response
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getJSONValueFromJSONFile)
+	End try
+end getJSONValueFromJSONFile
+
+
+--Description: Handler to get the specified column data list based on the Column header line
+---Input: Column header, LineNum :(Column header line number)
+---Output: returns specified column data list
+---Created By/date: Himaja R (15-Jul-2022)
+to getColumnDataBasedOnHeaderLineFromCSV  ColumnHeader,ColumnLineNum,ReadCSVData
+	try
+	(*put  "Odometer Value"  into ColumnHeader 
+		set ColumnLineNum to 2
+		put ReadFromCSVFile ("TOUC_10672") into ReadCSVData*)
+		
+		if ColumnLineNum is 2 then
+			set initialLine to 3
+		else if ColumnLineNum is 1 then
+			set initialLine to 2
+		end if
+		
+		put line ColumnLineNum of ReadCSVData into Header
+		put the number of lines in ReadCSVData into NoOfLines
+		repeat with each item of Header
+			
+			if it.value is ColumnHeader then 
+				put repeatIndex() into index
+				repeat  with  each line of ReadCSVData
+					set data  to  line  repeatindex() of ReadCSVData
+					put  item index of  data into ColumnData
+					if repeatIndex() is between initialLine and NoOfLines
+						
+						insert ColumnData.value into Columnlist 
+					end if 
+				end repeat
+				set Flag to true
+			end if 
+		end repeat
+		if Flag is "true" then
+			log Columnlist
+		else
+			logerror "Column Header/Column"&ColumnHeader&" not found in the exported CSV:"
+		end if
+		return  Columnlist
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getColumnDataBasedOnHeaderLineFromCSV)
+	End try
+end getColumnDataBasedOnHeaderLineFromCSV
+
+
+--Description: Handler to launch application
+---Input : Browser - Browser name, appUrl - Application URL
+---output: None
+---Created by:
+to VerifyAndOpenDownloadedFile FileName
+	try
+		global ConfigValues
+		typetext WindowsKey, r
+		Typetext FileName,  return
+		if ImageFound(image:"img_Notepad", waitFor:ConfigValues.MediumTimeOut)
+			LogSuccess "The name format of downloaded CSV is correct and downloaded successfully --> "&FileName
+			Typetext controlKey,a
+			wait 3
+			Typetext controlKey,c
+			wait 3
+			Put RemoteClipboard() into DataToWrite
+			typetext altKey,f4
+			return DataToWrite
+		else
+			if ImageFound(image:"img_FileNotFound", waitFor:ConfigValues.BasicTimeOut) 
+				logerror "The name format of downloaded CSV is NOT correct and NOT downloaded successfully --> "&FileName
+			else
+				LogError "The name format of downloaded CSV is NOT correct and NOT downloaded successfully --> "&FileName
+				
+			end if
+		end if
+	Catch exception
+		get LogException(exception,VerifyAndOpenDownloadedFile)
+	End try
+end VerifyAndOpenDownloadedFile
+
+
+

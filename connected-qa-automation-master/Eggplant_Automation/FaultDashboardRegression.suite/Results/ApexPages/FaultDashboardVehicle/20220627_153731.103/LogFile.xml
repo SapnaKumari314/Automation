@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites>
+ <testsuite name="ApexPages/FaultDashboard_script" package="FaultDashboardRegression.suite" timestamp="2022-06-27 15:37:31.103 +0530"
+ tests="1"  failures="0" errors="0" time="22.456000">
+  <properties>
+   <property name="RunDate" value="2022-06-27 15:37:31.103 +0530"/>
+   <property name="Status" value="Aborted"/>
+  </properties>
+  <testcase name="ApexPages/FaultDashboard.script" assertions="1" status="failure"  time="22.451">
+    <failure type="FAILURE" message="See main script" />
+  </testcase>
+ </testsuite>
+</testsuites>

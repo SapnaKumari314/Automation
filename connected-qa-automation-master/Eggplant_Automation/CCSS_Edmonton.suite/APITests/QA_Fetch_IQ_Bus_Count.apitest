@@ -1,0 +1,41 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = requestId;
+	    showCheckedNumber = <*BY>;
+	    value = "GET_INCOMING_BUS_QUEUE-14d16a32-439d-4c8d-bea5-295df8047f3c";
+	},
+	{
+	    checkedNumber = <*BY>;
+	    param = size;
+	    showCheckedNumber = <*BY>;
+	    value = 11;
+	},
+	{
+	    checkedNumber = <*BY>;
+	    param = sortBy;
+	    showCheckedNumber = <*BY>;
+	    value = bookInTime;
+	},
+	{
+	    checkedNumber = <*BY>;
+	    param = order;
+	    showCheckedNumber = <*BY>;
+	    value = ASC;
+	}
+    );
+    authenticationType = None;
+    httpVerb = GET;
+    oauth1Token = "";
+    password = "";
+    requestBody = "";
+    requestBodyFormat = "Form Url Encoded";
+    requestHeaders = "<![CDATA[authorization:eyJraWQiOiI3YmJXbTdTK0FsUXUrbkhNSTg5MnZpSkVNUzdqbWljUlJOdlJQaGJWYW1NPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiI0OGU1YjFhYi01YmRhLTRjMmMtOTFiZC1hMDJlMzk1MzE0ZDkiLCJ6b25laW5mbyI6ImI5ZWQ4M2ViLTVhOGQtNDg5Yy05NjM5LTA3NmQ0MDhiZThhNCIsImN1c3RvbTpmZWRVc2VyUm9sZSI6InRlbmFudF9hZG1pbiIsImN1c3RvbTp1c2VyTmFtZSI6InZubTY2ZytxYS1sYXVuY2gyMDIwX2NvZWFkbWluQGdtYWlsLmNvbSIsImlzcyI6Imh0dHBzOlwvXC9jb2duaXRvLWlkcC51cy1lYXN0LTEuYW1hem9uYXdzLmNvbVwvdXMtZWFzdC0xX1lMdTUwb3pJayIsImN1c3RvbTphc3NpZ25lZFJvbGUiOiJhZG1pbiIsImN1c3RvbTp0ZW5hbnRJZCI6ImI5ZWQ4M2ViLTVhOGQtNDg5Yy05NjM5LTA3NmQ0MDhiZThhNCIsImN1c3RvbTpwaG9uZSI6IjYwNDA2MTgwNjEiLCJjdXN0b206dXNlclJvbGUiOiJURU5BTlRfQURNSU4iLCJjdXN0b206bGFzdE1vZGlmaWVkVGltZSI6IjE2NDg0NjYwMDczNjIiLCJhdXRoX3RpbWUiOjE2NTg4MTI2NjYsImV4cCI6MTY1ODgxNjI2OSwiaWF0IjoxNjU4ODEyNjY5LCJlbWFpbCI6InZubTY2ZytxYS1sYXVuY2gyMDIwX2NvZWFkbWluQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJjdXN0b206aW50ZXJuYWxVc2VyIjoiMCIsImN1c3RvbTpsYXN0TmFtZSI6Im1hbWdhaW4iLCJjdXN0b206cm9sZUluZm9ybWF0aW9uIjoidGVuYW50X2FkbWluIiwiY29nbml0bzp1c2VybmFtZSI6IjQ4ZTViMWFiLTViZGEtNGMyYy05MWJkLWEwMmUzOTUzMTRkOSIsImN1c3RvbTp1c2VySWQiOiI3NDRmNTRlMy1mZmY2LTQxNTAtOGViMS0zMjVlOWU0NTJhNTIiLCJhdWQiOiIyZ2Q5bDZjdmd0YTZsb3M0bTdtaGVvbTB1NyIsImN1c3RvbTpjcmVhdGVkVGltZSI6IjE2NDgwMDcwNDI3NjEiLCJldmVudF9pZCI6ImNmOTJhN2Y3LTMzOGUtNGJlNC1iYzQwLTIxY2RkNzlkNTk4NiIsImN1c3RvbTpmaXJzdE5hbWUiOiJ2aXZlayIsInRva2VuX3VzZSI6ImlkIiwiY3VzdG9tOmFkZHJlc3NMaW5lMSI6IjQ4LUIsIEsuIFAuIEtzaGV0cmEsIFAgTyAtIEtvdGksIEF0aG9vcndhbGEiLCJjdXN0b206YWRkcmVzc0lkIjoiY2Q5ZTE5MjktYjBhNC00ZWFhLWIxYmYtMmU3ZWM5MGRjOGZiIn0.lNxxSjDlDtn4uOritWU-YKhREN6_6NqGSaNh6yAvInXFzhdaAp2C8bPOakyMFRe4tiFduiZ7pyLCatzlBqYe6zoeuoXXCE7J5uG9H94CU6lCTj4bknfmWqaecTuT-c8BkkzYE3KJiI0_jQvyAaKSVSO802VvAFj4yABuSf1wXwiWKAuPc7jvZ1n_AP_gE7uYjU6zXvVe2Yv8Pp5GWBagUwB1aUd6mfHr-ibknOTreJTMZx6078eWjhBE3NFw1yM_2E-SB87GWutI8doVknwHJ7eaCmXGZJ1dXEB8pNHlUplmXBM7BFj0mb6W7qgwwJ6iMjLg1BdRxWFhDOKPUhKeyQ
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "[[BaseURI]]/iq/tenants/[[tenantId]]/garages/[[garageId]]/incomingBuses?requestId=GET_INCOMING_BUS_QUEUE-14d16a32-439d-4c8d-bea5-295df8047f3c&size=11&sortBy=bookInTime&order=ASC";
+    userName = "";
+}

@@ -1,0 +1,28 @@
+{
+	"entries": [
+		{
+				"message": "Running ApexPages/FaultDashboard.script",
+				"identifier": "START",
+				"timestamp": "2022-06-27 16:04:26.382 +0530"
+			},
+		{
+				"handlerName": "on_apexpages_faultdashboard",
+				"timestamp": "2022-06-27 16:04:27.079 +0530",
+				"message": "SEARCHRECTANGLE = [[190.08,378],[1920,1080]]",
+				"scriptName": "ApexPages/FaultDashboard.script",
+				"handlerLine": 2,
+				"identifier": "set"
+			},
+		{
+				"message": "(Duration:\"4.76\", Errors:\"1\", Exceptions:\"0\", StartTime:\"2022-06-27 16:04:26 +0530\", Successes:\"0\", TestCase:\"ApexPages/FaultDashboard.script\", Warnings:\"0\")",
+				"identifier": "EndTestCase",
+				"timestamp": "2022-06-27 16:04:31.148 +0530"
+			},
+		{
+				"message": "Execution Time 0:00:04 ApexPages/FaultDashboard.script",
+				"identifier": "ABORTED",
+				"timestamp": "2022-06-27 16:04:31.164 +0530"
+			}
+	],
+	"createdTimestamp": "2022-06-27 16:04:26.382 +0530"
+}

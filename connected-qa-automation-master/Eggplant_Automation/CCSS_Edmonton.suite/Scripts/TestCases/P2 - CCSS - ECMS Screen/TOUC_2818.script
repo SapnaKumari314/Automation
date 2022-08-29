@@ -1,0 +1,26 @@
+﻿(***
+@Author: Mohammed Gouse
+@Date: 29/March/22
+@TC_ID: TOUC_2818
+@TC_Description: CCSS-ECMS-Active Charging Session Limit: Update Charge Station Monitoring Limit on the basis installed chargers
+***)
+
+BeginTestCase TOUC_2818
+
+Log "###########   Started execution of Test Case--> TOUC_2818   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Energy Management", "Energy Management", 1
+"CCSS_Pages/EnergyManagement".VerifyOnlinePowerCapacityIsHundredPercent
+"CCSS_Pages/EnergyManagement".UpdateChargingStationMonitoringLimitValue
+"CCSS_Pages/EnergyManagement".UpdateChargingStationMonitoringLimitValueLessThanZeroWithSpecialCharacter
+"CCSS_Pages/EnergyManagement".UpdateChargingStationMonitoringLimitValueMoreThanInstalledChargers
+"CCSS_Pages/EnergyManagement".UpdateChargingStationMonitoringLimitValueFromZeroToInstalledChargerCount
+
+Log "#############  Finished execution of Test Case--> TOUC_2818 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_2818

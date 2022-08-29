@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Suite">
+	<listeners>
+		<listener
+			class-name="main.java.com.proterra.ExtentListeners.ExtentListeners">
+		</listener>
+	</listeners>
+
+	<test name="Login Test" preserve-order="true">
+
+		<classes>
+
+			<!-- Do not remove the test below -->
+			<class
+				name="test.java.com.proterra.testcases.ccss.Login.NavigateToCCSS" />
+			<class
+				name="test.java.com.proterra.testcases.ccss.Login.TOUC3298_LoginValidUser" />
+			<!-- Do not remove the test above -->
+
+
+			<class
+				name="test.java.com.proterra.testcases.ccss.dataSetup.ClearGarage" />
+				
+				
+			 <class
+				name="test.java.com.proterra.testcases.ccss.RunAndTrackAssignment.BusDetails.TOUC3311_Components" />
+			<class
+				name="test.java.com.proterra.testcases.ccss.RunAndTrackAssignment.BusDetails.TOUC3312_CurrentEnergyBeforeAssignment" />
+			<class
+				name="test.java.com.proterra.testcases.ccss.RunAndTrackAssignment.BusDetails.TOUC3313_CurrentEnergyAfterAssignment" /> 
+			<class
+				name="test.java.com.proterra.testcases.ccss.RunAndTrackAssignment.BusDetails.TOUC3314_RangeBeforeAssignment" />
+			<class
+				name="test.java.com.proterra.testcases.ccss.RunAndTrackAssignment.BusDetails.TOUC3315_RangeAfterAssignment" />
+			<class
+				name="test.java.com.proterra.testcases.ccss.RunAndTrackAssignment.BusDetails.TOUC3316_HDDTCCounts" />
+
+
+			<!-- Do not remove the test below -->
+			<class
+				name="test.java.com.proterra.testcases.ccss.Login.LogoutFromCCSS" />
+			<!-- Do not remove the test above -->
+
+		</classes>
+	</test>
+</suite>
+
+
+<!-- To run using cmd -->
+<!-- clean install test -Denv.Name=qa -Dbrowser.headless=true -Dtestng.dtd.http=true 
+	-Dbrowser.type=chrome -DsuiteXmlFile=testng_ccss_ets_maven.xml -->

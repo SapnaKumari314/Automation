@@ -1,0 +1,319 @@
+﻿
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		OpenSearchLogoffArea:[[.80,0],[1,.290]],
+		OpenSearchLoginArea:[[.25,.25],[.75,.75]],
+		OpenSearchNavigationArea:[[0,0.12],[.15,0.95]],
+		ConsoleArea: [[0,0.15],[.5,0.95]],
+		ResponseArea: [[.5,0.18],[1,0.95]],
+	}
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+End ScreenPart
+
+//----------------------------------------------------------------------------------------
+
+--Description: Handler to launch application
+---Input : Browser - Browser name, appUrl - Application URL
+---output: None
+---Created by: Shalini V
+to OpenSearchDashboardLaunchApplication browser, appUrl
+	try
+		global ConfigValues
+		"Utilities/GenericOperations".CloseBrowser
+		typetext WindowsKey, r
+		Typetext browser&& appUrl,  return
+		
+		If imagefound(text:"Check the server output",waitfor:ConfigValues.MediumTimeOut)
+			
+			Click "CommonImages\imgChromeBrowser" --refresh the screen
+		End If
+		
+		PrivacyErrorinOSD 
+		
+		if ImageFound(text:"Username", waitFor:ConfigValues.LongTimeOut)
+			"Utilities/GenericOperations".Success "Application launched successfully --> "&&appUrl
+			
+		else
+			
+			if ImageFound(Image:"CommonImages/OpenSearchHelpIcon", waitFor:ConfigValues.MediumTimeOut) Then
+				Try
+					click FoundImageLocation()
+					Click {text:"Log out", waitFor:ConfigValues.LongTimeOut}
+					
+					set the SearchRectangle to ScreenPart("OpenSearchLoginArea")
+					WaitFor ConfigValues.LongTimeOut, text:"Username"
+					
+					LogSuccess "Logout clicked successfully"
+				Catch theException  
+					Log "Application logged out"
+				End try
+				
+				
+			end if
+			
+		end if
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,OpenSearchDashboardLaunchApplication)
+	End try
+end OpenSearchDashboardLaunchApplication
+-----------------------------------------------------
+//put readtext(ScreenPart("ResponseArea")) into val
+//log val
+//(2,211,324,1030)
+--Description: This handler is used to Open the application on a certain browser
+---Input : None
+---output: None
+---Created by:Shalini V
+-----------------------------------------------------
+to OpenApplication_OpenSearch 
+	try
+		--To set global wait variables over the suite
+		set Global ConfigValues to {MinTimeOut:"4",BasicTimeOut:"10",MediumTimeOut:"20",LongTimeOut:"30"}
+
+		"Utilities/ExcelOperations".readTestDataFrom ResourcePath("Configurations\Config.xlsx"), "QA_Env", "OpenSearchApplicationURL"
+		Set appUrl to the result
+		"Utilities/ExcelOperations".readTestDataFrom ResourcePath("Configurations\Config.xlsx"), "QA_Env", "BrowserName"
+		Set browserName to the result
+		OpenSearchDashboardLaunchApplication browserName, appUrl
+		"Utilities/ExcelOperations".readTestDataFrom ResourcePath("Configurations\Config.xlsx"), "QA_Env", "IternationNumber"
+		set Global Iteration to  the result
+	Catch exception
+		
+		
+		get "Utilities/GenericOperations".LogException(exception,openApplication)
+	End try
+end OpenApplication_OpenSearch
+-----------------------------------------------------
+--Description: This handler is used to login the open search dashboard based on the user login
+---Input : None
+---output: None
+---Created by:Shalini V
+-----------------------------------------------------
+to  handle OpenSearchLogin userRole
+	try
+		
+		Global ConfigValues,Iteration
+		
+		set the SearchRectangle to ScreenPart("OpenSearchLogoffArea")
+		Wait 5
+		if ImageFound(Image:"CommonImages/OpenSearchHelpIcon", waitFor:ConfigValues.BasicTimeOut) Then
+			Try
+				click FoundImageLocation()
+				Click {text:"Log out", waitFor:ConfigValues.MediumTimeOut}
+				
+				set the SearchRectangle to ScreenPart("OpenSearchLoginArea")
+				WaitFor ConfigValues.LongTimeOut, text:"Username"
+				
+				LogSuccess "Logout clicked successfully"
+			Catch theException	
+				Log "Application logged out"
+			End try
+			
+			
+		end if
+		
+		set the SearchRectangle to empty
+		if userRole=""
+			"Utilities/ExcelOperations".readTestDataFrom ResourcePath("Configurations\Config.xlsx"), "QA_Env", "OpenSearchDashboard_UserID"
+			Set UserID to the result
+			"Utilities/ExcelOperations".readTestDataFrom ResourcePath("Configurations\Config.xlsx"), "QA_Env", "OpenSearchDashboard_Password"
+			Set Password to the result
+		else 
+			
+			"Utilities/ExcelOperations".readTestDataFrom ResourcePath("Configurations\Config.xlsx"), "QA_Env", "ProterraAdminUserID"
+			Set UserID to the result
+			"Utilities/ExcelOperations".readTestDataFrom ResourcePath("Configurations\Config.xlsx"), "QA_Env", "ProterraAdminPassword"
+			Set Password to the result
+		end if
+		
+		set the SearchRectangle to ScreenPart("OpenSearchLoginArea")
+		if  ImageFound(text:"Username", waitFor: ConfigValues.MediumTimeOut) Then
+			click item 2 of everyImageLocation(text:"Username", WaitFor:ConfigValues.MediumTimeOut)
+			typetext controlKey, a
+			typetext UserID
+			LogSuccess "User name entered successfully" 
+			"Utilities/GenericOperations".CaptureScreenshot
+		else
+			LogError "Unable to enter User name successfully"
+			"Utilities/GenericOperations".CaptureScreenshot
+		end if
+		typetext tab
+		
+		if  ImageFound(text:"Password", waitFor: ConfigValues.BasicTimeOut) Then
+			click item 2 of everyImageLocation(text:"Password", WaitFor:ConfigValues.BasicTimeOut, caseSensitive:no)
+			typetext controlKey, a
+			typetext Password
+			LogSuccess "Password entered successfully"
+			"Utilities/GenericOperations".CaptureScreenshot
+		else
+			LogError "Unable to enter Password successfully"
+			"Utilities/GenericOperations".CaptureScreenshot
+		end if	
+		if  ImageFound(text:"Log In", waitFor: ConfigValues.MediumTimeOut) Then
+			click ImageLocation(text:"Log In", waitfor:ConfigValues.LongTimeOut)
+			
+			set the SearchRectangle to ScreenPart("OpenSearchLogoffArea")
+			WaitFor ConfigValues.LongTimeOut, "CommonImages\OpenSearchHelpIcon"
+			
+			
+			LogSuccess "Log In clicked successfully"
+			"Utilities/GenericOperations".CaptureScreenshot
+		else
+			LogError  "Unable to click on Log In"
+			"Utilities/GenericOperations".CaptureScreenshot
+		end if
+		set the SearchRectangle to empty
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Login)
+	End try
+end OpenSearchLogin
+
+
+-----------------------------------------------------
+--Description: to navigate to specific page
+---Input : None
+---output: None
+---Created by/date:Himaja(20-07-2022)
+-----------------------------------------------------
+
+to NavigateTo tabName
+	try
+		Global ConfigValues
+		//Set tabName to "Dev Tools"
+		click {image:"CommonImages/bt_OpenSearchNavigationIcon",waitfor: ConfigValues.BasicTimeOut,SearchRectangle:ScreenPart("OpenSearchNavigationArea")}
+		if imagefound(text:tabName,waitfor: ConfigValues.BasicTimeOut,SearchRectangle:ScreenPart("OpenSearchNavigationArea"))
+			click FoundImageLocation()
+			"Utilities/GenericOperations".Success tabName&&"found and clicked successfully!!"
+		else
+			"Utilities/GenericOperations".Error "Unable to enter User name successfully"	
+		end if
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,NavigateTo)
+	End try
+end NavigateTo
+
+-----------------------------------------------------
+--Description: to clear all the queiries in the console
+---Input : None
+---output: None
+---Created by/date:Himaja(20-07-2022)
+-----------------------------------------------------
+
+to ClearExistingQueries
+	try
+		Global ConfigValues
+		Put ImageLocation(image: "CommonImages/bt_OpenSearchNavigationIcon",waitfor: ConfigValues.BasicTimeOut) into Loc
+		Click Loc+[40,120]
+		
+		Typetext controlKey,a
+		typetext deletekey
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,ClearExistingQueries)
+	End try
+end ClearExistingQueries
+
+-----------------------------------------------------
+--Description: to clear all the queiries in the console
+---Input : None
+---output: None
+---Created by/date:Himaja(20-07-2022)
+-----------------------------------------------------
+to EnterQueryRunAndGetResponse Query
+	try
+		Global ConfigValues
+		Typetext Query
+		wait 2
+		Click {image: "CommonImages/bt_RunIcon", SearchRectangle:ScreenPart("ConsoleArea"),waitfor: ConfigValues.BasicTimeOut}
+		(*	if imagefound(Text:"OK",waitfor:ConfigValues.BasicTimeOut,validCharacters:"OK",SearchRectangle:ScreenPart("ResponseArea"))
+			"Utilities/GenericOperations".Success "Successfully recieved open Search Response"
+		else
+			"Utilities/GenericOperations".Error "Error in fetching open search Response"	
+		end if
+		--click FoundImageLocation()+[-30,79]
+		click FoundImageLocation()+[-20,79]*)
+		set List to ["200","Ok"]
+		Repeat with each item of List
+			
+			if imagefound(Text:it,waitfor:ConfigValues.MediumTimeOut,validCharacters:it,SearchRectangle:[1649,195,1909,267])
+			
+			//if imagefound(Text:it,waitfor:ConfigValues.MediumTimeOut,validCharacters:it,SearchRectangle:ScreenPart("ResponseArea"))
+				
+				"Utilities/GenericOperations".Success "Successfully recieved open Search Response"
+			else
+				"Utilities/GenericOperations".Error "Error in fetching open search Response"	
+			end if
+		end repeat
+		repeat 2 times
+			click FoundImageLocation()+[-20,79]
+			Typetext controlKey, a
+			wait 3
+			RightClick  FoundImageLocation()+[-20,79]
+			typetext downArrow
+			wait 4
+			typetext returnKey
+			wait 2
+			TypeText controlKey, c
+			wait 4
+			
+		end repeat
+		Put remoteclipboard() into Response
+		log "Response:"&Response
+		return Response
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,EnterQueryRunAndGetResponse)
+	End try
+end EnterQueryRunAndGetResponse
+
+
+
+-----------------------------------------------------
+--Description: to log out of opensearch dashboard
+---Input : None
+---output: None
+---Created by/date:Shalini V(20-07-2022)
+-----------------------------------------------------
+to handle LogoutOpensearchDashboard
+	try
+		
+		Global ConfigValues,Iteration
+		
+		set the SearchRectangle to ScreenPart("OpenSearchLogoffArea")
+		Wait 5
+		if ImageFound(Image:"CommonImages/OpenSearchHelpIcon", waitFor:ConfigValues.BasicTimeOut) Then
+			Try
+				click FoundImageLocation()
+				Click {text:"Log out", waitFor:ConfigValues.MediumTimeOut}
+				
+				set the SearchRectangle to ScreenPart("OpenSearchLoginArea")
+				WaitFor ConfigValues.LongTimeOut, text:"Username"
+				
+				LogSuccess "Logout clicked successfully"
+			Catch theException  
+				Log "Application logged out"
+			End try
+			
+		end if
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,LogoutOpensearchDashboard)
+	End try
+end LogoutOpensearchDashboard
+
+to handle PrivacyErrorinOSD
+	set the SearchRectangle to ScreenPart("OpenSearchLoginArea")
+	If	imagefound(text:"Connection is not private",waitfor:ConfigValues.MediumTimeOut) is True
+		Click{Text:"Advanced"}
+		wait 2
+		click{text:"Proceed to",waitfor:ConfigValues.MediumTimeOut}
+		WaitFor ConfigValues.LongTimeOut, text:"Username"
+	End if
+end PrivacyErrorinOSD

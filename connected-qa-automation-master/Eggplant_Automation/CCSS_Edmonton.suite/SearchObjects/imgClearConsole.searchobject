@@ -1,0 +1,47 @@
+{
+	"originalcapturelocation": [
+		1368,
+		134,
+		82,
+		46
+	],
+	"lastmodifieddate": 1647427539.329,
+	"createddate": 1647424140.349,
+	"name": "imgClearConsole",
+	"lastfounddate": 1647428597.3410001,
+	"ocrcapturestring": "[0 o to",
+	"lastfoundlocation": [
+		1405,
+		105,
+		12,
+		13
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[41,23]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "Generic/imgClearConsole.png",
+				"connectionname": "SUT_Vivek",
+				"type": 1,
+				"capturerect": [
+					1368,
+					134,
+					82,
+					46
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com"
+			}
+	]
+}

@@ -1,0 +1,41 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 07/Apr/22
+@TC_ID: TOUC_3338
+@TC_Description: CCSS-RRT-Track Details: Override Track
+***)
+
+BeginTestCase TOUC_3338
+
+Log "###########   Started execution of Test Case--> TOUC_3338   ##############"
+Log "#######################################################"
+
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+--Remove bus from Garage
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P0_TestData", "RunAndTrackComponents", "BusID", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedRunDetails 
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyButtonsAreDisabled
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3338 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3338
+
+
+
+
+
+
+
+
+
+

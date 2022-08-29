@@ -1,0 +1,56 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 04/Apr/22
+@TC_ID: TOUC_3322
+@TC_Description: CCSS-RRT-Run Details: Required Energy calculation
+***)
+
+BeginTestCase TOUC_3322
+
+Log "###########   Started execution of Test Case--> TOUC_3322   ##############"
+Log "#######################################################"
+
+--Navigate to the CCSS Application
+"CCSS_Pages/BasePage".OpenApplication
+--Login
+"CCSS_Pages/BasePage".Login
+
+--Enter a Bus ID in the BEB search box for a Bus which is not in the garage
+--Select the Bus from the populated list
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "BusIDNotReadyNotInGarage") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+--Click the Recommended Run and Track button from the Bus Details
+"CCSS_Pages/RunAndAssignmentTrackPage".UnCheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+
+
+--Verify that the Required Energy value is calculated correctly as per the below computation
+--Required Energy [kWh] = (Total Distance [km] * Consumption Rate [kWh/km] *(1 + Safety Margin))+ (0.1 * Available Battery Capacity [kWh])
+
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyCalculateRequiredEnergyIsCorrect
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3322 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3322
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

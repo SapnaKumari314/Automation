@@ -1,0 +1,23 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = "";
+	    showCheckedNumber = <*BY>;
+	    value = "";
+	}
+    );
+    authenticationType = None;
+    httpVerb = POST;
+    oauth1Token = "";
+    password = "";
+    requestBody = "";
+    requestBodyFormat = "JSON (application/json)";
+    requestHeaders = "<![CDATA[authorization:[[authToken]]
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "https://exp-api.proterra.com/exp-chargemonitor-qa2/businesstier/chargers/chargerStateSummary/[[chargerId]]";
+    userName = "";
+}

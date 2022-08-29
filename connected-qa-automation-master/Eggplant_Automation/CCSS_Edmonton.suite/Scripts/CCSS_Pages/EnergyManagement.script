@@ -1,0 +1,746 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 02/Mar/22
+@Description: This script is the POM scripts for Run and Assignment page.
+***)
+
+
+
+-----------------------------------------Run and Assignment Page
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		LogoffArea:[[.75,0],[1,.125]],
+		ElectricalServiceMonitoringArea:[[0,0.125],[0.20,.625]],
+		ChargingStationMonitoringArea:[[0.15,0.125],[.5,.625]],
+		PowerMonitoringAreaEllipse:[[0.45,.5],[.65,.65]],
+		PowerMonitoringArea:[[0,.5],[.75,.975]],
+		AlertsArea:[[0,.40],[0.25,1]],
+	}
+	
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+End ScreenPart
+-----------------------------------------------------
+set the SearchRectangle to ScreenPart("PowerMonitoringArea")
+
+to handle VerifyOnlinePowerCapacityPercentAndkW
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	Log "Verify that the Online Power Capacity is displayed as a percentage and a value in kW under the Online Power Capacity section "
+	
+	put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Online Power Capacity", 10,40,100,150) into varPercent
+	log varPercent
+	delete newline in varPercent
+	log varPercent
+	
+	if "Utilities/CommonActions".containsValue( "%", varPercent)
+		LogSuccess "Online Power Capacity is appearing in %"
+	else
+		LogError "Online Power Capacity is appearing in %"
+	end if
+	
+	if "Utilities/CommonActions".containsValue("kW", varPercent)
+		LogSuccess "Online Power Capacity is appearing in kW"
+	else
+		LogError "Online Power Capacity is appearing in kW"
+	end if
+	set the SearchRectangle to empty
+end VerifyOnlinePowerCapacityPercentAndkW
+
+to handle CheckFieldIsEditable fieldName, x1,y1,x2,y2, screenPart
+	set the SearchRectangle to ScreenPart(screenPart)
+	"Utilities/CommonActions".IsBelowFieldEditableAsPerCoordinates fieldName, x1,y1,x2,y2
+	set the SearchRectangle to empty
+end CheckFieldIsEditable
+
+to handle VerifyBookoutDelayTime fieldName, x1,y1,x2,y2 
+	put "Utilities/CommonActions".GetFieldValueBelowUsingCoordinates( "Cumulative Book Out Delay", 0,0,0,80) into cumulativeDelay
+	log "Cumulative bookout delay is of "&&cumulativeDelay
+	put 	split (cumulativeDelay, " ")  into cumulativeDelay
+	put first item of cumulativeDelay into cumulativeDelay
+	log cumulativeDelay
+	
+	put GetBookOutDelayFromAlerts() into delayFromAlert
+	
+	if cumulativeDelay= delayFromAlert
+		LogSuccess "The Cumulative Bookout delay is appearing correctly in Alerts and Energy Management System--> "&&cumulativeDelay
+	else
+		LogError "The Cumulative Bookout delay is not appearing correctly in Alerts and Energy Management System--> "&&cumulativeDelay
+	end if
+	
+end VerifyBookoutDelayTime
+
+to handle GetBookOutDelayFromAlerts 
+
+	"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Run & Track Assignment", "Run & Track Assignment", 1
+	set the SearchRectangle to ScreenPart("AlertsArea")
+	MoveTo text:"Book Out Delay -", waitFor:5
+	put "Utilities/CommonActions".GetTextByText ("Book Out Delay -") into delayMsg
+	
+	if "Utilities/CommonActions".containsValue("indefinite book out delay", delayMsg)
+		return "Infinite"
+	else
+		delete "to have book out delay of " from delayMsg
+		delete " minutes" from delayMsg
+		log delayMsg
+		return delayMsg
+	end if
+	
+	set the SearchRectangle to empty
+	
+end GetBookOutDelayFromAlerts
+
+
+
+--==================================Shared by Mohammed==========
+(***
+@author : Mohammed Gouse
+@date : 29/March/22
+@description : To Verify that the Online Power Capacity is set to 100%
+***)
+to handle VerifyOnlinePowerCapacityIsHundredPercent
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	Log "Verify that the Online Power Capacity is set to 100%"
+	put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Online Power Capacity", 0,30,-15,60) into varPercent
+	
+	log varPercent
+	delete newline in varPercent
+	log varPercent
+	
+	if "Utilities/CommonActions".containsValue("100", varPercent)
+		LogSuccess "Online Power Capacity is appearing as 100"
+	else
+		LogError "Online Power Capacity is not appearing as 100"
+	end if
+	
+	if "Utilities/CommonActions".containsValue( "%", varPercent)
+		LogSuccess "Online Power Capacity is appearing in %"
+	else
+		LogError "Online Power Capacity is appearing in %"
+	end if
+	set the SearchRectangle to empty
+end VerifyOnlinePowerCapacityIsHundredPercent
+
+
+(***
+@author : Mohammed Gouse
+@date : 29/March/22
+@description : To Update charging station monitoring limit value
+***)
+to handle UpdateChargingStationMonitoringLimitValue
+	set the SearchRectangle to ScreenPart("ChargingStationMonitoringArea")
+	Log "Update charging station monitoring limit value"
+	If ImageFound(text:"Session", waitFor:10) then
+		Click ImageLocation(text:"Session", WaitFor:40) + [0, 35]
+		DoubleClick ImageLocation(text:"Session", WaitFor:40) + [0, 35]
+		wait 2
+		TypeText 0
+		TypeText TabKey
+		LogSuccess "Updated the Limit value as Zero in Charging Station Monitoring successfully"
+	else
+		LogError "Unable to Update the Limit value as Zero in Charging Station Monitoring"
+	end if
+	set the SearchRectangle to empty
+end UpdateChargingStationMonitoringLimitValue
+
+
+(***
+@author : Mohammed Gouse
+@date : 29/March/22
+@description : To Update charging station monitoring limit with less than Zero and with Special character
+***)
+to handle UpdateChargingStationMonitoringLimitValueLessThanZeroWithSpecialCharacter 
+
+
+	set the SearchRectangle to ScreenPart("ChargingStationMonitoringArea")
+	Log "Update charging station monitoring limit with less than Zero and with Special character"
+	If ImageFound(text:"Session", waitFor:10) then
+		Click ImageLocation(text:"Session", WaitFor:40) + [0, 35]
+		DoubleClick ImageLocation(text:"Session", WaitFor:40) + [0, 35]
+		TypeText Backspace
+		wait 2
+		TypeText "- 1"
+		TypeText TabKey
+		
+		if  "Utilities/CommonActions".GetTextBelowByText ("Session", 35) is equal to -1
+			LogSuccess "Updated the Limit value as less than Zero with Special Character in Charging Station Monitoring successfully"
+		else
+			LogError "Unable to Update the Limit value as less than Zero with Special Character in Charging Station Monitoring"
+		end if
+	end if	
+	set the SearchRectangle to empty
+end UpdateChargingStationMonitoringLimitValueLessThanZeroWithSpecialCharacter
+
+(***
+@author : Mohammed Gouse
+@date : 29/March/22
+@description : To Update value greater than number of installed chargers
+***)
+to handle UpdateChargingStationMonitoringLimitValueMoreThanInstalledChargers
+	set the SearchRectangle to ScreenPart("ChargingStationMonitoringArea")
+	Log "Update value greater than number of installed chargers"
+	put "Utilities/CommonActions".GetTextBelowByText ("Session", 35) into previouslyUpdatedChargerCount
+	
+	If ImageFound(text:"Session", waitFor:10) then
+		Click ImageLocation(text:"Session", WaitFor:40) + [0, 35]
+		DoubleClick ImageLocation(text:"Session", WaitFor:40) + [0, 35]
+		TypeText Backspace
+		wait 2
+		TypeText "150"
+		TypeText TabKey
+		
+		put "Utilities/CommonActions".GetTextBelowByText ("Session", 35) into afterUpdatedChargerCount
+		
+		if "Utilities/CommonActions".compareValues (afterUpdatedChargerCount, previouslyUpdatedChargerCount) 
+			LogSuccess "Updated value is not greater than number of installed chargers"
+		else
+			LogError  "Unable to update value since entered value is greater than number of installed chargers"
+		end if
+	end if	
+	set the SearchRectangle to empty
+end UpdateChargingStationMonitoringLimitValueMoreThanInstalledChargers
+
+(***
+@author : Mohammed Gouse
+@date : 29/March/22
+@description : To Update Limit value from Zero To Installed Charger Count in Charging Station Monitoring
+***)
+to handle UpdateChargingStationMonitoringLimitValueFromZeroToInstalledChargerCount
+	set the SearchRectangle to ScreenPart("ChargingStationMonitoringArea")
+	Log "Update Limit value from Zero To Installed Charger Count in Charging Station Monitoring"
+	
+	
+	If ImageFound(text:"Session", waitFor:10) then
+		Click ImageLocation(text:"Session", WaitFor:40) + [0, 35]
+		DoubleClick ImageLocation(text:"Session", WaitFor:40) + [0, 35]
+		wait 2
+		
+		put 0..11 into var
+		put any item of var into valueToBeEntered
+		Log  "Value entered in Limit Field is" && valueToBeEntered
+		
+		TypeText valueToBeEntered
+		TypeText TabKey
+		
+		LogSuccess "Updated the Limit value from Zero To Installed Charger Count in Charging Station Monitoring successfully"
+	else
+		LogError "Unable to Update the Limit value from Zero To Installed Charger Count in Charging Station Monitoring"
+	end if
+	set the SearchRectangle to empty
+end UpdateChargingStationMonitoringLimitValueFromZeroToInstalledChargerCount
+
+(***
+@author : Mohammed Gouse
+@date : 30/March/22
+@description : To Verify Online Power Capacity value set between 0 to Incoming power Value
+***)
+to handle VerifyOnlinePowerCapacityPercentSetBetweenZeroToHundred
+	Log "Verify Online Power Capacity value set between 0 to Incoming power Value"
+	
+	put 0..100 into var
+	put any item of var into valueToBeEntered
+	Log  "Value entered in Limit Field is" && valueToBeEntered
+	
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	If ImageFound(text:"Online Po", waitFor:10) then
+		Click ImageLocation(text:"Online Pow", WaitFor:10) + [20, 35]
+		wait 2
+		DoubleClick ImageLocation(text:"Online Pow", WaitFor:10) + [20, 35]
+		wait 2
+		TypeText Backspace
+		wait 2
+		TypeText valueToBeEntered
+		wait 3
+		TypeText TabKey
+		
+		LogSuccess "Online Power Capacity value set between 0 to Incoming power Value successfully"
+	else
+		LogError "Online Power Capacity value was not set"
+	end if
+	set the SearchRectangle to empty
+end VerifyOnlinePowerCapacityPercentSetBetweenZeroToHundred
+
+(***
+@author : Mohammed Gouse
+@date : 30/March/22
+@description : To verify Online Power Capacity percentage resets to it's previous value when any non numeric characters are entered
+***)
+to handle UpdateOnlinePowerCapacityPercentWithSpecialCharacter
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	Log "verify Online Power Capacity percentage resets to it's previous value when entered Special character"
+	If ImageFound(text:"Online Po", waitFor:10) then
+		Click ImageLocation(text:"Online Po", WaitFor:10) + [20, 35]
+		DoubleClick ImageLocation(text:"Online Po", WaitFor:10) + [20, 35]
+		wait 2
+		TypeText Backspace
+		wait 2
+		TypeText "$$"
+		TypeText TabKey
+		
+		//if  "Utilities/CommonActions".GetTextBelowByText ("Online Po", 35) is equal to "$$"  --> Not working properly
+		put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Online Power", 0,30,40,70) into availableOnlinePowerCapacityInPercentage
+		log availableOnlinePowerCapacityInPercentage
+		Delete "%" in availableOnlinePowerCapacityInPercentage
+		log availableOnlinePowerCapacityInPercentage
+		put trim (availableOnlinePowerCapacityInPercentage)
+		log availableOnlinePowerCapacityInPercentage
+		
+		if "Utilities/CommonActions".compareValues (availableOnlinePowerCapacityInPercentage, "$$")
+			LogSuccess "Updated Online Power Capacity with Special Character successfully"
+		else
+			LogError "Unable to Update Online Power Capacity with Special Character"
+		end if
+	end if	
+	set the SearchRectangle to empty
+end UpdateOnlinePowerCapacityPercentWithSpecialCharacter
+
+(***
+@author : Mohammed Gouse
+@date : 30/March/22
+@description : To verify Online Power Capacity kW resets to it's previous value when any non numeric characters are entered
+***)
+to handle UpdateOnlinePowerCapacitykWWithSpecialCharacter
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	Log "verify Online Power Capacity kW resets to it's previous value when entered Special character"
+	If ImageFound(text:"Online Po", waitFor:10) then
+		Click ImageLocation(text:"Online Po", WaitFor:10) + [20, 120]
+		DoubleClick ImageLocation(text:"Online Po", WaitFor:10) + [20, 120]
+		wait 2
+		TypeText Backspace
+		wait 2
+		TypeText "$$"
+		TypeText TabKey
+		
+		//if  "Utilities/CommonActions".GetTextBelowByText ("Online Po", 120) is equal to "$$" --> Not working properly
+		put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Online Power", 0,120,80,160) into availableOnlinePowerCapacityInkW
+		log availableOnlinePowerCapacityInkW
+		Delete "," in availableOnlinePowerCapacityInkW
+		Delete "kW" in availableOnlinePowerCapacityInkW
+		put trim (availableOnlinePowerCapacityInkW)
+		log availableOnlinePowerCapacityInkW
+		
+		if "Utilities/CommonActions".compareValues (availableOnlinePowerCapacityInkW, "$$")
+			LogSuccess "Updated Online Power Capacity with Special Character successfully"
+		else
+			LogError "Unable to Update Online Power Capacity with Special Character"
+		end if
+	end if
+	set the SearchRectangle to empty
+end UpdateOnlinePowerCapacitykWWithSpecialCharacter
+
+
+(***
+@author : Mohammed Gouse
+@date : 30/March/22
+@description : To verify Online Power Capacity resets to it's previous value when greater than 100 entered
+***)
+to handle UpdateOnlinePowerCapacityMoreThanHundredPercentage
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	Log "Verify Online Power Capacity resets to it's previous value when greater than 100 entered"
+	If ImageFound(text:"Online Po", waitFor:10) then
+		Click ImageLocation(text:"Online Po", WaitFor:10) + [20, 35]
+		DoubleClick ImageLocation(text:"Online Po", WaitFor:10) + [20, 35]
+		wait 2
+		TypeText Backspace
+		wait 2
+		TypeText "150"
+		TypeText TabKey
+		
+		if  "Utilities/CommonActions".GetTextBelowByText ("Online Po", 35) is equal to "150"
+			LogSuccess "Updated Online Power Capacity greater than 100 successfully"
+		else
+			LogError "Unable to Update Online Power Capacity greater than 100"
+		end if
+	end if	
+	set the SearchRectangle to empty
+end UpdateOnlinePowerCapacityMoreThanHundredPercentage
+
+(***
+@author : Mohammed Gouse
+@date : 30/March/22
+@description : To Verify Online Power Capacity resets to it's previous value when greater than Incoming power Value is entered
+***)
+to handle UpdateOnlinePowerCapacityMoreThanIncomingPower
+	Log "Verify Online Power Capacity resets to it's previous value when greater than Incoming power Value is entered"
+	
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Incoming Power", -15,20,20,50) into availableIncomingPowerInkW
+	log availableIncomingPowerInkW
+	Delete "," in availableIncomingPowerInkW
+	Delete "kW" in availableIncomingPowerInkW
+	put trim (availableIncomingPowerInkW)
+	log availableIncomingPowerInkW
+	put (availableIncomingPowerInkW + 1) into moreThanAvailableIncomingPowerInkW
+	log moreThanAvailableIncomingPowerInkW
+	set the SearchRectangle to empty
+	
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	If ImageFound(text:"Online Po", waitFor:10) then
+		Click ImageLocation(text:"Online Po", WaitFor:10) + [20, 120]
+		DoubleClick ImageLocation(text:"Online Po", WaitFor:10) + [20, 120]
+		wait 2
+		TypeText Backspace
+		wait 2
+		TypeText moreThanAvailableIncomingPowerInkW
+		TypeText TabKey 
+		set the SearchRectangle to empty
+		
+		//if  "Utilities/CommonActions".GetTextBelowByText ("Online Po", 120) is equal to moreThanAvailableIncomingPowerInkW
+		set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+		put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Online Power", 0,120,80,160) into availableOnlinePowerCapacityInkW
+		log availableOnlinePowerCapacityInkW
+		Delete "," in availableOnlinePowerCapacityInkW
+		Delete "kW" in availableOnlinePowerCapacityInkW
+		put trim (availableOnlinePowerCapacityInkW)
+		log availableOnlinePowerCapacityInkW
+		
+		if availableOnlinePowerCapacityInkW is not equal to moreThanAvailableIncomingPowerInkW then
+			LogSuccess "Online Power Capacity resets to it's previous value when greater than Incoming power Value is entered successfully"
+		else
+			LogError "Online Power Capacity was not resets"
+		end if
+	end if	
+	set the SearchRectangle to empty
+end UpdateOnlinePowerCapacityMoreThanIncomingPower
+
+
+(***
+@author : Mohammed Gouse
+@date : 30/March/22
+@description : To verify Online Power Capacity resets to it's previous value when less than 0 entered
+***)
+to handle UpdateOnlinePowerCapacityLessThanZeroPercentage
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	Log "Verify Online Power Capacity resets to it's previous value when less than 0 entered"
+	If ImageFound(text:"Online Po", waitFor:10) then
+		Click ImageLocation(text:"Online Po", WaitFor:10) + [20, 35]
+		DoubleClick ImageLocation(text:"Online Po", WaitFor:10) + [20, 35]
+		wait 2
+		TypeText Backspace
+		wait 2
+		TypeText "-10"
+		TypeText TabKey
+		
+		if  "Utilities/CommonActions".GetTextBelowByText ("Online Po", 35) is equal to "-10"
+			LogSuccess "Updated Online Power Capacity less than 0 successfully"
+		else
+			LogError "Unable to Update Online Power Capacity less than 0"
+		end if
+	end if	
+	set the SearchRectangle to empty
+end UpdateOnlinePowerCapacityLessThanZeroPercentage
+
+(***
+@author : Mohammed Gouse
+@date : 30/March/22
+@description : To Verify Online Power Capacity resets to it's previous value when less than 0 is entered
+***)
+to handle UpdateOnlinePowerCapacityLessThanZerokW
+	Log "Verify Online Power Capacity resets to it's previous value when less than 0 is entered"
+	
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	If ImageFound(text:"Online Po", waitFor:10) then
+		Click ImageLocation(text:"Online Po", WaitFor:10) + [20, 120]
+		DoubleClick ImageLocation(text:"Online Po", WaitFor:10) + [20, 120]
+		wait 2
+		TypeText Backspace
+		wait 2
+		TypeText "- 1"
+		TypeText TabKey 
+		set the SearchRectangle to empty
+		
+		set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+		put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Online Power", 0,120,80,160) into availableOnlinePowerCapacityInkW
+		log availableOnlinePowerCapacityInkW
+		Delete "," in availableOnlinePowerCapacityInkW
+		Delete "kW" in availableOnlinePowerCapacityInkW
+		put trim (availableOnlinePowerCapacityInkW)
+		log availableOnlinePowerCapacityInkW
+		
+		if availableOnlinePowerCapacityInkW is not equal to "- 1" then
+			LogSuccess "Online Power Capacity resets to it's previous value when less than 0 is entered successfully"
+		else
+			LogError "Online Power Capacity was not resets"
+		end if
+	end if	
+	set the SearchRectangle to empty
+end UpdateOnlinePowerCapacityLessThanZerokW
+
+(***
+@author : Mohammed Gouse
+@date : 30/March/22
+@description : To Verify Online Power Capacity value is equal to Incoming Power value when percentage is set to 100
+***)
+to handle UpdateOnlinePowerCapacityToHundredIsEqualToIncomingPower
+	Log "Verify Online Power Capacity value is equal to Incoming Power value when percentage is set to 100"
+	
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Incoming Power", -15,20,20,50) into availableIncomingPowerInkW
+	log availableIncomingPowerInkW
+	Delete "," in availableIncomingPowerInkW
+	Delete "kW" in availableIncomingPowerInkW
+	put trim (availableIncomingPowerInkW)
+	log availableIncomingPowerInkW
+	set the SearchRectangle to empty
+	
+	wait 3
+	
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	If ImageFound(text:"Online Po", waitFor:10) then
+		Click ImageLocation(text:"Online Pow", WaitFor:10) + [20, 35]
+		wait 2
+		DoubleClick ImageLocation(text:"Online Pow", WaitFor:10) + [20, 35]
+		wait 2
+		TypeText Backspace
+		wait 2
+		TypeText "100"
+		wait 3
+		TypeText TabKey
+		set the SearchRectangle to empty
+		
+		wait 3
+		
+		set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+		put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Online Power", 0,120,80,160) into availableOnlinePowerCapacityInkW
+		log availableOnlinePowerCapacityInkW
+		Delete "," in availableOnlinePowerCapacityInkW
+		Delete "kW" in availableOnlinePowerCapacityInkW
+		put trim (availableOnlinePowerCapacityInkW)
+		log availableOnlinePowerCapacityInkW
+		set the SearchRectangle to empty
+		
+		wait 3
+		
+		// if "Utilities/CommonActions".compareValues (availableIncomingPowerValue, availableOnlinePowerCapacityValueInkW) --> Not wroking properly
+		if availableIncomingPowerInkW is equal to availableOnlinePowerCapacityInkW then
+			LogSuccess "Online Power Capacity value is equal to Incoming Power value when percentage is set to 100 successfully"
+		else
+			LogError "Online Power Capacity value is not equal to Incoming Power"
+		end if
+	end if
+	set the SearchRectangle to empty
+end UpdateOnlinePowerCapacityToHundredIsEqualToIncomingPower
+
+(***
+@author : Mohammed Gouse
+@date : 30/March/22
+@description : To Verify Online Power Capacity percent automatically set 100 when value entered is equal to Incoming Power
+***)
+to handle UpdateOnlinePowerCapacitykWIsEqualToIncomingPower
+	Log "Verify Online Power Capacity percent automatically set 100 when value entered is equal to Incoming Power"
+	
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Incoming Power", -15,20,20,50) into availableIncomingPowerInkW
+	log availableIncomingPowerInkW
+	Delete "," in availableIncomingPowerInkW
+	Delete "kW" in availableIncomingPowerInkW
+	put trim (availableIncomingPowerInkW)
+	log availableIncomingPowerInkW
+	set the SearchRectangle to empty
+	
+	wait 3
+	
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	If ImageFound(text:"Online Po", waitFor:10) then
+		Click ImageLocation(text:"Online Pow", WaitFor:10) + [20, 120]
+		wait 2
+		DoubleClick ImageLocation(text:"Online Pow", WaitFor:10) + [20, 120]
+		wait 2
+		TypeText Backspace
+		wait 2
+		TypeText availableIncomingPowerInkW
+		wait 3
+		TypeText TabKey
+		set the SearchRectangle to empty
+		
+		wait 3
+		
+		set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+		put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Online Power", 0,120,80,160) into availableOnlinePowerCapacityInkW
+		log availableOnlinePowerCapacityInkW
+		Delete "," in availableOnlinePowerCapacityInkW
+		Delete "kW" in availableOnlinePowerCapacityInkW
+		put trim (availableOnlinePowerCapacityInkW)
+		log availableOnlinePowerCapacityInkW
+		set the SearchRectangle to empty
+		
+		wait 3
+		
+		put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Online Power", 0,30,50,70) into availableOnlinePowerCapacityInPercentage
+		log availableOnlinePowerCapacityInPercentage
+		//Delete "%" in availableOnlinePowerCapacityInPercentage
+		//log availableOnlinePowerCapacityInPercentage
+		put trim (availableOnlinePowerCapacityInPercentage)
+		log availableOnlinePowerCapacityInPercentage
+		
+		wait 3
+		
+		// if "Utilities/CommonActions".compareValues (availableIncomingPowerValue, availableOnlinePowerCapacityValueInkW) --> Not wroking properly
+		if availableOnlinePowerCapacityInPercentage is equal to "100 %" then
+			LogSuccess "Online Power Capacity percent automatically set 100 when value entered is equal to Incoming Power successfully"
+		else
+			LogError "Online Power Capacity percent was not automatically set 100"
+		end if
+	end if
+	set the SearchRectangle to empty
+end UpdateOnlinePowerCapacitykWIsEqualToIncomingPower
+
+(***
+@author : Mohammed Gouse
+@date : 30/March/22
+@description : To Verify Online Power Capacity value is automatically set to the Percentage of the Incoming Power value
+***)
+to handle UpdateOnlinePowerCapacityIsEqualToIncomingPower
+	Log "Verify Online Power Capacity value is automatically set to the Percentage of the Incoming Power value"
+	
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Incoming Power", -15,20,20,50) into availableIncomingPowerInkW
+	log availableIncomingPowerInkW
+	Delete "," in availableIncomingPowerInkW
+	Delete "kW" in availableIncomingPowerInkW
+	put trim (availableIncomingPowerInkW)
+	log availableIncomingPowerInkW
+	put availableIncomingPowerInkW/100 into availableIncomingPowerInkW
+	log availableIncomingPowerInkW
+	
+	set the SearchRectangle to empty
+	
+	wait 3		
+	
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Online Power", 0,20,0,70) into availableOnlinePowerCapacityInPercentage
+	log availableOnlinePowerCapacityInPercentage
+	put trim (availableOnlinePowerCapacityInPercentage)
+	log availableOnlinePowerCapacityInPercentage
+	set the SearchRectangle to empty
+	
+	wait 3
+	
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Online Power", 0,120,80,160) into availableOnlinePowerCapacityInkW
+	log availableOnlinePowerCapacityInkW
+	Delete "," in availableOnlinePowerCapacityInkW
+	Delete "kW" in availableOnlinePowerCapacityInkW
+	put trim (availableOnlinePowerCapacityInkW)
+	log availableOnlinePowerCapacityInkW
+	set the SearchRectangle to empty
+	
+	wait 3
+	
+	//Online Power Capacity Value = Incoming Power x Online Power Capacity %
+	put ( availableIncomingPowerInkW * availableOnlinePowerCapacityInPercentage) into calculatedOnlinePowerCapacityInkW
+	Log calculatedOnlinePowerCapacityInkW
+	
+	if availableOnlinePowerCapacityInkW  is equal to calculatedOnlinePowerCapacityInkW then
+		LogSuccess " Online Power Capacity value is automatically set to the Percentage of the Incoming Power value successfully"
+	else
+		LogError " Online Power Capacity value was not set to the Percentage of the Incoming Power value"
+	end if
+end UpdateOnlinePowerCapacityIsEqualToIncomingPower
+
+(***
+@author : Mohammed Gouse
+@date : 30/March/22
+@description : To Verify Online Power Capacity percentage is automatically set as Percentage of Incoming Power
+***)
+to handle UpdateOnlinePowerCapacityPercentIsSetEqualToIncomingPower
+	Log "Verify Online Power Capacity percentage is automatically set as Percentage of Incoming Power"
+	
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Online Power", 0,30,40,70) into availableOnlinePowerCapacityInPercentage
+	log availableOnlinePowerCapacityInPercentage
+	Delete "%" in availableOnlinePowerCapacityInPercentage
+	log availableOnlinePowerCapacityInPercentage
+	put trim (availableOnlinePowerCapacityInPercentage)
+	log availableOnlinePowerCapacityInPercentage
+	set the SearchRectangle to empty
+	
+	wait 3
+	
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Incoming Power", -15,20,20,50) into availableIncomingPowerInkW
+	log availableIncomingPowerInkW
+	Delete "," in availableIncomingPowerInkW
+	Delete "kW" in availableIncomingPowerInkW
+	put trim (availableIncomingPowerInkW)
+	log availableIncomingPowerInkW
+	set the SearchRectangle to empty
+	
+	wait 3
+	
+	set the SearchRectangle to ScreenPart("ElectricalServiceMonitoringArea")
+	put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Online Power", 0,120,80,160) into availableOnlinePowerCapacityInkW
+	log availableOnlinePowerCapacityInkW
+	Delete "," in availableOnlinePowerCapacityInkW
+	Delete "kW" in availableOnlinePowerCapacityInkW
+	put trim (availableOnlinePowerCapacityInkW)
+	log availableOnlinePowerCapacityInkW
+	Delete newline in availableOnlinePowerCapacityInkW
+	log availableOnlinePowerCapacityInkW
+	set the SearchRectangle to empty
+	
+	wait 3		
+	
+	//Online Power Capacity percentage = (Incoming Power / Online Power Capacity) x 100
+	put ((availableOnlinePowerCapacityInkW / availableIncomingPowerInkW) * 100 ) into calculatedOnlinePowerCapacityPercentage
+	Log calculatedOnlinePowerCapacityPercentage
+	
+	if calculatedOnlinePowerCapacityPercentage  is equal to availableOnlinePowerCapacityInPercentage then
+		LogSuccess " Online Power Capacity value is automatically set to the Percentage of the Incoming Power value successfully"
+	else
+		LogError " Online Power Capacity value was not set to the Percentage of the Incoming Power value"
+	end if
+end UpdateOnlinePowerCapacityPercentIsSetEqualToIncomingPower
+
+
+to handle SelectMenuOptionFrom screenPartName, optionToSelect
+	set the SearchRectangle to ScreenPart(screenPartName)
+	--Verify "Override" button is disabled
+	"Utilities/CommonActions".ClickBtnByImage "GarageOverview\imgEllipseMenu"
+	
+	if "Utilities/CommonActions".ClickElementByCoordinates (optionToSelect,0,0)
+		LogSuccess  optionToSelect&&" Menu item clicked Successfully"
+	else
+		LogError  optionToSelect&&" Menu item not clicked Successfully"
+	end if
+	
+	set the SearchRectangle to empty
+	
+end SelectMenuOptionFrom
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

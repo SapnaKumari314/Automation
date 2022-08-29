@@ -1,0 +1,54 @@
+﻿(***
+@Author: Mohammed
+@Date: 01/April/22
+@TC_ID: TOUC_3382
+@TC_Description: CCSS-RRT-Assign Run and Track: Override Track screen components
+***)
+
+
+BeginTestCase TOUC_3382
+
+Log "###########   Started execution of Test Case--> TOUC_3382   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+--Remove bus from the track
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P0_TestData", "RunAndTackAssignment", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+------------------------
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "BusID") into BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetails BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+--API - Verify Run and Trackdetails
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedRunDetailsAreBlank
+
+--------------Step-8-11 Override button click
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickConfirmButton
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "ToastMsgForNoTrackSelected") into ToastMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage ToastMsg
+
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgBlackTrack"
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickConfirmButton "nocomments"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "BlankCommentsInOverridePopup") into errMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyErrorMessages errMsg
+
+
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickButton "Cancel", "OverrideCommentsBoxArea"
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyElementIsNotPresent "Confirm Run Override", "OverrideCommentsBoxArea", "Correctly"
+--Click Cancel on the Run override screen
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickButton "Cancel", "TracksArea"
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyElementIsNotPresent "Confirm", "TracksArea", "Correctly"
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3382 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3382

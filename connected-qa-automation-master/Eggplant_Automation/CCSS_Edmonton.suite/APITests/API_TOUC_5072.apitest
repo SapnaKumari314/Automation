@@ -1,0 +1,40 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = "";
+	    showCheckedNumber = <*BY>;
+	    value = "";
+	}
+    );
+    authenticationType = None;
+    httpVerb = POST;
+    oauth1Token = "";
+    password = "";
+    requestBody = "{
+    \"chargerName\": \"LAXMISDC90OCPP11\",
+    \"start\": \"2021-02-01T00:00:00-07:00\",
+    \"end\": \"2022-07-05T00:00:00-07:00\",
+    \"fields\": [
+        \"Energy_Active_Import_Register\",
+        \"SoC\",
+        \"Current_Offered\",
+        \"Current_Import\",
+        \"Power_Active_Import\",
+        \"Temperature\",
+        \"Power_Offered\",
+        \"Voltage\",
+        \"Frequency\",
+        \"RPM\"
+    ]
+}";
+    requestBodyFormat = "JSON (application/json)";
+    requestHeaders = "<![CDATA[x-api-key:SESSYxMADr9V5EiQnHOh1524y5SekQoZ5H1YKnw0
+Content-Type:application/json
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "https://exp-api.proterra.com/exp-datalake-qa2/v1/external/tenants/c6c29eec-013a-4e35-a92d-ec8f09cfc676/rawchargercsvreports";
+    userName = "";
+}

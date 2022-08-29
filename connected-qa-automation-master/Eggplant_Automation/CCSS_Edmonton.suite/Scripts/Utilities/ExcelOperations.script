@@ -1,0 +1,99 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 23/Feb/22
+@Description: Its a Global Library to read excel sheet test data use inside of the test cases.
+***)
+
+to handle readTestDataFrom excelName, excelSheetName, column
+	set myExcelDB to {type: "excel", file: Resourcepath(excelName), name:excelSheetName}
+	put the records of myExcelDB into excelData
+	
+	repeat with each item rowData of excelData
+		Log column
+		
+		put rowData.(column) into val
+		Log val
+		--put rowData.UID into global uid
+		--put rowData.Password into global pwd
+		return  val
+	end repeat
+end readTestDataFrom
+
+
+to handle writeDataIntoExcel  excelName, excelSheetName, primaryColumnName, primaryColumnValue, columnNameToUpdate, columnNameToUpdateValue
+
+	set myExcelDB to {type:"excel",  file: Resourcepath(excelName), name:excelSheetName, writable: Yes} 
+	set member to the record of myExcelDB where (primaryColumnName) is (primaryColumnValue)
+	put (columnNameToUpdateValue) into member's (columnNameToUpdate)
+	
+end writeDataIntoExcel
+
+--writeDataIntoExcel "TestData\CCSS_P0_TestData.xlsx","RunAndTrackReassignment","BusID","8027","OverrideRunTrackToastMsg","my value at runtime"
+
+
+to handle CreateOutputFile fileName
+	try 
+		delete file  resourcePath ( "\OutputData\outputdata"&fileName&".txt")
+	catch  e
+		log "file is not found to delete"
+	end try
+	
+	put the abbrev time into ti
+	log ti
+	replace every occurrence of ":" with "-" in ti 
+	log ti
+	create new file resourcePath ( "\OutputData\outputdata"&fileName&".txt")
+	--return "\OutputData\outputdata"&fileName&".txt"
+end CreateOutputFile
+
+to handle WriteIntoFile fileName, fieldName, fieldValue
+	put resourcePath("\OutputData\outputdata"&fileName&".txt") into MyFileVar// creates a variable with a path to a file
+	open file MyFileVar// opens the file	
+	put fieldName&"::"&fieldValue into MyWrite
+	write return to file MyFileVar at eof
+	write MyWrite to file MyFileVar
+	close file MyFileVar// closes the file
+end WriteIntoFile
+
+to handle ReadFromFile fileName, fieldName
+	open file  resourcePath("\OutputData\outputdata"&fileName&".txt")
+	repeat forever	
+		read from file  resourcePath("\OutputData\outputdata"&fileName&".txt") until return-- reads one line
+		if it is empty then exit repeat-- we've reached the end of the file
+		delete newline from it
+		put it-- or do other processing with 'it' here
+		put split (it, "::") into keyVal
+		put first item of keyVal into key
+		put second item of keyVal into val
+		if key = fieldName
+			close file resourcePath("\OutputData\outputdata"&fileName&".txt")
+			return val
+		end if
+	end repeat
+	
+	close file resourcePath("\OutputData\outputdata"&fileName&".txt")
+end ReadFromFile
+
+
+--CreateOutputFile "busdetails2"
+--WriteIntoFile "busdetails", "busid", "8045"
+--ReadFromFile  "busdetails", "busid"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

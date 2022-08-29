@@ -1,0 +1,29 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 22/March/22
+@TC_ID: TOUC_3840
+@TC_Description: CCSS-Config-Garage: Active selected garage when user updates any field
+***)
+
+
+BeginTestCase TOUC_3840
+
+Log "###########   Started execution of Test Case--> TOUC_3840  ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "P2_TestData", "GarageNameToSwitch") into varGarageNameToSwitch
+"CCSS_Pages/CCSSConfiguration".SwitchTheGarage varGarageNameToSwitch
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "CCSS Configuration", "CCSS Configuration", 1
+"CCSS_Pages/CCSSConfiguration".ClickOnGarageTab
+"CCSS_Pages/CCSSConfiguration".UpdateField "Global Vehicle Battery Capacity (kWh)", "80"
+"CCSS_Pages/CCSSConfiguration".ClickApplyButton
+"CCSS_Pages/CCSSConfiguration".VerifyPageTitle
+
+Log "#############  Finished execution of Test Case--> TOUC_3840 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3840

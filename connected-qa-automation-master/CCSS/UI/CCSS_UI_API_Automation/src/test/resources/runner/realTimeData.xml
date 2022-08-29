@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Suite">
+	<listeners>
+		<listener
+			class-name="main.java.com.proterra.ExtentListeners.ExtentListeners">
+		</listener>
+	</listeners>
+
+
+	<test name="Demo">
+		<classes>
+			<class
+				name="test.java.com.proterra.testcases.ccssAPI.loginAPI.LoginAPITest">
+				<methods>
+					<include name="CCSS_API_LoginValidUser" />
+				</methods>
+			</class>
+			<class
+				name="test.java.com.proterra.testcases.ccssAPI.loadGaragesAPI.LoadGaragesAPITest">
+				<methods>
+					<include name="CCSS_API_LoadGaragesValidData" />
+				</methods>
+			</class>
+			<class
+				name="test.java.com.proterra.testcases.ccssAPI.trackSetupAPI.TrackSetupAPITest">
+				<methods>
+					<include name="CCSS_API_TrackSetupValidData" />
+				</methods>
+			</class>
+			<class
+				name="test.java.com.proterra.testcases.ccssAPI.assetsAPI.AssetsAPITest">
+				<methods>
+					<include name="CCSS_API_AssetsValidData" />
+				</methods>
+			</class>
+			<class
+				name="test.java.com.proterra.testcases.ccssAPI.realTimeData.BusRTDataAtrributeValidation" />
+			<class
+				name="test.java.com.proterra.testcases.ccssAPI.realTimeData.BusRTData" />
+			<class
+				name="test.java.com.proterra.testcases.ccssAPI.realTimeData.ChargerRTAttributeValidation" />
+			<class
+				name="test.java.com.proterra.testcases.ccssAPI.realTimeData.ChargerRTData" />
+		</classes>
+	</test>
+</suite>

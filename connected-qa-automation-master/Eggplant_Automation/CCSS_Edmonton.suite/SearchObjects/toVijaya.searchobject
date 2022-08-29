@@ -1,0 +1,41 @@
+{
+	"lastmodifieddate": 1650456268.2160001,
+	"ocrcapturestring": "0 ProterraEdmonton\tX + O A Not secure qa-launch2020-ccss-ecms.connected.proterra.com.s3-website-us-east-1.amazonaws.eom/#/chargerControl  ☆ ￼ 0 Logical Charge Queue Charge History   Bus ID Charging Station ID Assigned Run ID Current Energy Required Energy 8035  12601 368 kWh 453 kWh 8027 KATG 8-1 11001 582 kWh 401 kWh     ■ ■ ■ Electric Bus Remaining Charge Time Priority Charger Status Book Out Time Bus ID  0  10:24 8027 00:00 1 0 10:23 8027 8027 8027 O’ l£? ☆\t￼ X : Faults • ■ • Charger Faults ... Faulted System Criticality Kfo Faulted Criticality NOT AVAILABL ... Major   NOT AVAILABL ... Major   NOT AVAILABL ... Major   NOT AVAILABL ... Major   Alerts (02) Notifications 20 Apr 10:29 Book Out Delay - Bus 8035 is estimated to have indefinite book out delay... 20 Apr 11:41 Bus 8027 has been successfully assigned to run 11001 and position 8-1 1 20 Apr 10:29 Bus 8035 requires charging but is parked at a position (KATG 11-1) that... Check 20 Apr 11:27 Bus 8027 has been successfully set In Maintenance but not assigned to a... 20 Apr 11:10 Bus 8027 has been successfully assigned to run 801 and position 8-1 20 Apr 10:58 Bus 8027 has been successfully assigned to run 11001 and position 8-1 20 Apr 10:40 Bus 8027 has been successfully assigned to run 801 and position 8-1 5 20 Apr 10:29 Bus 8035 has been successfully assigned to run 12601 and position 11-1 6 2 3 5 6 7 8 9 10 13 17 18 19 25 2; 4 0 0 0 0 9035 0 0 0 0  0  Initiate Charging K> I 0 0 8027 20 21 26\t27 22\t23\t24 14\t15\t16 11 12 fZ T2l 20 Apr 10:25 Bus 8027 has moved from 1-1 to 16-2 20 Apr 10:24 Bus 8027 has been successfully assigned to run 11001 and position 1-1 | Ready/Topped Up\tB Ready\tNot Ready\tDelay B Busin Maintenance Q Diesel Bus o Charging 0 In Active  Maintenance Emergency Stop All 20 Apr 10:22 12:03 PM",
+	"originalcapturelocation": [
+		0,
+		1,
+		1917,
+		1053
+	],
+	"createddate": 1650456268.2160001,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Tolerance": "_73",
+					"HotSpot": "[958,526]",
+					"Scale": "    1",
+					"Discrepancy": "_0",
+					"SearchType": "Smoothed for Text"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "toVijaya.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com",
+				"capturerect": [
+					0,
+					1,
+					1917,
+					1053
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "0 ProterraEdmonton\tX + O A Not secure qa-launch2020-ccss-ecms.connected.proterra.com.s3-website-us-east-1.amazonaws.eom/#/chargerControl  ☆ ￼ 0 Logical Charge Queue Charge History   Bus ID Charging Station ID Assigned Run ID Current Energy Required Energy 8035  12601 368 kWh 453 kWh 8027 KATG 8-1 11001 582 kWh 401 kWh     ■ ■ ■ Electric Bus Remaining Charge Time Priority Charger Status Book Out Time Bus ID  0  10:24 8027 00:00 1 0 10:23 8027 8027 8027 O’ l£? ☆\t￼ X : Faults • ■ • Charger Faults ... Faulted System Criticality Kfo Faulted Criticality NOT AVAILABL ... Major   NOT AVAILABL ... Major   NOT AVAILABL ... Major   NOT AVAILABL ... Major   Alerts (02) Notifications 20 Apr 10:29 Book Out Delay - Bus 8035 is estimated to have indefinite book out delay... 20 Apr 11:41 Bus 8027 has been successfully assigned to run 11001 and position 8-1 1 20 Apr 10:29 Bus 8035 requires charging but is parked at a position (KATG 11-1) that... Check 20 Apr 11:27 Bus 8027 has been successfully set In Maintenance but not assigned to a... 20 Apr 11:10 Bus 8027 has been successfully assigned to run 801 and position 8-1 20 Apr 10:58 Bus 8027 has been successfully assigned to run 11001 and position 8-1 20 Apr 10:40 Bus 8027 has been successfully assigned to run 801 and position 8-1 5 20 Apr 10:29 Bus 8035 has been successfully assigned to run 12601 and position 11-1 6 2 3 5 6 7 8 9 10 13 17 18 19 25 2; 4 0 0 0 0 9035 0 0 0 0  0  Initiate Charging K> I 0 0 8027 20 21 26\t27 22\t23\t24 14\t15\t16 11 12 fZ T2l 20 Apr 10:25 Bus 8027 has moved from 1-1 to 16-2 20 Apr 10:24 Bus 8027 has been successfully assigned to run 11001 and position 1-1 | Ready/Topped Up\tB Ready\tNot Ready\tDelay B Busin Maintenance Q Diesel Bus o Charging 0 In Active  Maintenance Emergency Stop All 20 Apr 10:22 12:03 PM"
+			}
+	],
+	"name": "toVijaya"
+}

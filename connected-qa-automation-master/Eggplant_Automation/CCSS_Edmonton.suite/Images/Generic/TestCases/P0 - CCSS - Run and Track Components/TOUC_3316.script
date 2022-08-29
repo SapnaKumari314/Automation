@@ -1,0 +1,53 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 08/Apr/22
+@TC_ID: TOUC_3316
+@TC_Description: CCSS-RRT-Bus Details: HDDTC count
+***)
+
+BeginTestCase TOUC_3316
+
+Log "###########   Started execution of Test Case--> TOUC_3316  ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Enter a Bus ID in the BEB search box for a Bus for a Bus which is not in the Garage
+----Click on the Bus ID from the list and verify none of the details are displayed blank or as null
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackReassignment", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetailsAreNotNull "hddtcverify"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "bus_image_run_and_track_screen") into BusImg
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusIsNotInTracksByImage BusImg
+
+--Verify that the HDDTC count is displayed as per the value from the getRuns API - Need to confirm the API
+
+--Click Menu and click Charger Control screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+"CCSS_Pages/ChargerControl".verifyNumberOfFaultsAreEqualToHDDTCCount "hddtcverify"
+
+--Click Menu and click Garage Overview screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+"CCSS_Pages/GarageOverview".verifyNumberOfFaultsAreEqualToHDDTCCount "hddtcverify"
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3316 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3316
+
+
+
+
+
+
+
+
+
+
+
+

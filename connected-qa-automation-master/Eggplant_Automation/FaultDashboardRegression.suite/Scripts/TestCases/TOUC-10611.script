@@ -1,0 +1,52 @@
+﻿(***
+@Author: Shalini Vijayakumar
+@Date: 2/Aug/2022
+@TC_ID: TOUC_10611
+@TC_Description: Verify user able to see data fields as per grouping by unique combination by selecting the all option in customer drop down with single charger
+***)
+
+BeginTestCase TOUC_10611
+Log "###########   Started execution of Test Case--> TOUC_10611  ##############"
+Log "#######################################################"
+
+
+--Prereq:
+--Create an active charger fault
+
+--"1.Login as an superadmin in Apex Portal.
+
+"LoginPage".OpenApplication
+
+"LoginPage".Login "ProterraAdmin"
+Set DatasheetPath to Resourcepath("TestData\TOUC-10611.xlsx")
+--Fetch the charger id from the charger management screen forthe given ocpp id
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "OCPPID") into OCPPID
+put "ApexPages/FaultDashboardCharger".Fetch_ChargerIDWRTCPPID(OCPPID) into ChargerID
+put item 2 of split(ChargerID,":") into ChargerID
+
+--2.Under Historical Data on Left menu choose Fault Dashboard
+get "ApexPages/FaultDashboardSearchCriteria".NavigateTo ("HISTORICAL DATA","FAULT DASHBOARD")
+
+get  "ApexPages/FaultDashboardSearchCriteria".AssetTypeSelection ("Charger")
+--3.Select the charger in toggle and select the options as below  customer dropdown = all ,charger name = single ,Fault status = all and select the from & to date 
+get "ApexPages/FaultDashboardSearchCriteria".SelectCustomer ("All")
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "AssetName") into AssetID
+put "All" into Status
+put "All" into Priority
+
+get "ApexPages/FaultDashboardSearchCriteria".SelectAssetID ("Charger",AssetID)
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultPriority (Priority)
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultStatus (Status)
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDateTime") into FromDateTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDateTime") into ToDateTime
+
+If uppercase(Status) is not "ACTIVE"
+	
+	"ApexPages/FaultDashboardSearchCriteria".SelectDateRange FromDateTime,ToDateTime
+end if
+
+get "ApexPages/FaultDashboardSearchCriteria".ClickGetDataBtn
+put "ApexPages/FaultDashboardSearchCriteria".GetUTCTimeStamp_HM("UTC") into CurrentTime
+"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Sequential"
+
+

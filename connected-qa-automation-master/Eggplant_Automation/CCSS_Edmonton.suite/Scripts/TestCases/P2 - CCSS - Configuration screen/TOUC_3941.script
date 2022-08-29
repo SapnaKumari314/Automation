@@ -1,0 +1,55 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 29/March/22
+@TC_ID: TOUC_3941
+@TC_Description: CCSS-Config-Garage: Runs Required Energy when Required Energy Safety Margin is updated
+***)
+
+
+BeginTestCase TOUC_3941
+
+Log "###########   Started execution of Test Case--> TOUC_3941  ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login "COEAdmin"
+
+--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "P2_TestData", "GarageNameToSwitch") into varGarageNameToSwitch
+--"CCSS_Pages/CCSSConfiguration".SwitchTheGarage varGarageNameToSwitch
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "CCSS Configuration", "CCSS Configuration", 1
+"CCSS_Pages/CCSSConfiguration".ClickOnGarageTab
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "ConfigScreen", "RequiredEnergySafetyMargin") into RequiredEnergySafetyMargin
+"CCSS_Pages/CCSSConfiguration".UpdateField "Required Energy Safety Margin", RequiredEnergySafetyMargin
+"CCSS_Pages/CCSSConfiguration".ClickCancelButton
+--Verify the field value is reset to 0.1
+"CCSS_Pages/CCSSConfiguration".VerifyFieldValueIsReset "Required Energy Safety Margin", "0.1"
+
+"CCSS_Pages/CCSSConfiguration".UpdateField "Required Energy Safety Margin", thresholdRatio
+
+"CCSS_Pages/CCSSConfiguration".ClickApplyButton
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Run & Track Assignment", "Run & Track Assignment", 1
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "ConfigScreen", "BusID") into BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+
+-----Verify all the Required Energy for all the Recommended Runs
+
+"CCSS_Pages/CCSSConfiguration".CalculateRequiredEnergy
+
+-----Verify all the Required Energy for all the Non-Recommended Runs
+"CCSS_Pages/CCSSConfiguration".CalculateRequiredEnergyForNonRecommendedRun
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3941 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3941
+
+
+

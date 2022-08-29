@@ -1,0 +1,23 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = requestId;
+	    showCheckedNumber = <*BY>;
+	    value = "GET_LOGICAL_CHARGE_QUEUE-17ab251d-54f1-4411-a429-257612f57e37";
+	}
+    );
+    authenticationType = None;
+    httpVerb = GET;
+    oauth1Token = "";
+    password = "";
+    requestBody = "";
+    requestBodyFormat = "Form Url Encoded";
+    requestHeaders = "<![CDATA[authorization:[[authToken]]
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "[[BaseURI]]/tenants/[[tenantId]]/trackSetups/a4ac820a-9d67-4bd8-af67-9d9b30d0aaea/logicalChargeQueue?requestId=GET_LOGICAL_CHARGE_QUEUE-17ab251d-54f1-4411-a429-257612f57e37";
+    userName = "";
+}

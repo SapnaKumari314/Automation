@@ -1,0 +1,49 @@
+{
+	"originalcapturelocation": [
+		984,
+		955,
+		172,
+		51
+	],
+	"lastmodifieddate": 1648556642.0019999,
+	"createddate": 1648556576.721,
+	"name": "trackHorizontalScrollBar1",
+	"lastfounddate": 1648556579.6360002,
+	"ocrcapturestring": "Bus in",
+	"lastfoundlocation": [
+		984,
+		955,
+		172,
+		51
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"deleted": true,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[86,25]",
+					"Tolerance": "_64",
+					"Discrepancy": "_0",
+					"SearchType": "Smoothed for Text"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "trackHorizontalScrollBar1.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com",
+				"capturerect": [
+					984,
+					955,
+					172,
+					51
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "Bus in"
+			}
+	]
+}

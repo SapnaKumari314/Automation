@@ -1,0 +1,97 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 26/July/22
+@TC_ID: TOUC_9513
+@TC_Description: ETS - Validate the ETS Customer's COE Admin role permissions
+***)
+
+BeginTestCase TOUC_9513
+
+Log "###########   Started execution of Test Case--> TOUC_9513   ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P2_TestData", "RolesPermissions", "BusID", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "RolesPermissions", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+
+--Click the Recommended Run and Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+
+--API - Verify Run and Trackdetails
+--"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedRunDetails 
+
+--Click the Assign button from Track Details
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "no"
+--Verify Toast msg
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "RolesPermissions", "ToastMsg") into ToastMsg
+put "CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage (ToastMsg) into toastMessageGeneratedAfterAssignTrack
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "RolesPermissions", "BusID") into BusId
+--Reassigning bus to other position
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+
+
+--Select a Charger Track Position using Track Override if the default track does not match the requirement
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgActiveCharger"
+--Click the Assign Run & Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "yes"
+
+--Verify that user is able to Drag and Drop Buses
+
+"CCSS_Pages/RunAndAssignmentTrackPage".DragBusAndDropToAnyPosition "RunAndTrackAssignmentPage/bus_8035.png", "RunAndTrackAssignmentPage/imgBlackTrack.png"
+
+
+--Click Menu and click Charger Control screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+
+
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "RolesPermissions", "InitiateChargingBtn") into InitiateChargingBtn
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "RolesPermissions", "InitiateChargingMsg") into InitiateChargingMsg
+
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickCheckAlertButton InitiateChargingBtn , InitiateChargingMsg
+
+--Click the Emergency Stop All button from the garage legend
+--Click Yes
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickEmergencyStopAllButton "Yes"
+TypeText pageUp
+"CCSS_Pages/GarageOverview".SelectMenuOptionFrom "LogicalChargeQueueArea", "Export to PDF"
+
+--Navigate to Garage Overview screen by selecting 'Garage Overview' link from main menu
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+--Navigate to Logical Charge Queue section
+"CCSS_Pages/GarageOverview".NavigateToElement "Logical Charge Queue", "LogicalChargeQueueArea"
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Energy Management", "Energy Management", 1
+"CCSS_Pages/EnergyManagement".UpdateChargingStationMonitoringLimitValue
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "CCSS Configuration", "CCSS Configuration", 1
+"CCSS_Pages/CCSSConfiguration".VerifyAllEditableAndNonEditableGlobalFields
+
+
+
+Log "#############  Finished execution of Test Case--> TOUC_9513 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_9513
+
+
+
+
+
+
+
+
+
+
+
+

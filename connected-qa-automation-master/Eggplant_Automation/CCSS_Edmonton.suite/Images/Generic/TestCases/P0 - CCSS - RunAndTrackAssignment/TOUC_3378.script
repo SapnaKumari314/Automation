@@ -1,0 +1,69 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 01/Apr/22
+@TC_ID: TOUC_3378
+@TC_Description: CCSS-RRT-Assign Run and Track: Assign default Run and overridden Track for Non Maintenance Bus
+***)
+
+BeginTestCase TOUC_3378
+
+Log "###########   Started execution of Test Case--> TOUC_3378   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "BusID") into BusId
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "API_Bus_Details_id") into API_Bus_Details_id
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "API_Bus_Details_busVins") into API_Bus_Details_busVins
+
+--API Call
+
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetails BusId, API_Bus_Details_id, API_Bus_Details_busVins
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+--API - Verify Run and Trackdetails
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedRunDetailsAreBlank
+
+--------------Step-8-11 Override button click
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgBlackTrack"
+
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "no"
+--Verify Toast msg
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "OverrideRunTrackToastMsg") into ToastMsg
+put "CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage (ToastMsg) into toastMessageGeneratedAfterAssignTrack
+
+"Utilities/ExcelOperations".writeDataIntoExcel "OutputData\outputdata.xlsx","Sheet1","busId", BusId , "ToastMessage", toastMessageGeneratedAfterAssignTrack
+
+put "Utilities/ExcelOperations".readTestDataFrom ("OutputData\outputdata.xlsx", "Sheet1", "ToastMessage") into ToastMsg
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "NotificationMsg") into NotificationMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyNotificationMessage NotificationMsg, ToastMsg
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "NotificationMsg") into NotificationMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyNotificationMessage NotificationMsg, NotificationMsg
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "Bus_Image") into BusImage
+"CCSS_Pages/RunAndAssignmentTrackPage".findBusInTracksOfGarageOverviewPageByImage "RunAndTrackAssignmentPage\bus_8027_GarageOverview", "Garage Overview"
+
+Log "#############  Finished execution of Test Case--> TOUC_3378 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3378
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,3582 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 02/Mar/22
+@Description: This script is the POM scripts for Run and Assignment page.
+***)
+
+-----------------------------------------Run and Assignment Page
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		LogoffArea:[[.75,0],[1,.125]],
+		GarageDropdownArea:[[.75,0],[0.90,.125]],
+		SearchBEBArea:[[0,0.125],[.25,.375]],
+		BusDetailsArea:[[0,.125],[.40,.5]],
+		RecommendedRunArea:[[0.25,.125],[.65,.50]],
+		RecommendedTrackArea:[[0.5,.125],[1,.50]],
+		AlertsArea:[[0,.40],[0.18,1]],
+		NotificationsArea:[[0.15,.375],[0.5,1]],
+		TracksArea:[[0,.35],[1,1]],
+		TracksAreaGarageOverview:[[0,.275],[1,1]],
+		BusChargerStatusArea:[[0.25,.875],[1,1]],
+		ToastMessageArea:[[0.25,.06],[1,.25]],
+		TitleBarArea:[[0,0],[.75, .40]],
+		MenuArea:[[0,.05],[.15, .45]],
+		SelectRunArea:[[0,0.35],[1,1]],
+		IncomingQueueArea:[[0,0.125],[1,.24]],
+		OverrideCommentsBoxArea:[[.25,0.25],[.75,.75]],
+		OrverrideTitlebarArea:[[0,0.455],[1,.49]],
+		ToolsTipArea:[[0.25,0.15],[.55,.75]],
+		TrackPaginationArea:[[0.7,0.90],[1,.95]],
+		AlertsHtmlCodeArea:[[0.5,0],[1,.75]],
+		ToolTipArea:[[0.35,0.5],[.75,.95]],
+
+	}
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+End ScreenPart
+-----------------------------------------------------
+set the SearchRectangle to ScreenPart("AlertsArea")
+--Select Bus from IQ
+to handle SelectBusFromIQ dBusId 
+	Log "****Select Bus from IQ, Bus ID--> "&&dBusId
+	set the SearchRectangle to ScreenPart("SearchBEBArea")
+	"Utilities/CommonActions".ClickBtnLabel("Bus ID")
+	set the SearchRectangle to empty
+end SelectBusFromIQ
+
+--Search Bus from BEB
+to handle SearchBusFromBEB dBusId
+	Log "****Searching Bus from BEB, Bus ID--> "&&dBusId
+	"Utilities/GenericOperations".WaitForApiSynchronization
+	set the SearchRectangle to ScreenPart("SearchBEBArea")
+	--Wait 4
+	"Utilities/CommonActions".EnterTextBoxByText "Search BEB", dBusId
+	--Wait 4
+	"Utilities/CommonActions".SelectLabel dBusId
+	set the SearchRectangle to empty
+end SearchBusFromBEB
+
+--This handler is used to verify the details of bus
+to handle VerifyBusDetails dBusId, idVal, busVinVal
+	Log "****Verifying Bus details in Bus Details section, Bus ID--> "&&dBusId
+	
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "DragAndDrop", "API_Bus_Details_id") into idVal
+	--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "DragAndDrop", "API_Bus_Details_busVins") into busVinVal
+	log idVal
+	log busVinVal
+	---API to access the Bus Details
+	
+	--put "Utilities/GetAuthorizationToken".getAutherizationTokenForAPI into authToken
+	put "Utilities\exceloperations".ReadFromFile  ("authtoken", "token") into authToken
+	put "CCSS_Pages/BasePage".SetGlobalEnvironmentVariables into BaseURI
+	put QA_GetBusDetails() into summaryAPI
+	put summaryAPI.responsebody into respbody1
+	--log respbody1
+	
+	put jsonvalue (respbody1) into responsebody2 
+	log responsebody2
+	put responsebody2.buses.(busVinVal)._source.PCes_usi_SystemEnergy_kwh into currentEnergy
+	put split (currentEnergy , ".")  into listo
+	put first item of listo into currentEnergy
+	
+	log currentEnergy
+	put responsebody2.buses.(busVinVal)._source.PCes_usi_DashSoC_pct into soc
+	log soc
+	--put split (soc , ".")  into listo
+	--put first item of listo into soc
+	log round(soc)
+	log round(soc)
+	
+	put responsebody2.buses.(busVinVal).Range  into range
+	log range
+	put range*1.609344  into range
+	--put split (range , ".")  into listo
+	--put range rounded to 0 places-- 123.46
+	
+	--put first item of listo into range
+	--put range rounded to 0 places
+	put round(range) into range
+	log range
+	
+	put responsebody2.buses.(busVinVal)._source.PCtc_udi_Odometer_mi into odometer
+	
+	put odometer*1.609344 into odometer
+	--put split (odometer , ".")  into listo
+	--put range rounded to 2 places-- 123.46
+	--put first item of listo into odometer
+	--put odometer rounded to 0 places-- 123.46
+	put  round(odometer) into odometer
+	
+	put responsebody2.buses.(busVinVal).energyConsumption into energyConsumption
+	log energyConsumption
+	--put split (energyConsumption , ".")  into listo
+	--put first item of listo into energyConsumption
+	put energyConsumption rounded to 1 places
+	log energyConsumption
+	
+	put responsebody2.buses.(busVinVal)._source.busMetadata.busName  into busNo
+	log busNo
+	--log responsebody2.(valueToFind)
+	--put responsebody2.(valueToFind) into varJsonSnap
+	-------------------------------------------
+	"Utilities/GenericOperations".WaitForApiSynchronization
+	--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "DragAndDrop", "BusID") into BusId
+	"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB dBusId
+	set the SearchRectangle to ScreenPart("BusDetailsArea")
+	
+	put "Utilities/CommonActions".GetTextBelowByText ("Bus ID") into actualBusId
+	"Utilities/CommonActions".compareValues busNo, actualBusId
+	
+	put "Utilities/CommonActions".GetTextBelowByText ("Consumption") into actualenergyConsumption
+	put split (actualenergyConsumption , " ")  into listo
+	put first item of listo into actualenergyConsumption
+	put "Utilities/CommonActions".GetTextBelowByText ("Odometer", 15) into actualodometer
+	put split (actualodometer , " ")  into listo
+	put first item of listo into actualodometer
+	put "Utilities/CommonActions".GetTextBelowByText ("Range") into actualRange
+	put split (actualRange , " ")  into listo
+	put first item of listo into actualRange
+	put "Utilities/CommonActions".GetTextBelowByText ("SOC") into actualSOC
+	put split (actualSOC , " ")  into listo
+	put first item of listo into actualSOC
+	put "Utilities/CommonActions".GetTextBelowByText ("Current Energy") into actualcurrentEnergy
+	put split (actualcurrentEnergy , " ")  into listo
+	put first item of listo into actualcurrentEnergy
+	
+	"Utilities\exceloperations".CreateOutputFile "busdetails"
+	"Utilities\exceloperations".WriteIntoFile "busdetails", "BusID", actualBusId
+	"Utilities\exceloperations".WriteIntoFile "busdetails", "Consumption", actualenergyConsumption
+	"Utilities\exceloperations".WriteIntoFile "busdetails", "Odometer", actualodometer
+	"Utilities\exceloperations".WriteIntoFile "busdetails", "Range", actualRange
+	"Utilities\exceloperations".WriteIntoFile "busdetails", "SOC", actualSOC
+	"Utilities\exceloperations".WriteIntoFile "busdetails", "CurrentEnergy", actualcurrentEnergy
+	
+	
+	if "Utilities/CommonActions".containsValue (currentEnergy, actualcurrentEnergy)
+		LogSuccess "Current Energy - Is appearing correctly, API and UI values are matching"
+	else
+		LogError "Current Energy - Is not appearing correctly, API and UI values are matching"
+	end if
+	
+	if "Utilities/CommonActions".containsValue (soc, actualSOC)
+		LogSuccess "SOC - Is appearing correctly, API and UI values are matching"
+	else
+		LogError "SOC - Is not appearing correctly, API and UI values are matching"
+	end if
+	
+	if "Utilities/CommonActions".containsValue( range, actualRange)
+		LogSuccess "Range - Is appearing correctly, API and UI values are matching"
+	else
+		LogError "Range - Is not appearing correctly, API and UI values are matching"
+	end if
+	
+	if "Utilities/CommonActions".containsValue (odometer, actualodometer)
+		LogSuccess "Odometer - Is appearing correctly, API and UI values are matching"
+	else
+		LogError "Odometer - Is not appearing correctly, API and UI values are matching"
+	end if
+	
+	if "Utilities/CommonActions".containsValue (energyConsumption, actualenergyConsumption)
+		LogSuccess "Enegry Consumption - Is appearing correctly, API and UI values are matching"
+	else
+		LogError "Energy Consumption - Is not appearing correctly, API and UI values are matching"
+	end if
+	
+	
+	set the SearchRectangle to empty
+end VerifyBusDetails
+
+--This handler is used to verify the details of bus
+to handle verifyRecommendedRunDetails
+	Log "****Verifying Run details in Recommended Run section "
+	---API to access the Bus Details
+	--"Utilities/GenericOperations".WaitForApiSynchronization
+	--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "DragAndDrop", "BusID") into BusId
+	
+	set the SearchRectangle to ScreenPart("RecommendedRunArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Run ID") into actualRunId
+	log actualRunId
+	put "Utilities/CommonActions".GetTextBelowByText ("Run Status") into actualRunStatus
+	put "Utilities/CommonActions".GetTextBelowByText ("Estimated Charge") into actualEstChargeTime
+	put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Book Out Date",0,15,19,26) into actualBookOutTime
+	log actualBookOutTime
+	
+	put "Utilities/CommonActions".GetTextBelowByText ("Required Energy") into actualReqEnergy
+	put split(actualReqEnergy, " ")into lst
+	put first item of lst into actualReqEnergy
+	log actualReqEnergy
+	put "Utilities/CommonActions".GetTextBelowByText ("Distance") into actualDistance
+	put split(actualDistance, " ")into lst
+	put first item of lst into actualDistance
+	log actualDistance
+	
+	"Utilities\exceloperations".CreateOutputFile "recommendedrun"
+	"Utilities\exceloperations".WriteIntoFile "recommendedrun", "RunID", actualRunId
+	"Utilities\exceloperations".WriteIntoFile "recommendedrun", "RunStatus", actualRunStatus
+	"Utilities\exceloperations".WriteIntoFile "recommendedrun", "EstimatedCharge", actualEstChargeTime
+	"Utilities\exceloperations".WriteIntoFile "recommendedrun", "BookOutDate", actualBookOutTime
+	"Utilities\exceloperations".WriteIntoFile "recommendedrun", "RequiredEnergy", actualReqEnergy
+	"Utilities\exceloperations".WriteIntoFile "recommendedrun", "Distance", actualDistance
+	
+	put "Utilities/GetAuthorizationToken".getAutherizationTokenForAPI into authToken
+	put "CCSS_Pages/BasePage".SetGlobalEnvironmentVariables into BaseURI
+	--put "Utilities\exceloperations".ReadFromFile("authtoken", "token") into authToken
+	log authToken
+	put QA_RecommendedRunDetails() into summaryAPI
+	put summaryAPI.responsebody into respbody1
+	--log respbody1
+	put jsonvalue (respbody1) into responsebody2 
+	--log responsebody2
+	--log responsebody2.runs
+	repeat until responsebody2.runs is empty
+		--put the last item of responsebody2.runs
+		put the last item of responsebody2.runs into var
+		--log  responsebody2.runs.busVIN
+		--log "=============================================================================================================================="
+		--log var.runNumber
+		if (var.runNumber=actualRunId)
+			log var.busVIN
+			log var.runNumber
+			log var.energyRequired
+			log var.estimatedChargeTimeInS
+			log var.bookOutTime
+			
+			log var.distanceInMiles 
+			log var.assigned
+			
+			--			log var.busVIN
+			put var.runNumber into expectedRunID
+			put round(var.energyRequired) into expectedReqEnerg
+			put var.estimatedChargeTimeInS into expectedEstChargeTime
+			
+			if expectedEstChargeTime>=60
+				put round(expectedEstChargeTime / 60) into mins
+				put expectedEstChargeTime mod 60 into secs
+				log mins &":"&secs
+			else
+				--put 50 into expectedEstChargeTime
+				put "00" into mins
+				if expectedEstChargeTime<10		
+					put expectedEstChargeTime&0 into secs
+				else
+					put expectedEstChargeTime into secs
+				end if 
+				put (mins &":"&secs) into expectedEstChargeTime
+				
+			end if
+			put round (expectedReqEnerg) into expectedReqEnerg
+			
+			put var.bookOutTime into expectedBookOutTime
+			--put "2022-04-03T11:43:00Z"  into expectedBookOutTime
+			log expectedBookOutTime
+			put "2022-04-03T11:43:00Z"  into expectedBookOutTime
+			(***solution 1
+			put abbreviated common date(var)&&time(var) into CDT
+			put trim(CDT,"PM") into CDT1
+			delete year(CDT1) from CDT1
+			set the itemDelimiter to space
+			log CDT1
+			put item 2 of CDT1&&item 1 of CDT1&","&&item 4 of CDT1 into CDT2
+			log CDT2
+			***)
+			(***
+put "2022-04-01T10:24:00Z" into apiTime
+put apiTime split by "T" into splitTime
+put item 1 of splitTime into simpleDate
+put item 2 of splitTime into simpleTime
+put chars 1 to 5 of simpleTime into reqTime
+log reqTime
+put formattedTime("%b %d", simpleDate) into reqDate
+log reqDate&", "&reqTime
+***)
+			
+			--solution -1 
+			put "2022-04-03T11:43:00Z"  into expectedBookOutTime
+			put abbreviated common date(expectedBookOutTime)&&time(expectedBookOutTime) into CDT
+			put trim(CDT,"PM") into CDT1
+			delete year(CDT1) from CDT1
+			set the itemDelimiter to space
+			log CDT1
+			put item 2 of CDT1&&item 1 of CDT1&","&&item 4 of CDT1 into CDT2
+			log CDT2
+			
+			--put standardformat(expectedBookOutTime) into newExpectedBookOutTime
+			--put formattedTime("[mon] [da], [hr12]:[mi]", newExpectedBookOutTime) into convertedAPIDate
+			--log convertedAPIDate
+			
+			put var.distanceInMiles  into expectedDistance
+			log expectedDistance
+			put round(expectedDistance * 1.609344) into expectedDistance
+			log expectedDistance
+			put var.assigned into expectedRunStatus
+			if expectedRunStatus="UnAssigned"
+				put "Not Assigned" into expectedRunStatus
+			else
+				put "Assigned" into expectedRunStatus
+			end if
+			exit repeat
+		end if
+		
+		delete the last item of responsebody2.runs 
+		--delete the last item of responsebody2.runs
+	end repeat
+	
+	--put responsebody2.totalProterraDistance.description into expectedVal
+	if "Utilities/CommonActions".compareValues (expectedRunStatus, actualRunStatus)
+		LogSuccess "Run Status - values matching between UI and API, actual Run Status= "&&actualRunStatus&&" expected = "&&expectedRunStatus
+	else
+		LogError "Run Status - values not matching between UI and API, actual Run Status= "&&actualRunStatus&&" expected = "&&expectedRunStatus
+	end if
+	
+	--put responsebody2.totalProterraDistance.description into expectedVal
+	if "Utilities/CommonActions".compareValues (expectedEstChargeTime, actualEstChargeTime)
+		LogSuccess "Estimated Chrarge Time - values matching between UI and API, actual Estimated Chrarge Time= "&&actualEstChargeTime&&" expected = "&&expectedEstChargeTime
+	else
+		LogError "Estimated Chrarge Time - values not matching between UI and API, Estimated Chrarge Time= "&&actualEstChargeTime&&" expected = "&&expectedEstChargeTime
+	end if
+	
+	if "Utilities/CommonActions".compareValues( expectedBookOutTime, actualBookOutTime)
+		LogSuccess "Book Out Date, Time  - values matching between UI and API, actual Book Out Date, Time= "&&actualBookOutTime&&" expected = "&&expectedBookOutTime
+	else
+		LogError "Book Out Date, Time  - values not matching between UI and API, actual Book Out Date, Time= "&&actualBookOutTime&&" expected = "&&expectedBookOutTime
+	end if
+	
+	--put responsebody2.totalProterraDistance.description into expectedVal
+	if "Utilities/CommonActions".compareValues( expectedReqEnerg, actualReqEnergy)
+		LogSuccess "Required Energy - values matching between UI and API, actual Required Energy = "&&actualReqEnergy&&" expected = "&&expectedReqEnerg
+	else
+		LogError "Required Energy - values not matching between UI and API, actual Required Energy = "&&actualReqEnergy&&" expected = "&&expectedReqEnerg
+	end if
+	
+	--put responsebody2.totalProterraDistance.description into expectedVal
+	if "Utilities/CommonActions".compareValues (expectedDistance, actualDistance)
+		LogSuccess "Distance - values matching between UI and API, actual Distance = "&&actualDistance&&" expected = "&&expectedDistance
+	else
+		LogError "Distance - values not matching between UI and API, actual Distance= "&&actualDistance&&" expected = "&&expectedDistance
+	end if
+	
+	
+	set the SearchRectangle to empty
+end verifyRecommendedRunDetails
+
+--This handler is used to verify the details of bus
+to handle verifyRecommendedRunDetailsAreBlank
+	Log "****Verifying Run details in Recommended Run section" 
+	
+	set the SearchRectangle to ScreenPart("RecommendedRunArea")
+	--put responsebody2.totalProterraDistance.description into expectedVal
+	put "Utilities/CommonActions".GetTextBelowByText ("Run Status", 15) into actualRunStatus
+	log actualRunStatus
+	if "Utilities/CommonActions".compareValues ("", actualRunStatus)
+		LogSuccess "Run Status value is blank by defualt"
+	else
+		LogError  "Run Status value is not blank by defualt"
+	end if
+	
+	--put responsebody2.totalProterraDistance.description into expectedVal
+	put "Utilities/CommonActions".GetTextBelowByText ("Estimated Charge", 15) into actualEstChargeTime
+	if "Utilities/CommonActions".compareValues ("", actualEstChargeTime)
+		LogSuccess "Estimated Charge value is blank by defualt"
+	else
+		LogError  "Estimated Charge value is not blank by defualt"
+	end if
+	
+	--put responsebody2.totalProterraDistance.description into expectedVal
+	put "Utilities/CommonActions".GetTextBelowByText ("Book Out Date", 15) into actualBookOutTime
+	if "Utilities/CommonActions".compareValues ("", actualBookOutTime)
+		LogSuccess "Book Out Date, Time value is blank by defualt"
+	else
+		LogError  "Book Out Date, Time value is not blank by defualt"
+	end if
+	set the SearchRectangle to empty
+	
+	--put ReadText((ImageLocation(text:"Bus ID", WaitFor:20) + [0,15])) into actualBusId
+	put "Utilities/CommonActions".GetTextBelowByText ("Run ID", 15) into actualRunId
+	if "Utilities/CommonActions".compareValues ("", actualRunId)
+		LogSuccess "Run ID value is blank by defualt"
+	else
+		LogError  "Run ID value is not blank by defualt"		
+	end if
+	
+	--put responsebody2.totalProterraDistance.description into expectedVal
+	put "Utilities/CommonActions".GetTextBelowByText ("Required Energy", 15) into actualReqEnergy
+	if "Utilities/CommonActions".compareValues( "", actualReqEnergy)
+		LogSuccess "Required Energy value is blank by defualt"
+	else
+		LogError  "Required Energy value is not blank by defualt"		
+	end if
+	--put responsebody2.totalProterraDistance.description into expectedVal
+	put "Utilities/CommonActions".GetTextBelowByText ("Distance", 15) into actualDistance
+	if "Utilities/CommonActions".compareValues ("", actualDistance)
+		LogSuccess "Distance value is blank by defualt"
+	else
+		LogError  "Distance value is not blank by defualt"		
+	end if
+	
+	set the SearchRectangle to empty
+end verifyRecommendedRunDetailsAreBlank
+
+--This handler is used to verify the details of bus
+to handle verifyRecommendedTrackDetails dBusId
+	Log "****Verifying Run details in Recommended Run section, Bus ID--> "&&dBusId
+	---API to access the Bus Details
+	--put QA_LoginAPI() into responseAPI
+	--put responseAPI.responsebody into respBody
+	--put "Utilities/GetAuthorizationToken".getAutherizationTokenForAPI into authToken
+	
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "DragAndDrop", "API_Run_tenantId") into tenantIdVal
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "DragAndDrop", "API_Run_requestId") into requestIdVal
+	log tenantIdVal
+	log requestIdVal
+	---API to access the Bus Details
+	(**	put QA_LoginAPI() into responseAPI
+	put responseAPI.responsebody into respBody**)
+	--put "GET_BUS_DETAILS-27365903-95ec-40ee-ad29-1fc81deeb626" into vinId
+	--put "7JZTH13J2LS000303" into busVinId
+	--put "7JZTH13J1LS000311" into busVinId2
+	put "CCSS_Pages/BasePage".SetGlobalEnvironmentVariables into BaseURI
+	put QA_RecommendedRunDetails() into summaryAPI
+	put summaryAPI.responsebody into respbody1
+	
+	put jsonvalue (respbody1) into responsebody2 
+	log responsebody2
+	
+	
+	
+	log responsebody2.@"0ef006bd-94c5-4a28-ae46-759678898ffe".ocppTransactionPowerActiveImport
+	--log respbody1.positionInChargeQueue
+	
+	put jsonvalue (respbody1) into responsebody2 
+	put JSONFormat(respbody1) into responsebody3
+	--log responsebody3
+	set responsebody3 to fileo
+	log fileo
+	
+	--log responsebody2
+	put responsebody2.buses
+	
+	put responsebody2.buses.(busVinVal)._source.PCes_usi_SystemEnergy_kwh into currentEnergy
+	log currentEnergy
+	
+	
+	
+	
+	log currentEnergy
+	put responsebody2.buses.@"7JZTH13J2LS000303"._source.PCes_usi_DashSoC_pct into soc
+	log soc
+	put responsebody2.buses.@"7JZTH13J2LS000303".Range  into range
+	log range
+	put responsebody2.buses.@"7JZTH13J2LS000303"._source.PCtc_udi_Odometer_mi into odometer
+	log odometer
+	put responsebody2.buses.@"7JZTH13J2LS000303".energyConsumption into energyConsumption
+	log energyConsumption
+	put responsebody2.buses.@"7JZTH13J2LS000303"._source.busMetadata.busName  into busNo
+	log busNo
+	
+	--Log expectedVal
+	--log responsebody2.(valueToFind)
+	--put responsebody2.(valueToFind) into varJsonSnap
+	-------------------------------------------
+	
+	set the SearchRectangle to ScreenPart("RecommendedRunArea")
+	put responsebody2.totalProterraDistance.description into expectedVal
+	put "Utilities/CommonActions".GetTextBelowByText ("Run Status") into actualRunStatus
+	"Utilities/CommonActions".compareValues expectedVal, actualRunStatus
+	
+	put responsebody2.totalProterraDistance.description into expectedVal
+	put "Utilities/CommonActions".GetTextBelowByText ("Estimated Charge") into actualEstChargeTime
+	"Utilities/CommonActions".compareValues expectedVal, actualEstChargeTime
+	
+	put responsebody2.totalProterraDistance.description into expectedVal
+	put "Utilities/CommonActions".GetTextBelowByText ("Book Out Date, Time") into actualBookOutTime
+	"Utilities/CommonActions".compareValues expectedVal, actualBookOutTime
+	set the SearchRectangle to empty
+	
+	--put ReadText((ImageLocation(text:"Bus ID", WaitFor:20) + [0,15])) into actualBusId
+	put "Utilities/CommonActions".GetTextBelowByText ("Run ID") into actualRunId
+	"Utilities/CommonActions".compareValues expectedVal, actualRunId
+	
+	put responsebody2.totalProterraDistance.description into expectedVal
+	put "Utilities/CommonActions".GetTextBelowByText ("Required Energy") into actualReqEnergy
+	"Utilities/CommonActions".compareValues expectedVal, actualReqEnergy
+	
+	put responsebody2.totalProterraDistance.description into expectedVal
+	put "Utilities/CommonActions".GetTextBelowByText ("Distance") into actualDistance
+	"Utilities/CommonActions".compareValues expectedVal, actualDistance
+	
+	set the SearchRectangle to empty
+end verifyRecommendedTrackDetails
+
+--This handler is used to verify the details of bus
+to handle verifyRecommendedTrackDetailsAreBlank
+	Log "****Verifying Run details in Recommended Track section"
+	
+	set the SearchRectangle to ScreenPart("RecommendedTrackArea")
+	--put responsebody2.totalProterraDistance.description into expectedVal
+	put "Utilities/CommonActions".GetTextBelowByText ("Track No", 15) into actualTrackNo
+	if "Utilities/CommonActions".compareValues( "", actualTrackNo)
+		LogSuccess "Track No is blank by default"
+	else
+		LogError "Track No is not blank by default"	
+	end if
+	
+	--put responsebody2.totalProterraDistance.description into expectedVal
+	put "Utilities/CommonActions".GetTextBelowByText ("Position", 15) into actualPosition
+	if "Utilities/CommonActions".compareValues ("", actualPosition)
+		LogSuccess "Position is blank by default"
+	else
+		LogError "Position is not blank by default"	
+	end if
+	--put responsebody2.totalProterraDistance.description into expectedVal
+	put "Utilities/CommonActions".GetTextBelowByText ("Track Type", 15) into actualTrackType
+	if "Utilities/CommonActions".compareValues ("", actualTrackType)
+		LogSuccess "Track Type is blank by default"
+	else
+		LogError "Track Type is not blank by default"		
+	end if
+	
+	set the SearchRectangle to empty
+	
+end verifyRecommendedTrackDetailsAreBlank
+
+to handle UncheckNeedsMaintenanceCheckBx 
+	Log "****Unchecking the Need Maintenance details check box"
+	set the SearchRectangle to ScreenPart("BusDetailsArea")
+	--put ReadText((ImageLocation(text:"Bus ID", WaitFor:20) + [0,15])) into actualBusId
+	"Utilities/CommonActions".UnSelectCheckBoxByImage "RunAndTrackAssignmentPage/imgNeedsMaintenance.png", "RunAndTrackAssignmentPage/imgNeedsMaintenanceUnchecked"
+	set the SearchRectangle to empty
+end UncheckNeedsMaintenanceCheckBx
+
+to handle CheckNeedsMaintenanceCheckBx 
+	Log "****Checking the Need Maintenance details check box"
+	set the SearchRectangle to ScreenPart("BusDetailsArea")
+	--put ReadText((ImageLocation(text:"Bus ID", WaitFor:20) + [0,15])) into actualBusId
+	"Utilities/CommonActions".SelectCheckBox "RunAndTrackAssignmentPage/imgNeedsMaintenance.png", "RunAndTrackAssignmentPage/imgNeedsMaintenanceUnchecked"
+	set the SearchRectangle to empty
+end CheckNeedsMaintenanceCheckBx
+
+to handle clickRecommendedRunAndTrackButton
+	Log "****Clicking the Recommended Run and Track button in Bus Details section"
+	set the SearchRectangle to ScreenPart("BusDetailsArea")
+	
+	set the SearchRectangle to empty
+	if "Utilities/CommonActions".ClickBtnByText ("Recommended Run & Track")
+		LogSuccess "Recommended Run & Track button clicked Successfully"
+		"Utilities/GenericOperations".ApiSynchronization
+	else
+		LogError "Recommended Run & Track button not clicked Successfully"
+		
+	end if
+	
+	set the SearchRectangle to empty
+	
+end clickRecommendedRunAndTrackButton
+
+to handle clickAssignRunAndTrackButton willPopupAppear
+	Log "****Clicking the Run and Track button under Assigned Track section"
+	set the SearchRectangle to ScreenPart("RecommendedTrackArea")
+	"Utilities/CommonActions".ClickBtnByText "Assign Run & Track"
+	--Click confirmation message
+	--"Are you sure you want to re-assign the bus to this run and track No.?"
+	set the SearchRectangle to empty
+	
+	if willPopupAppear="no"
+		Log "--"
+	else
+		
+		set the SearchRectangle to ScreenPart("TracksArea")
+		"Utilities/CommonActions".ClickBtnByText "Yes"
+		--"Utilities/GenericOperations".ApiSynchronization
+		wait 2
+		set the SearchRectangle to empty
+	end if
+	set the SearchRectangle to empty
+end clickAssignRunAndTrackButton
+
+to handle clickOverridInRecommendedTrack
+	Log "****Clicking the Override button under Assigned Track section"
+	set the SearchRectangle to ScreenPart("RecommendedTrackArea")
+	--"Utilities/CommonActions".ClickBtnByText "Assign Run & Track"
+	--Click confirmation message
+	--"Are you sure you want to re-assign the bus to this run and track No.?"
+	if "Utilities/CommonActions".ClickBtnByText ("Override")
+		"Utilities/GenericOperations".ApiSynchronization
+		LogSuccess "Override button clicked successfully under Recommended Track"
+	else
+		LogError  "Override button not clicked successfully under Recommended Track"
+	end if
+	
+	set the SearchRectangle to empty
+	
+end clickOverridInRecommendedTrack
+
+to handle clickOverridInAssignedRun
+	Log "****Clicking the Override button under Assigned Run section"
+	set the SearchRectangle to ScreenPart("RecommendedRunArea")
+	
+	if "Utilities/CommonActions".ClickBtnByText ("Override")
+		LogSuccess "Override button clicked successfully under Recommended Run"
+		"Utilities/GenericOperations".ApiSynchronization
+	else
+		LogError  "Override button not clicked successfully under Recommended Run"
+	end if
+	set the SearchRectangle to empty
+	
+end clickOverridInAssignedRun
+
+(***
+@author : Vivek Mamgain
+@date : 15/March
+@description : SelectRunAndClickConfirmAfterOverrideClick
+***)
+to handle ClickConfirmButton varComments
+	if varComments=""
+		put  "Automation Comments" into varComments
+	else if  varComments="nocomments"
+		put  "" into varComments
+	end if
+	
+	Log "****Click on Confirm button"
+	"Utilities/CommonActions".ClickBtnByText "Confirm"
+	wait 2
+	Log "****Enter comments in the Reason text box"
+	set the SearchRectangle to ScreenPart("OverrideCommentsBoxArea")
+	"Utilities/CommonActions".EnterTextBoxByTextBelow "Reason", varComments, 26
+	wait 2
+	Log "****Click Done after entering the comments"
+	if "Utilities/CommonActions".ClickBtnByText("Done")
+		"Utilities/GenericOperations".ApiSynchronization
+		LogSuccess "Done button clicked successfully"
+	else
+		LogError "Done button not clicked successfully"
+	end if
+	set the SearchRectangle to empty
+end ClickConfirmButton
+
+to handle SelectRunAndClickConfirmAfterOverrideClick
+	Log "****Selecting a Run from the list"
+	set the SearchRectangle to ScreenPart("RecommendedRunArea")
+	
+	"Utilities/CommonActions".ClickBtnByImage "RunAndTrackAssignmentPage\imgRun"
+	ClickConfirmButton
+	
+	set the SearchRectangle to empty
+	
+end SelectRunAndClickConfirmAfterOverrideClick
+
+to handle SelectTrackAndClickConfirmAfterOverrideClick chargerPosition
+	Log "****Selecting a blank Track from the Tracks"
+	set the SearchRectangle to ScreenPart("TracksArea")
+	"Utilities/CommonActions".pageDown
+	if "Utilities/CommonActions".ClickBtnByImage (chargerPosition)
+		LogSuccess "Track selected successfully"
+	else
+		LogError "Track not selected successfully"
+	end if
+	TypeText pageUp
+	ClickConfirmButton
+	
+	set the SearchRectangle to empty
+	
+end SelectTrackAndClickConfirmAfterOverrideClick
+
+to handle verifyToastMessage toastMsg 
+	Log "****Verifying the Toast Message after clicking AssignRunAndTrackButton"
+	set the SearchRectangle to ScreenPart("ToastMessageArea")
+	--put "Utilities/CommonActions".GetTextByText (toastMsg, 80, 10) into actualMsg
+	put "Utilities/CommonActions".ReadTextInRectangle (toastMsg, 367,61,1530,156) into actualMsg
+	log actualMsg
+	put actualMsg into toastMessageGeneratedAfterAssignTrack
+	delete "yf " from toastMessageGeneratedAfterAssignTrack
+	log toastMessageGeneratedAfterAssignTrack
+	--"Utilities/CommonActions".getCoordinates "Run & Track"
+	
+	"Utilities\exceloperations".CreateOutputFile "toastmessage"
+	"Utilities\exceloperations".WriteIntoFile "toastmessage", "toastmessage", toastMessageGeneratedAfterAssignTrack
+	
+	if "Utilities/CommonActions".containsValue (toastMsg, actualMsg)
+		LogSuccess "Toast message is appearing correctly, msg--> "&&toastMessageGeneratedAfterAssignTrack
+	else
+		LogError "Toast message is not appearing correctly, msg--> "&&toastMessageGeneratedAfterAssignTrack
+	end if
+	return actualMsg
+	set the SearchRectangle to empty
+end verifyToastMessage
+
+to handle CreateChargerName fileName, sheetName, primaryColumnName, primaryColumnValue
+	--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&fileName&".xlsx", sheetName, "OutputToastMsg") into ToastMsg
+	put "Utilities\exceloperations".ReadFromFile ("toastmessage", "toastmessage") into ToastMsg
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&fileName&".xlsx", sheetName, "ChargerNameInitial") into ChargerNameInitial
+	put split(ToastMsg, "position") into lstMsg
+	put second item of lstMsg into trackPos
+	put ChargerNameInitial&trackPos into opChargerName
+	
+	"Utilities/ExcelOperations".writeDataIntoExcel "TestData\"&fileName&".xlsx", sheetName, primaryColumnName, primaryColumnValue, "OutputChargerName", opChargerName
+end CreateChargerName
+
+to handle CreateRunNumber fileName, sheetName, primaryColumnName, primaryColumnValue
+	--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&fileName&".xlsx", sheetName, "OutputToastMsg") into ToastMsg
+	put "Utilities\exceloperations".ReadFromFile ("toastmessage", "toastmessage") into ToastMsg
+	--	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&fileName&".xlsx", sheetName, "RunNumber") into RunNumber
+	put split(ToastMsg, "run") into lstMsg
+	put split(second item of lstMsg, space) into lstMsg1
+	put second item of lstMsg1 into runNumber
+	--put ChargerNameInitial&trackPos into opChargerName
+	
+	"Utilities/ExcelOperations".writeDataIntoExcel "TestData\"&fileName&".xlsx", sheetName, primaryColumnName, primaryColumnValue, "RunNumber", runNumber
+end CreateRunNumber
+
+to handle CreatePositionNumber fileName, sheetName, primaryColumnName, primaryColumnValue
+	--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&fileName&".xlsx", sheetName, "OutputToastMsg") into ToastMsg
+	put "Utilities\exceloperations".ReadFromFile ("toastmessage", "toastmessage") into ToastMsg
+	--	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&fileName&".xlsx", sheetName, "RunNumber") into RunNumber
+	put split(ToastMsg, "position") into lstMsg
+	--put split(second item of lstMsg, space) into lstMsg1
+	put second item of lstMsg into posNumber
+	--put ChargerNameInitial&trackPos into opChargerName
+	
+	"Utilities/ExcelOperations".writeDataIntoExcel "TestData\"&fileName&".xlsx", sheetName, primaryColumnName, primaryColumnValue, "PositionNumber", posNumber
+end CreatePositionNumber
+
+to handle CreatePositionNumberAfterDragDrop fileName, sheetName, primaryColumnName, primaryColumnValue
+
+	set the SearchRectangle to ScreenPart("OverrideCommentsBoxArea")
+	put "Utilities\ExcelOperations".ReadFromFile ("confirmationmsgafterDraganddropbus","msg") into actualMsg
+	
+	log actualMsg
+	put split(actualMsg, "to") into lstactualMsg
+	delete "?" from third item  of lstactualMsg
+	delete space from third item  of lstactualMsg
+	put third item of lstactualMsg into runNumber
+	set the SearchRectangle to empty
+	"Utilities/ExcelOperations".writeDataIntoExcel "TestData\"&fileName&".xlsx", sheetName, primaryColumnName, primaryColumnValue, "PositionNumberAfterMoveBus", runNumber
+	
+end CreatePositionNumberAfterDragDrop
+
+to handle verifyNotificationMessage fullNotificationMsg, msg, splitterInHtmlForm
+	Log "****Verifying the Notification Message after clicking AssignRunAndTrackButton"
+	--put "Bus 8005 has m" into	partialNotificationMsg 
+	set the SearchRectangle to ScreenPart("NotificationsArea")
+	
+	put split (fullNotificationMsg,"fully") into lstpartialNotificationMsg
+	put first item of lstpartialNotificationMsg into partialNotificationMsg
+	--	put "Utilities/CommonActions".ReadMultiLineText (partialNotificationMsg) into actualMsg
+	put false into flag
+	repeat with each item of EveryImageLocation(text:partialNotificationMsg, waitfor:20)
+		put GetAlertFromHTMLCode(partialNotificationMsg, msg, splitterInHtmlForm) into actualAlertMsg
+		log actualAlertMsg
+		--"Utilities/CommonActions".getCoordinates "Run & Track"
+		if "Utilities/CommonActions".containsValue (fullNotificationMsg, actualAlertMsg)
+			--if "Utilities/CommonActions".containsValue (partialNotificationMsg, actualMsg)
+			put true into flag
+			LogSuccess "Notification message is appearing correctly, msg--> "&&actualAlertMsg
+			Exit repeat
+		else
+			Log "Notification message is  appearing as, msg--> "&&actualAlertMsg
+		end if
+	end repeat
+	
+	if  flag=false
+		LogError "Notification message is not appearing correctly, msg--> "&&actualAlertMsg
+	end if
+	
+	
+	set the SearchRectangle to empty
+	
+end verifyNotificationMessage
+
+
+to handle findBusInTracksByTextAndGetCoordinates busNo
+	Log "****Verifying the Bus  in the Bus Tracks"
+	TypeText pageDown
+	--"Utilities/CommonActions".scrollGridDownTillElementFound (busNo)
+	set the SearchRectangle to ScreenPart("TracksArea")
+	put "Utilities/CommonActions".scrollCursorRightHorizontally (busNo, "Generic/trackHorizontalScrollBar") into flag
+	if flag = true
+		"Utilities/CommonActions".getCoordinates busNo
+		put getCoordinates (busNo) into busCoordinates
+	else
+		put "Utilities/CommonActions".scrollCursorLeftHorizontally (busNo, "Generic/trackHorizontalScrollBar") into flag
+		if flag = true
+			"Utilities/CommonActions".getCoordinates busNo
+			put getCoordinates (busNo) into busCoordinates
+		else
+			put "Utilities/CommonActions".scrollCursorDownVertically (busNo, "Generic/trackVerticalScrollBar") into flag
+			if flag = true
+				"Utilities/CommonActions".getCoordinates busNo
+				put getCoordinates (busNo) into busCoordinates
+			else
+				put "Utilities/CommonActions".scrollCursorUpVertically (busNo, "Generic/trackVerticalScrollBar") into flag
+				if flag = true
+					"Utilities/CommonActions".getCoordinates busNo
+					put getCoordinates (busNo) into busCoordinates
+				end if
+			end if
+		end if
+	end if
+	
+	put item 1 of busCoordinates into xCoordinateBus
+	put item 2 of busCoordinates into yCoordinateBus
+	
+	put "Utilities/CommonActions".getCoordinates ("D") into dCoordinates
+	put item 1 of dCoordinates into xDCoordinates
+	
+	--xDCoordinates, xDCoordinates
+	put "Utilities/CommonActions".GetTextByCoordinates (xDCoordinates-10, yCoordinateBus, xDCoordinates, yCoordinateBus) into trackRowNo
+	
+	put "Utilities/CommonActions".getCoordinates ("12") into dCoordinates
+	put item 2 of dCoordinates into y12Coordinates
+	
+	put "Utilities/CommonActions".GetTextByCoordinates (xCoordinateBus-10, y12Coordinates, xCoordinateBus, y12Coordinates) into tracColumnNo
+	
+	put trackRowNo and tracColumnNo into assignedTracks
+	
+	set the SearchRectangle to empty
+	
+end findBusInTracksByTextAndGetCoordinates
+
+
+to handle findBusInTracksByImageAndGetCoordinates imgBusNo
+	Log "****Verifying the Bus  in the Bus Tracks"
+	TypeText pageDown
+	--"Utilities/CommonActions".scrollGridDownTillElementFound (imgBusNo)
+	set the SearchRectangle to ScreenPart("TracksArea")
+	put "Utilities/CommonActions".scrollCursorRightHorizontally (imgBusNo, "Generic/trackHorizontalScrollBar") into flag
+	if flag = true
+		"Utilities/CommonActions".getCoordinatesImage imgBusNo
+		put "Utilities/CommonActions".getCoordinatesImage (imgBusNo) into busCoordinates
+	else
+		put "Utilities/CommonActions".scrollCursorLeftHorizontally (imgBusNo, "Generic/trackHorizontalScrollBar") into flag
+		if flag = true
+			--"Utilities/CommonActions".getCoordinates imgBusNo
+			put "Utilities/CommonActions".getCoordinatesImage (imgBusNo) into busCoordinates
+		else
+			put "Utilities/CommonActions".scrollCursorDownVertically (imgBusNo, "Generic/trackVerticalScrollBar") into flag
+			if flag = true
+				--"Utilities/CommonActions".getCoordinates imgBusNo
+				put "Utilities/CommonActions".getCoordinatesImage (imgBusNo) into busCoordinates
+			else
+				put "Utilities/CommonActions".scrollCursorUpVertically (imgBusNo, "Generic/trackVerticalScrollBar") into flag
+				if flag = true
+					--"Utilities/CommonActions".getCoordinates imgBusNo
+					put "Utilities/CommonActions".getCoordinatesImage (imgBusNo) into busCoordinates
+				end if
+			end if
+		end if
+	end if
+	
+	put item 1 of busCoordinates into xCoordinateBus
+	put item 2 of busCoordinates into yCoordinateBus
+	
+	--"Utilities/CommonActions".scrollMouseWheelUp
+	put "Utilities/CommonActions".getCoordinatesOfImage ("RunAndTrackAssignmentPage/imgTrackImg12") into dCoordinates
+	
+	put item 1 of dCoordinates into xDCoordinates
+	--(620,690,677,714)
+	--xDCoordinates, xDCoordinates
+	
+	
+	put "Utilities/CommonActions".GetTextByCoordinates (xDCoordinates, yCoordinateBus+183) into trackRowNo
+	
+	put "Utilities/CommonActions".getCoordinates ("12") into dCoordinates
+	put item 2 of dCoordinates into y12Coordinates
+	
+	put "Utilities/CommonActions".GetTextByCoordinates (xCoordinateBus-10, y12Coordinates, xCoordinateBus, y12Coordinates) into tracColumnNo
+	
+	put trackRowNo and tracColumnNo into assignedTracks
+	
+	set the SearchRectangle to empty
+	
+end findBusInTracksByImageAndGetCoordinates
+
+to handle findBusInTracksByImage imgBusNo
+	Log "****Verifying the Bus  in the Bus Tracks"
+	--set the SearchRectangle to ScreenPart("TracksArea")
+	repeat until imagefound(image:"Generic/trackHorizontalScrollBar",waitFor:0)
+		if the repeatIndex > 2 then 
+			Log "Seems Horizontal bar is not present in the screen!!"
+			Exit repeat
+		end if
+		TypeText pageDown
+	end repeat
+	
+	set the SearchRectangle to ScreenPart("TracksArea")
+	put "Utilities/CommonActions".scrollCursorRightHorizontally (imgBusNo, "Generic/trackHorizontalScrollBar") into flag
+	if flag = true
+		LogSuccess "Bus is found on the track with correct state"
+	else
+		put "Utilities/CommonActions".scrollCursorLeftHorizontally (imgBusNo, "Generic/trackHorizontalScrollBar") into flag
+		if flag = true
+			LogSuccess "Bus is found on the track with correct state"
+		else
+			put "Utilities/CommonActions".scrollCursorDownVertically (imgBusNo, "Generic/trackVerticalScrollBar") into flag
+			if flag = true
+				LogSuccess "Bus is found on the track with correct state"
+			else
+				put "Utilities/CommonActions".scrollCursorUpVertically (imgBusNo, "Generic/trackVerticalScrollBar") into flag
+				if flag = true
+					LogSuccess "Bus is found on the track with correct state"
+				else
+					LogError "Bus is not found on the Track with correct state"
+				end if
+			end if
+		end if
+	end if
+	
+	set the SearchRectangle to empty
+	
+end findBusInTracksByImage
+
+to handle VerifyBusIsNotInTracksByImage imgBusNo
+	Log "****Verifying the Bus  in the Bus Tracks"
+	--set the SearchRectangle to ScreenPart("TracksArea")
+	repeat until imagefound(image:"Generic/trackHorizontalScrollBar",waitFor:0)
+		if the repeatIndex > 2 then 
+			Log "Seems Horizontal bar is not present in the screen!!"
+			Exit repeat
+		end if
+		TypeText pageDown
+	end repeat
+	
+	set the SearchRectangle to ScreenPart("TracksArea")
+	put "Utilities/CommonActions".scrollCursorRightHorizontally (imgBusNo, "Generic/trackHorizontalScrollBar") into flag
+	if flag = false
+		LogSuccess "Bus is not found on the track with correct state"
+	else
+		put "Utilities/CommonActions".scrollCursorLeftHorizontally (imgBusNo, "Generic/trackHorizontalScrollBar") into flag
+		if flag = false
+			LogSuccess "Bus is not found on the track with correct state"
+		else
+			put "Utilities/CommonActions".scrollCursorDownVertically (imgBusNo, "Generic/trackVerticalScrollBar") into flag
+			if flag = false
+				LogSuccess "Bus is not found on the track with correct state"
+			else
+				put "Utilities/CommonActions".scrollCursorUpVertically (imgBusNo, "Generic/trackVerticalScrollBar") into flag
+				if flag = false
+					LogSuccess "Bus is not found on the track with correct state"
+				else
+					LogError "Bus is found on the Track"
+				end if
+			end if
+		end if
+	end if
+	set the SearchRectangle to empty
+	
+	Click [159,534]
+
+	Typetext PageUp
+	
+end VerifyBusIsNotInTracksByImage
+
+to handle findBusInTracksOfGarageOverviewPageByImage imgBusNo, pageName
+	Log "****Verifying the Bus  in the Bus Tracks"
+	--set the SearchRectangle to ScreenPart("TracksArea")
+	put false into foundFlag
+	if 	pageName = "Garage Overview"
+		set the SearchRectangle to ScreenPart("TracksAreaGarageOverview")
+	else 
+		set the SearchRectangle to ScreenPart("TracksArea")
+	end if
+	"Utilities/CommonActions".pagedown
+	if "Utilities/CommonActions".SearchImageOnScreen (imgBusNo)
+		LogSuccess "Bus found on the Track!!"
+		put true into foundFlag
+		Exit handler
+	end if
+	
+	put "Utilities/CommonActions".scrollCursorUpVertically (imgBusNo, "Generic/trackVerticalScrollBar") into flag
+	if flag = true
+		put true into foundFlag
+		LogSuccess "Bus is found on the track"
+	else
+		put "Utilities/CommonActions".scrollCursorDownVertically (imgBusNo, "Generic/trackVerticalScrollBar") into flag
+		if flag = true
+			put true into foundFlag
+			LogSuccess "Bus is found on the track"
+		else
+			put "Utilities/CommonActions".scrollCursorLeftHorizontally (imgBusNo, "Generic/trackHorizontalScrollBar") into flag
+			if flag = true
+				put true into foundFlag
+				LogSuccess "Bus is found on the track"
+			else
+				put "Utilities/CommonActions".scrollCursorRightHorizontally (imgBusNo, "Generic/trackHorizontalScrollBar") into flag
+				if flag = true
+					put true into foundFlag
+					LogSuccess "Bus is found on the track"
+				else
+					put "Utilities/CommonActions".scrollCursorUpVertically (imgBusNo, "Generic/trackVerticalScrollBar") into flag
+					if flag = true
+						put true into foundFlag
+						LogSuccess "Bus is found on the track"
+					else
+						put false into foundFlag
+						LogError "Bus is not found on the Track"
+						Exit all
+					end if
+				end if
+			end if
+		end if
+	end if
+	
+	set the SearchRectangle to empty
+	return foundFlag
+end findBusInTracksOfGarageOverviewPageByImage
+
+to handle DragAndDropBusInTrack imgBusInTrack, screenName
+	Log "****Drag and Drop the the Bus inside of the Tracks"
+	if screenName= "Garage Overview"
+		set the SearchRectangle to ScreenPart("TracksAreaGarageOverview")
+	else if screenName=""
+		set the SearchRectangle to ScreenPart("TracksArea")
+	end if
+	if findBusInTracksOfGarageOverviewPageByImage (imgBusInTrack) = True
+		"Utilities/CommonActions".DragAndDropImage  imgBusInTrack 
+	end if
+	
+	set the SearchRectangle to empty
+end DragAndDropBusInTrack
+
+to DragBusAndDropToAnyPosition ImageToDrag, imgToDrop //--> Created By Mohammed
+	//put imageLocation(ImageToDrag) into ElementLoc
+	set the SearchRectangle to ScreenPart("TracksArea")
+	"Utilities/CommonActions".DragImageAndDropIntoImage ImageToDrag,imgToDrop
+	set the SearchRectangle to empty
+	put "Are you sure you want to move Bus" into PartialMessage
+	set the SearchRectangle to ScreenPart("OverrideCommentsBoxArea")
+	if ImageFound(text:PartialMessage, WaitFor:20) then
+		--put FoundImageLocation() into messageLocation
+		--DoubleClick messageLocation
+		--put ReadText(messageLocation) into msgTackChangeConfirmation
+		--Log msgTackChangeConfirmation
+		put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Are you sure", 0,0,590,15) into actualMsg
+		log actualMsg
+		put split(actualMsg, "to") into lstactualMsg
+		delete "?" from third item  of lstactualMsg
+		delete space from third item  of lstactualMsg
+		put third item of lstactualMsg into runNumber
+		set the SearchRectangle to empty
+		--Write messgage into output file
+		
+		"Utilities\exceloperations".CreateOutputFile "confirmationmsgafterDraganddropbus"
+		"Utilities\exceloperations".WriteIntoFile "confirmationmsgafterDraganddropbus'", "msg", actualMsg
+		
+		"Utilities/CommonActions".ClickBtnByText "Yes"
+		LogSuccess "Bus has been successfully moved to new position"
+	else
+		LogError "Bus has not been re-moved to new position"
+		
+	end if
+	set the SearchRectangle to empty
+	return msgTackChangeConfirmation
+end DragBusAndDropToAnyPosition
+
+to VerifyDragBusAndDropIsDisabled ImageToDrag, imgToDrop 
+	//put imageLocation(ImageToDrag) into ElementLoc
+	set the SearchRectangle to ScreenPart("TracksArea")
+	"Utilities/CommonActions".DragImageAndDropIntoImage ImageToDrag,imgToDrop
+	put "Are you sure you want to move Bus" into PartialMessage
+	if ImageFound(text:PartialMessage, WaitFor:2) then
+		put FoundImageLocation() into messageLocation
+		DoubleClick messageLocation
+		put ReadText(messageLocation) into msgTackChangeConfirmation
+		Log msgTackChangeConfirmation
+		"Utilities/CommonActions".ClickBtnByText "Yes"
+		LogError "Bus has been successfully moved to new position"
+	else
+		LogSuccess "Bus has not been moved to new position"
+		
+	end if
+	set the SearchRectangle to empty
+	return msgTackChangeConfirmation
+end VerifyDragBusAndDropIsDisabled
+
+to DragBusAndHoverOnAnyPosition ImageToDrag, imgToDrop, msgToVerify
+	Log "Drag bus and hover over on a Chrger/Bus in the track"
+	set the SearchRectangle to ScreenPart("TracksArea")
+	MoveTo ImageToDrag 
+	MouseButtonDown 1 
+	MoveTo imgToDrop
+	
+	if  "Utilities/CommonActions".IsTextPresentOnScreen.IsTextPresentOnScreen (msgToVerify)
+		LogSuccess "Correct message is appearing after mouse hover of bus "&ImageToDrag&" to bus/charger "&imgToDrop
+	else
+		LogError "Correct message is appearing after mouse hover of bus "&ImageToDrag&" to bus/charger "&imgToDrop
+	end if
+	MoveTo ImageToDrag
+	MouseButtonUp 1 
+	
+	set the SearchRectangle to empty
+end DragBusAndHoverOnAnyPosition
+
+to handle verifyRecommendedTracksAfterBusDragAndDropInTracks msgTrackMovementConfirmation
+
+	put split (msgTrackMovementConfirmation , "to")  into listo
+	put third item of listo into track
+	
+	put split (track , "?")  into listo
+	put first item of listo into track
+	
+	put split (track , "-")  into listo
+	put first item of listo into trackNo
+	put second item of listo into position
+	
+	put "Utilities/CommonActions".GetTextBelowByText ("Track No") into actualTrackNo
+	
+	if "Utilities/CommonActions".containsValue (trackNo, actualTrackNo)
+		LogSuccess "Track No updated successfully under the Recommended Track section, Track No--> "&trackNo
+	else
+		LogError  "Track No updated successfully under the Recommended Track section--> "&trackNo
+	end if
+	
+	put "Utilities/CommonActions".GetTextBelowByText ("Position") into actualPosition
+	if "Utilities/CommonActions".containsValue (position, actualPosition)
+		LogSuccess "Position updated successfully under the Recommended Track section, Track No--> "&position
+	else
+		LogError  "Position updated successfully under the Recommended Track section--> "&position
+	end if
+end verifyRecommendedTracksAfterBusDragAndDropInTracks
+
+to handle apiData valueToFind
+	Log "****Fetching expected data from the APIs"
+	put ExecuteJavaScript("return window.localStorage.getItem('token')", "gsfi lst-d-f") into myval
+	put "CCSS_Pages/BasePage".SetGlobalEnvironmentVariables into BaseURI
+	--	put ExecuteJavaScript("return document.getElementsByClassName(arguments[0]);", "gsfi lst-d-f") into myVariable
+	put QA_LoginAPI() into responseAPI
+	--Log responseAPI
+	put responseAPI.responsebody into respBody
+	--Log respBody
+	
+	put QA_SummaryAPI() into summaryAPI
+	put summaryAPI.responsebody into respbody1
+	--log respbody1
+	
+	put jsonvalue (respbody1) into responsebody2 
+	--log responsebody2.totalProterraDistance.description
+	
+	--put responsebody2.totalProterraDistance into varJsonSnap
+	
+	--log responsebody2.(valueToFind)
+	put responsebody2.(valueToFind) into varJsonSnap
+	log varJsonSnap
+	--log varJsonSnap
+	return varJsonSnap
+	
+end apiData
+
+to handle verifyMessageAfterBusDragAndDrop
+	Log "****Verifying the Mesage after Dragging and Dropping the Bus inside of the track"
+	set the SearchRectangle to ScreenPart("TracksArea")
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("Are you sure you want to move Bus 8027 from position") = true
+		LogError "Bus is moved after override button click"
+	else 
+		LogSuccess "Bus is not moved after override button click"
+	end if
+	set the SearchRectangle to empty
+end verifyMessageAfterBusDragAndDrop
+
+to handle verifyDragAndDropIsDiabled
+	Log "****Verifying the Mesage after Dragging and Dropping the Bus inside of the track"
+	set the SearchRectangle to ScreenPart("TracksArea")
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("Are you sure you want to move Bus ") = true
+		LogError "Bus is moved after override button click"
+	else 
+		LogSuccess "Bus is not moved after override button click"
+	end if
+	set the SearchRectangle to empty
+end verifyDragAndDropIsDiabled
+
+to handle NavigatePageAfterClickMenuIcon pageName, pageTitle, itemNumberInList
+	Log "****Click on the Menu Icon"
+	"Utilities/CommonActions".pageUp
+	set the SearchRectangle to ScreenPart("MenuArea")
+	"Utilities/CommonActions".ClickBtnByImage "Generic/imgMenuIcon"
+	Wait 2
+	"Utilities/CommonActions".ClickAnElementInListByText pageName, itemNumberInList
+	"Utilities/GenericOperations".ApiSynchronization
+	--Wait 5
+	if "Utilities/CommonActions".IsTextPresentOnScreen (pageTitle)= true then
+		LogSuccess "Navigation to page " &&pageName &&"is successful"
+	else
+		LogError "Navigation to page " &&pageName &&"is unsuccessful"
+	end if
+	
+	set the SearchRectangle to empty
+	
+end NavigatePageAfterClickMenuIcon
+
+to handle clickInitiateChargingButtonInAlerts
+
+	Log "****Click on Initiate Charging in Alerts secton"
+	set the SearchRectangle to ScreenPart("AlertsArea")
+	"Utilities/CommonActions".ClickBtnByText "Initiate Charging"
+	if imagefound(text:"Successfully submitted request to perform the action on the charger")
+		LogSuccess "Message is appearing correctly after click on Initiate Charging  button"
+	else
+		logError "Message is not appearing correctly after click on Initiate Charging  button"
+	end if
+	set the SearchRectangle to empty
+	
+end clickInitiateChargingButtonInAlerts
+
+to handle verifyChargerStatusIsCharging
+
+	Log "****Verify the Charger Status is Charging"
+	set the SearchRectangle to ScreenPart("TracksArea")
+	"Utilities/CommonActions".ClickBtnByText "Initiate Charging"
+	set the SearchRectangle to empty
+	
+end verifyChargerStatusIsCharging
+
+to VerifyNoBusesInIncomingQueue --Mohd has to complete it
+	Log "****Verify the no buses are in the queue"
+	set the SearchRectangle to ScreenPart("IncomingQueueArea")
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("No buses in queue")
+		LogSuccess "No buses are in the queue"
+	else
+		LogError "Buses are in the queue"
+	end if
+	--Condition
+	set the SearchRectangle to empty
+	
+end VerifyNoBusesInIncomingQueue
+
+to VerifyBusNotInIncomingQueue busID --Mohd has to complete it
+	Log "****Verify the Incoming queue with Bus ID"
+	set the SearchRectangle to ScreenPart("IncomingQueueArea")
+	if not "Utilities/CommonActions".IsTextPresentOnScreen (busID) 
+		Log "Bus not found in Incoming Queue"
+	else
+		LogWarning "Bus is found in Incoming Queue"
+		
+	end if
+	--Condition
+	set the SearchRectangle to empty
+	
+end VerifyBusNotInIncomingQueue
+
+to handle VerifyAutoPopulatedBusesListInBEBSearch busID, expectedBusId
+	Log "****Verify the bus is autopopulated in BEB search box"
+	
+	set the SearchRectangle to ScreenPart("SearchBEBArea")
+	
+	if expectedBusId=""
+		"Utilities/CommonActions".EnterTextBoxByText "Search BEB", busID
+		wait 5
+		put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle (busID, -50,0,50, 100) into buses
+		--put "Utilities/CommonActions".containsValue ("Search BEB", 100) into buses
+		log buses
+		
+		if  expectedBusId contains  busID then
+			LogError "Invalid bus is getting pupulated wrongly in BEB Search"
+		else
+			LogSuccess "Invalid bus is not getting pupulated in BEB Search"
+			
+		end if
+		
+	else
+		"Utilities/CommonActions".EnterTextBoxByText "Search BEB", busID
+		wait 5
+		put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle (busID, -50,0,50, 100) into buses
+		--put "Utilities/CommonActions".containsValue ("Search BEB", 100) into buses
+		log buses
+		if "Utilities/CommonActions".containsValue (expectedBusId, buses) then
+			LogSuccess "Buses are pupulated sccessfully in BEB Search"
+		else
+			LogError "Buses are not pupulated sccessfully in BEB Search"
+			
+		end if
+		
+	end if
+	
+	set the SearchRectangle to empty
+	
+end VerifyAutoPopulatedBusesListInBEBSearch
+
+
+(**Handler No : 38**)
+--------------------------------
+(***
+@author : Mohammed Gouse
+@date : 21/March/22
+@description : To Verify the Incoming queue with Bus ID
+***)
+to VerifyBusInIncomingQueue busID --Mohd has to complete it
+	Log "****Verify the Incoming queue with Bus ID"
+	set the SearchRectangle to ScreenPart("IncomingQueueArea")
+	"Utilities/CommonActions".IsTextPresentOnScreen busID
+	if ImageFound(Text:busID, waitFor:10) then
+		LogSuccess busID && "Bus is Available in Incoming Queue"
+		set the SearchRectangle to empty
+	else
+		LogError busID && "Bus is Not Available in Incoming Queue"
+		
+	end If
+	set the SearchRectangle to empty
+end VerifyBusInIncomingQueue
+
+
+to handle CalculateThresholdEnergy currentEnergy, thresholdRatio, listRequiredEnergy
+	--Threshold Energy = Required Energy + (Energy Threshold Ratio x Available Battery Capacity)
+	put "" into runtoselect
+	repeat with each item of listRequiredEnergy
+		put it into var
+		delete "[" in var
+		delete "]" in var
+		delete quote in var
+		delete "@" in var
+		log var
+		
+		put var + (thresholdRatio *  528) into thresholdEnergy
+		
+		if ((thresholdEnergy is greater than currentEnergy) and (currentEnergy  is greater than var))
+			put var into runtoselect
+			Exit repeat
+			
+		end if
+	end repeat
+	return runtoselect
+end CalculateThresholdEnergy
+
+to handle SelectARunWhereThrEnrgyIsGreaterThnCurrentEnrgyGreaterThnReqEnnrgy threshouldRatio
+	--Get Current Energy
+	set the SearchRectangle to ScreenPart("BusDetailsArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Current Energy") into actualcurrentEnergy
+	put split(actualcurrentEnergy," ") into actualcurrentEnergy
+	put first item of actualcurrentEnergy into actualcurrentEnergy
+	set the SearchRectangle to empty
+	wait 2
+	"Utilities/CommonActions".pageDown
+	put 1 into i
+	repeat until i>30
+		if EvaluateRequiredEnergyAndSelectARun (actualcurrentEnergy,threshouldRatio)=false
+			--"Utilities/CommonActions".pageDown
+			put false into flag
+			set the SearchRectangle to ScreenPart("TrackPaginationArea")
+			"Utilities/CommonActions".ClickBtnByTextWithProperties "Next", "#4a2825", 0,0
+			
+			set the SearchRectangle to empty
+		else
+			put true into flag
+			exit handler
+		End If
+		add 1 to i
+	end repeat
+	if flag=false
+		LogSuccess "Run is not found for the condition 'Threshold Energy>Current Energy> Required Energy', runNumber"
+	end if
+end SelectARunWhereThrEnrgyIsGreaterThnCurrentEnrgyGreaterThnReqEnnrgy 
+
+to handle EvaluateRequiredEnergyAndSelectARun actualcurrentEnergy,threshouldRatio
+	put true into flag
+	--Select a run
+	set the SearchRectangle to ScreenPart("SelectRunArea")
+	put ImageRectangle(text:"Required Energy", waitFor:20) into ImageRectangleOfFieldName
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100,20],ImageRectangleOfFieldName.BottomRight+[0,500]) as list into energyUpdated 
+	log energyUpdated 
+	delete "kWh" in energyUpdated
+	log energyUpdated
+	delete newline in energyUpdated
+	log energyUpdated
+	replace tabKey by space in energyUpdated
+	log energyUpdated
+	put split(energyUpdated, space) into energyUpdated	
+	--Calculate the Threshold Energy
+	put CalculateThresholdEnergy (actualcurrentEnergy,threshouldRatio, energyUpdated) into runNumber
+	if runNumber=""
+		put false into flag
+		Log "Searching for run having the condition Threshold Energy>Current Energy> Required Energy"
+		--exit handler
+	else
+		put ImageRectangle(text:runNumber, waitFor:20) into ImageRectangleOfEnergy
+		put ImageRectangle(text:"Selection", waitFor:20) into ImageRectangleOfSelect
+		put ImageRectangleOfSelect.topleft.x into x1
+		put ImageRectangleOfSelect.topright.x into x2
+		put ImageRectangleOfEnergy.topleft.y into y1
+		put (x1+x2)/2 rounded to 0 places into x
+		Click [x, y1]
+		put true into flag
+		LogSuccess "Run is found for the condition 'Threshold Energy>Current Energy> Required Energy', runNumber-->"&&runNumber
+		ClickConfirmButton
+	end if
+	set the SearchRectangle to empty
+	return flag
+end EvaluateRequiredEnergyAndSelectARun
+
+to handle SelectDifferentRunID listRunIDs, runIdFromRecommendedTrack
+	repeat with each item of listRunIDs
+		put it into runId
+		delete "[" from runId
+		delete "@" from runId
+		delete quote from runId
+		if runId not equal runIdFromRecommendedTrack
+			put runId into val
+			exit repeat
+		end if
+		
+	end repeat
+	return val
+end SelectDifferentRunID
+
+to handle SelectRunWithoutChangingTrack varOutputFileName
+
+	--Get Current Energy
+	set the SearchRectangle to ScreenPart("RecommendedRunArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Run ID") into runIdFromRecommendedRun
+	log runIdFromRecommendedRun
+	set the SearchRectangle to empty
+	wait 2
+	set the SearchRectangle to ScreenPart("RecommendedTrackArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Position") into positionFromRecommendedTrack
+	log "Position before selecting run "&&positionFromRecommendedTrack
+	put "Track no before selecting run "&&"Utilities/CommonActions".GetTextBelowByText ("Track No") into trackNoFromRecommendedTrack
+	log trackNoFromRecommendedTrack
+	set the SearchRectangle to empty
+	
+	--Select a run
+	set the SearchRectangle to ScreenPart("SelectRunArea")
+	
+	put ImageRectangle(text:"Run ID", waitFor:20) into ImageRectangleOfFieldName
+	
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100,20],ImageRectangleOfFieldName.BottomRight+[10,450]) as list into runIDs
+	log runIDs
+	
+	put split(runIDs, "\n") into runIDs
+	log runIDs
+	
+	put SelectDifferentRunID (runIDs, runIdFromRecommendedRun) into runIDToSelect
+	log runIDToSelect
+	
+	put ImageRectangle(text:runIDToSelect, waitFor:20) into ImageRectangleOfEnergy
+	put ImageRectangle(text:"Selection", waitFor:20) into ImageRectangleOfSelect
+	
+	put ImageRectangleOfSelect.topleft.x into x1
+	put ImageRectangleOfSelect.topright.x into x2
+	put ImageRectangleOfEnergy.topleft.y into y1
+	put (x1+x2)/2 rounded to 0 places into x
+	Click [x, y1]
+
+	ClickConfirmButton
+	
+	set the SearchRectangle to empty
+	
+	set the SearchRectangle to ScreenPart("RecommendedTrackArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Position") into positionFromRecommendedTrack1
+	log positionFromRecommendedTrack1
+	put "Utilities/CommonActions".GetTextBelowByText ("Track No") into trackNoFromRecommendedTrack1
+	log trackNoFromRecommendedTrack1
+	set the SearchRectangle to empty
+	
+	if positionFromRecommendedTrack1=positionFromRecommendedTrack
+		LogSuccess "Position is not changed after selecting a run"
+	else
+		LogError "Position is changed after selecting a run"
+	end if
+	if trackNoFromRecommendedTrack1= trackNoFromRecommendedTrack
+		LogSuccess "Track No is not changed after selecting a run"
+	else
+		LogError "Track No is changed after selecting a run"
+		
+	end if
+	
+	set the SearchRectangle to ScreenPart("RecommendedRunArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Run ID") into actualRunId
+	log actualRunId
+	put "Utilities/CommonActions".GetTextBelowByText ("Run Status") into actualRunStatus
+	put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Estimated Charge Time",,0,15,19,26) into actualEstChargeTime
+	put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle ("Book Out Date",0,15,19,26) into actualBookOutTime
+	log actualBookOutTime
+	
+	put "Utilities/CommonActions".GetTextBelowByText ("Required Energy") into actualReqEnergy
+	put split(actualReqEnergy, " ")into lst
+	put first item of lst into actualReqEnergy
+	log actualReqEnergy
+	put "Utilities/CommonActions".GetTextBelowByText ("Distance") into actualDistance
+	put split(actualDistance, " ")into lst
+	put first item of lst into actualDistance
+	log actualDistance
+	
+	"Utilities\exceloperations".CreateOutputFile varOutputFileName
+	"Utilities\exceloperations".WriteIntoFile varOutputFileName, "RunID", actualRunId
+	"Utilities\exceloperations".WriteIntoFile varOutputFileName, "RunStatus", actualRunStatus
+	"Utilities\exceloperations".WriteIntoFile varOutputFileName, "EstimatedCharge", actualEstChargeTime
+	"Utilities\exceloperations".WriteIntoFile varOutputFileName, "BookOutDate", actualBookOutTime
+	"Utilities\exceloperations".WriteIntoFile varOutputFileName, "RequiredEnergy", actualReqEnergy
+	"Utilities\exceloperations".WriteIntoFile varOutputFileName, "Distance", actualDistance
+	set the SearchRectangle to empty
+	
+end SelectRunWithoutChangingTrack
+
+to handle GetAlertFromHTMLCode partMsg, msg, splitter
+	wait 2
+	if splitter=""
+		put "bus" into splitter
+	end if
+	put split (msg, splitter) into lstmsg
+	put first item of lstmsg  into lstmsg
+	log partMsg
+	
+	--put "Charger at position" into partMsg
+	RightClick text:partMsg
+	Click text:"Inspect"
+	
+	wait 3
+	set the SearchRectangle to ScreenPart("AlertsHtmlCodeArea")
+	
+	if ImageFound(image:"RunAndTrackAssignmentPage\alertsHtmlCode", waitfor:20)
+		Click image:"RunAndTrackAssignmentPage\alertsHtmlCode"
+	end if
+	
+	MoveTo text:lstmsg
+	DoubleClick text:lstmsg
+	TypeText controlKey, "c" 
+	
+	put remoteClipboard() into alertMsg
+	log alertMsg
+	
+	TypeText F12
+	set the SearchRectangle to empty
+	return alertMsg
+end GetAlertFromHTMLCode
+
+to handle verifyAlertMessage msg, splitterInHtmlForm
+	Log "****Verifying the Alert message in Alerts section"
+	--"Utilities/GenericOperations".WaitForApiSynchronization
+	set the SearchRectangle to ScreenPart("AlertsArea")
+	put split (msg, " ") into lstmsg
+	put first item of lstmsg && second item of lstmsg && third item of lstmsg && fourth item of lstmsg  into partMsg
+	log partMsg 
+	--put "Charger at position (KATG " into partMsg
+	set the SearchRectangle to ScreenPart("AlertsArea")
+	put false into flag
+	repeat with each item of EveryImageLocation(text:partMsg, waitfor:20)
+		put it into cor
+		log txt
+		--SetOption MouseMoveSpeed, 10
+		MoveTo [cor.x,cor.y]
+
+		
+		put GetAlertFromHTMLCode(partMsg, msg, splitterInHtmlForm) into actualAlertMsg 
+		--put "Utilities/CommonActions".GetFieldValueBelowUsingCoordinates(partMsg, -4, -10, 150, 90) into actualAlertMsg 
+		log actualAlertMsg
+		
+		put split (actualAlertMsg, space) into lstActualAlert
+		delete newline  from lstActualAlert
+		delete space from lstActualAlert
+		put split(msg,space) into lstexpectedAlert
+		put "" into expA
+		repeat with each item of lstexpectedAlert
+			put expA&it into expA
+		end repeat
+		put "" into actualA
+		repeat with each item of lstActualAlert
+			put actualA&it into actualA
+		end repeat		
+		
+		if (expA = actualA)
+			LogSuccess "Alert is found in the Alerts section, actual message-->"&&actualA&&"', expected message--> ''"&&expA&&"''"
+			put true into flag
+			--exit repeat
+		end if
+		
+	end repeat
+	
+	if (flag=false)
+		LogError "Alert is not found in the Alerts section, actual message-->"&&actualA&&"', expected message--> ''"&&expA&&"''"
+		
+	end if
+	--"Utilities/CommonActions".MoveToElementByText partMsg
+	wait 2
+	set the SearchRectangle to empty
+end verifyAlertMessage
+
+to handle verifyAlertMessageNotPresent msg, splitterInHtmlForm 
+	Log "****Verifying the Alert message in Alerts section"
+	--"Utilities/GenericOperations".WaitForApiSynchronization
+	set the SearchRectangle to ScreenPart("AlertsArea")
+	put split (msg, " ") into lstmsg
+	put first item of lstmsg && second item of lstmsg && third item of lstmsg && fourth item of lstmsg  && fifth item of lstmsg  into partMsg
+	log partMsg 
+	--put "Charger at position (KATG " into partMsg
+	set the SearchRectangle to ScreenPart("AlertsArea")
+	put false into flag
+	repeat with each item of EveryImageLocation(text:partMsg, waitfor:20)
+		put it into cor
+		log txt
+		--SetOption MouseMoveSpeed, 10
+		MoveTo [cor.x,cor.y]
+		
+		put GetAlertFromHTMLCode(partMsg, msg, splitterInHtmlForm) into actualAlertMsg 
+		--put "Utilities/CommonActions".GetFieldValueBelowUsingCoordinates(partMsg, -4, -10, 150, 90) into actualAlertMsg 
+		log actualAlertMsg
+		
+		put split (actualAlertMsg, space) into lstActualAlert
+		delete newline  from lstActualAlert
+		delete space from lstActualAlert
+		put split(msg,space) into lstexpectedAlert
+		put "" into expA
+		repeat with each item of lstexpectedAlert
+			put expA&it into expA
+		end repeat
+		put "" into actualA
+		repeat with each item of lstActualAlert
+			put actualA&it into actualA
+		end repeat		
+		
+		if (expA = actualA)
+			LogError "Alert is  found in the Alerts section, actual message-->"&&actualA&&"', expected message--> ''"&&expA&&"''"
+			put true into flag
+			--exit repeat
+		end if
+		
+	end repeat
+	
+	if (flag=false)
+		LogSuccess "Alert is not found in the Alerts section, actual message-->"&&actualA&&"', expected message--> ''"&&expA&&"''"
+		
+	end if
+	--"Utilities/CommonActions".MoveToElementByText partMsg
+	wait 2
+	set the SearchRectangle to empty
+end verifyAlertMessageNotPresent
+
+
+to handle VerifyAllTheRequiredEnergyForRuns
+
+	--Select a run
+	set the SearchRectangle to ScreenPart("SelectRunArea")
+	----------------Get All Required Energy 	
+	put ImageRectangle(text:"Required Energy", waitFor:20) into ImageRectangleOfFieldName
+	
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100,20],ImageRectangleOfFieldName.BottomRight+[0,400]) as list into energyUpdated 
+
+	log energyUpdated 
+	delete "kWh" in energyUpdated
+	log energyUpdated
+	delete newline in energyUpdated
+	log energyUpdated
+	
+	
+	put split(energyUpdated, space) into energyUpdated
+	
+	
+	----------------Get All Distance
+	set the SearchRectangle to ScreenPart("SelectRunArea")
+	
+	put ImageRectangle(text:"Distance", waitFor:20) into ImageRectangleOfFieldName
+	
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100,20],ImageRectangleOfFieldName.BottomRight+[0,400]) as list into distances
+
+	log distances 
+	delete "km" in distances
+	log distances
+	delete newline in distances
+	log distances
+	
+	
+	put split(distances, space) into distances
+	
+	repeat with each item of distances
+		put it into var
+		delete "[" in var
+		delete "]" in var
+		delete "kn" in var
+		delete quote in var
+		log var
+		insert var after distancesUpdated
+		
+	end repeat
+	log myVar
+	
+	------------------Calculate the Required Energy from Distance
+	CalculateRequiredEnergy energyUpdated, distancesUpdated
+	
+	set the SearchRectangle to empty
+	
+end VerifyAllTheRequiredEnergyForRuns
+
+to handle CalculateRequiredEnergy energyUpdated, distancesUpdated
+	--put 274 into distancesUpdated
+	put "Utilities/ExcelOperations".ReadFromFile ("authtoken", "token") into authToken
+	put "CCSS_Pages/BasePage".SetGlobalEnvironmentVariables into BaseURI
+	put QA_CCSSConfiguration() into summaryAPI
+	put summaryAPI.responsebody into respbody1
+	--log respbody1
+	put jsonvalue (respbody1) into responsebody2 
+	--log responsebody2
+	put  responsebody2.configs into var
+	
+	---Fetching the Consumption Rate [kWh/km]  from API
+	repeat with each item of var
+		put it into recs
+		if recs.key="fleetEfficiency"
+			put  recs.conversionRate * recs.value into consumptionrate
+			log consumptionrate
+		end if
+		if recs.key="energyRequiredSafetyMarginRatio"
+			put  recs.value  into safetyMargin
+			log safetyMargin
+		end if	
+		if recs.key="energyRequiredReservedRatio"
+			put  recs.value  into energyRequiredReservedRatio
+			log energyRequiredReservedRatio
+		end if
+		if recs.key="globalVehicleBatteryCapacity"
+			put  recs.value  into batteryCapacity
+			log batteryCapacity
+		end if
+	end repeat
+	--Calculate the required energy
+	--*Required Energy (kwh) = (Total Distance [km] * Consumption Rate [kWh/km] *(1 + Safety Margin))+ (Required Energy Reserved Ratio * Available Battery Capacity [kWh])*
+	--put 1 into i
+	repeat with each item of distancesUpdated
+		
+		put it into distanceInKm
+		log distanceInKm
+		--put item i of energyUpdated into var1
+		--log var1
+		--add 1 to i
+		put ((distanceInKm*consumptionrate*(1+safetyMargin))+(energyRequiredReservedRatio*batteryCapacity)) into requiredEnergy
+		put split(requiredEnergy,".") into requiredEnergy
+		put first item of requiredEnergy into requiredEnergy
+	end repeat
+	return requiredEnergy
+end CalculateRequiredEnergy
+
+to handle VerifyCalculateRequiredEnergyIsCorrect
+	put "Utilities/CommonActions".GetTextBelowByText ("Distance") into actualDistance
+	put split(actualDistance, " ")into lst
+	put first item of lst into actualDistance
+	log actualDistance
+	
+	put "Utilities/CommonActions".GetTextBelowByText ("Required Energy") into actualReqEnergyUI
+	put split(	actualReqEnergyUI, space) into actualReqEnergyUI
+	put first item of actualReqEnergyUI into actualReqEnergyUI
+	
+	put CalculateRequiredEnergy ("", actualDistance) into calculatedReqEnergy
+	
+	if calculatedReqEnergy=actualReqEnergyUI
+		LogSuccess "Required energy calculated "&&calculatedReqEnergy&&" is similar to UI-->"&&actualReqEnergyUI
+	else
+		LogError "Required energy calculated "&&calculatedReqEnergy&&" is not similar to UI-->"&&actualReqEnergyUI
+	end if
+	
+end VerifyCalculateRequiredEnergyIsCorrect
+
+to handle CalculateEstimatedChargeTime actualReqEnergyUI, actualCurrentEnergy
+	--put 274 into distancesUpdated
+	put "Utilities/ExcelOperations".ReadFromFile ("authtoken", "token") into authToken
+	put "CCSS_Pages/BasePage".SetGlobalEnvironmentVariables into BaseURI
+	put QA_CCSSConfiguration() into summaryAPI
+	put summaryAPI.responsebody into respbody1
+	--log respbody1
+	put jsonvalue (respbody1) into responsebody2 
+	log responsebody2
+	put  responsebody2.configs into var
+	
+	---Fetching the Consumption Rate [kWh/km]  from API
+	repeat with each item of var
+		put it into recs
+		if recs.key="ABB_MAX_CHARGER_POWER"
+			put  recs.conversionRate * recs.value into maxchargerrate
+			log maxchargerrate
+		end if
+	end repeat
+	--Calculate the required energy
+	--Estimated Charge Time = (Required Energy - Current Energy) / Maximum Charger Rate
+	--put 1 into i
+	repeat with each item of distancesUpdated
+		
+		put it into distanceInKm
+		log distanceInKm
+		put ((actualReqEnergyUI-actualCurrentEnergy)/maxchargerrate) into estimatedChargeTime
+	end repeat
+	return estimatedChargeTime
+end CalculateEstimatedChargeTime
+
+to handle VerifyEstimatedChargeTimeIsCorrect
+	set the SearchRectangle to ScreenPart("BusDetailsArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Current Energy") into actualCurrentEnergy
+	put split(actualCurrentEnergy, " ")into lst
+	put first item of lst into actualCurrentEnergy
+	log actualCurrentEnergy
+	set the SearchRectangle to empty
+	
+	set the SearchRectangle to ScreenPart("RecommendedRunArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Required Energy") into actualReqEnergyUI
+	put split(	actualReqEnergyUI, space) into actualReqEnergyUI
+	put first item of actualReqEnergyUI into actualReqEnergyUI
+	set the SearchRectangle to ScreenPart("RecommendedRunArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Estimated Charge Time",15) into actualEstimatedChargeTimeUI
+	log actualEstimatedChargeTimeUI
+	set the SearchRectangle to empty
+	
+	put CalculateEstimatedChargeTime (actualReqEnergyUI, actualCurrentEnergy) into calculatedEstimatedChargeTime
+	
+	if calculatedEstimatedChargeTime=actualEstimatedChargeTimeUI
+		LogSuccess "Estimated Charge time calculated "&&calculatedEstimatedChargeTime&&" is similar to UI-->"&&actualEstimatedChargeTimeUI
+	else
+		LogError "Estimated Charge time calculated "&&calculatedEstimatedChargeTime&&" is not similar to UI-->"&&actualEstimatedChargeTimeUI
+	end if
+	
+end VerifyEstimatedChargeTimeIsCorrect
+
+to handle ReadAllNotifications
+	set the SearchRectangle to ScreenPart("NotificationsArea")
+	
+	put ImageRectangle(text:"Notifications", waitFor:20) into ImageRectangleOfFieldName
+	
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100,20],ImageRectangleOfFieldName.BottomRight+[166,600]) as list into energyUpdated 
+
+	log energyUpdated 
+	set the SearchRectangle to empty
+	
+end ReadAllNotifications
+
+
+to handle ClickButton btnName, screenPart 
+
+	set the SearchRectangle to ScreenPart(screenPart)
+	"Utilities/CommonActions".ClickBtnByText btnName
+	
+	set the SearchRectangle to empty
+	
+end ClickButton
+
+to handle ClickButtonByImg imgBtn, screenPart 
+
+	set the SearchRectangle to ScreenPart(screenPart)
+	"Utilities/CommonActions".ClickBtnByText imgBtn
+	
+	set the SearchRectangle to empty
+	
+end ClickButtonByImg
+
+to handle verifyRunAndTrackDetailsByHoveringOverToolTip imgBus, outputRecommendeRunFileName
+	set the SearchRectangle to ScreenPart("TracksArea")
+	Log "******Verify Run and Track details by hovering on tool tip"
+	
+	
+	"Utilities/CommonActions".MoveToElement(imgBus)
+	
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Paired Bus ID:",  "100","-5","200","10") into busid
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Current Energy:",  "100","0","200","0") into curenergy
+	put split(curenergy," ") into lst
+	put first item of lst into curenergy
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Required Energy:",  "100","0","200","0") into reqenergy
+	put split(reqenergy," ") into lst
+	put first item of lst into reqenergy
+	--put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates( "Estimated Charge Time:",  "100","0","200","0") into estimatedcharge
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("SOC:",  "100","0","300","0") into soc
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates("Run Number:",  "100","0","200","10") into runno
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Book Out Date",  "100","-5","200","20") into bookoutdate
+	
+	--log busid, curenergy, reqenergy, estimatedcharge, soc, runno, bookoutdelay
+	
+	
+	put "Utilities\exceloperations".ReadFromFile  ("busdetails", "BusID") into obusid
+	put "Utilities\exceloperations".ReadFromFile  ("busdetails", "CurrentEnergy") into ocurrenergy
+	put "Utilities\exceloperations".ReadFromFile  ("busdetails", "SOC") into osoc
+	put "Utilities\exceloperations".ReadFromFile  (outputRecommendeRunFileName, "RequiredEnergy") into oreqenergy
+	put "Utilities\exceloperations".ReadFromFile  (outputRecommendeRunFileName, "RunID") into orunid
+	put "Utilities\exceloperations".ReadFromFile  (outputRecommendeRunFileName, "BookOutDate") into obookoutdate
+	
+	if busid = obusid
+		LogSuccess "Bus Id - "&&obusid&&" under bus details section is appearing correctly in Bus Details tool tip- " &&busid
+	else
+		LogError "Bus Id - "&&obusid&&" under bus details section is not appearing correctly in Bus Details tool tip- " &&busid
+	end if
+	
+	if curenergy = ocurrenergy
+		LogSuccess "CurrentEnergy - "&&ocurrenergy&&" under bus details section is appearing correctly in Bus Details tool tip- " &&curenergy
+	else
+		LogError "Current Energy - "&&ocurrenergy&&" under bus details section is not appearing correctly in Bus Details tool tip- " &&curenergy
+	end if
+	
+	if soc = osoc
+		LogSuccess "SOC - "&&osoc&&" under bus details section is appearing correctly in Bus Details tool tip- " &&soc
+	else
+		LogError "SOC - "&&osoc&&" under bus details section is not appearing correctly in Bus Details tool tip- " &&soc
+	end if
+	
+	if reqenergy = oreqenergy
+		LogSuccess "Required Energy - "&&oreqenergy&&" under bus details section is appearing correctly in Recommended Run Details tool tip- " &&reqenergy
+	else
+		LogError "Required Energy - "&&oreqenergy&&" under bus details section is not appearing correctly in Recommended Run Details tool tip- " &&reqenergy
+	end if
+	
+	if runno = orunid
+		LogSuccess "Run ID - "&&orunid&&" under bus details section is appearing correctly in Recommended Run Details tool tip- " &&runid
+	else
+		LogError "Run ID - "&&orunid&&" under bus details section is not appearing correctly in Recommended Run Details tool tip- " &&runid
+	end if
+	
+	if bookoutdate = obookoutdate
+		LogSuccess "Book Out Date, time - "&&obookoutdate&&" under bus details section is appearing correctly in Recommended Run Details tool tip- " &&bookoutdate
+	else
+		LogError "Book Out Date, time - "&&obookoutdate&&" under bus details section is not appearing correctly in Recommended Run Details tool tip- " &&bookoutdate
+	end if
+	
+	
+	set the SearchRectangle to empty
+	
+end verifyRunAndTrackDetailsByHoveringOverToolTip
+
+(***
+@author : Mohammed Gouse
+@date : 21/March/22
+@description : To Verify the Incoming queue with Bus ID
+***)
+to VerifyBusInIncomingQueue busID --Mohd has to complete it
+	Log "****Verify the Incoming queue with Bus ID"
+	set the SearchRectangle to ScreenPart("IncomingQueueArea")
+	"Utilities/CommonActions".IsTextPresentOnScreen busID
+	if ImageFound(Text:busID, waitFor:10) then
+		LogSuccess busID && "Bus is Available in Incoming Queue"
+		set the SearchRectangle to empty
+	else
+		LogError busID && "Bus is Not Available in Incoming Queue"
+		
+	end If
+	set the SearchRectangle to empty
+end VerifyBusInIncomingQueue
+
+to handle VerifyIQBusTimeFormat varTime
+	put varTime into logTime
+	put formattedTime("%H", logTime) into hr
+	put formattedTime("%M", logTime) into min
+	log hr&":"&min
+	return hr&":"&min
+end VerifyIQBusTimeFormat
+
+
+to VerifyBusesAreInQueue
+	put false into flag
+	set the SearchRectangle to ScreenPart("IncomingQueueArea")
+	if "Utilities/CommonActions".IsTextPresentOnScreen("No buses are in queue")
+		Log "No buses found in the incoming queue"
+	else
+		put true into flag
+		LogSuccess "Buses found in the Incoming Queue"
+	end if
+	set the SearchRectangle to empty
+	return flag
+end VerifyBusesAreInQueue
+
+to handle IsBusDisplayedAndVerifyIncomingQueue
+	put 0 into BusCount
+	put 0 into FinalBusCount
+	
+	if not VerifyBusesAreInQueue()
+		LogError "No buses are found in the queue, aborting execution"
+		exit handler
+	End if
+	
+	if ImageFound(text:"Search BEB", WaitFor:20) then
+		put ImageRectangle(text:"Search BEB", waitFor:20) into FoundBusLocation
+		put ReadText(FoundBusLocation.TopRight+[1800,0],FoundBusLocation.BottomRight+[0,-50]) as list into BookInTimeOfIncomingQueueBusTime
+		log BookInTimeOfIncomingQueueBusTime
+		Log "******Verify HH:mm time format for the bus in IQ"
+		repeat with each item of BookInTimeOfIncomingQueueBusTime
+			put it into BusTimeVariable
+			delete "[" in BusTimeVariable
+			delete "]" in BusTimeVariable
+			delete quote in BusTimeVariable
+			put VerifyIQBusTimeFormat(BusTimeVariable) into actualBusTime
+			
+			if actualBusTime = BusTimeVariable
+				LogSuccess "Incoming Queue bus time is appearing in HH:mm format--> "&&BusTimeVariable
+			else
+				LogError "Incoming Queue bus time is not appearing in HH:mm format--> "&&BusTimeVariable
+			end if
+			
+			add 1 to BusCount
+		end repeat
+		--set the SearchRectangle to empty
+		
+		put ImageRectangle(text:"Search BEB", waitFor:20) into FoundBusLocation
+		put ReadText(FoundBusLocation.TopRight+[1800,0],FoundBusLocation.BottomRight+[0,40]) as list into BookInTimeOfIncomingQueueBusNo
+		log BookInTimeOfIncomingQueueBusNo
+		Log "******Verify the buses in IQ"
+		repeat with each item of BookInTimeOfIncomingQueueBusNo
+			put it into BusNumberVariable
+			delete "[" in BusNumberVariable
+			delete "]" in BusNumberVariable
+			delete quote in BusNumberVariable
+			delete tab in BusNumberVariable
+			delete "(" in BusNumberVariable
+			add 1 to BusCount
+			add 1 to FinalBusCount
+			Log "Bus in Incoming Queue is" && BusNumberVariable
+			
+			if BusNumberVariable is empty then
+				set BusCount to 0
+				Log "No buses found in the Incoming Queue"
+				Exit repeat
+			end if
+		end repeat
+		Log "Total Number of Bus(es) available in Incoming Queue is" && FinalBusCount
+		LogSuccess "Bus Found In Incoming Queue and Verified their details Successfully"
+	else
+		LogError "Bus was not Found In Incoming Queue and not Verified their details"
+	end if
+	set the SearchRectangle to empty
+end IsBusDisplayedAndVerifyIncomingQueue
+
+to handle CalculateThresholdEnergyGreaterThnBatteryCapacity  thresholdRatio, listRequiredEnergy
+	--Threshold Energy = Required Energy + (Energy Threshold Ratio x Available Battery Capacity)
+	
+	repeat with each item of listRequiredEnergy
+		put it into var
+		delete "[" in var
+		delete "]" in var
+		delete quote in var
+		delete "@" in var
+		log var
+		
+		put var + (thresholdRatio *  528) into thresholdEnergy
+		
+		if (thresholdEnergy > 528)
+			put true into flag
+		else 
+			if var=""
+				Exit repeat
+			end if
+			put false into flag
+			Exit repeat
+		end if
+	end repeat
+	return flag
+end CalculateThresholdEnergyGreaterThnBatteryCapacity
+
+to handle VerifyAllRunsWhereThresholdEnergyIsGreaterThanBatteryCapacity threshouldRatio
+	--	put 0.1 into threshouldRatio
+	--Select a run
+	set the SearchRectangle to ScreenPart("SelectRunArea")
+	
+	put ImageRectangle(text:"Required Energy", waitFor:20) into ImageRectangleOfFieldName
+	
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100,20],ImageRectangleOfFieldName.BottomRight+[0,500]) as list into energyUpdated 
+
+	log energyUpdated 
+	delete "kWh" in energyUpdated
+	log energyUpdated
+	delete newline in energyUpdated
+	log energyUpdated
+	
+	
+	put split(energyUpdated, space) into energyUpdated
+	
+	--Calculate the Threshold Energy
+	put CalculateThresholdEnergyGreaterThnBatteryCapacity (threshouldRatio, energyUpdated) into flag
+	log flag
+	
+	if flag=true
+		LogSuccess " All the runs are appearing correctly as per the condition where Threshold Energy>Battery Capacity"
+	else
+		LogError " All the runs are not appearing correctly as per the condition where Threshold Energy>Battery Capacity"
+		
+	end if
+	
+	set the SearchRectangle to empty
+end VerifyAllRunsWhereThresholdEnergyIsGreaterThanBatteryCapacity
+
+to handle VerifyCurrentEnergyFromTrackSetupAPI
+	put "CCSS_Pages/BasePage".SetGlobalEnvironmentVariables into BaseURI
+	put "Utilities/GetAuthorizationToken".getAutherizationTokenForAPI into authToken
+	--put "Utilities\exceloperations".ReadFromFile  ("authtoken", "token") into authToken
+	put QA_TrackSetup() into tracksetupAPI
+	put tracksetupAPI.responsebody into respbody1
+	--log respbody1
+	
+	put jsonvalue (respbody1) into responsebody2 
+	log responsebody2.currentEnergy
+	put round(responsebody2.currentEnergy) into currentEnergyFromAPI
+	log currentEnergyFromAPI
+	
+	--Fetching the Current energy from application UI
+	put "Utilities/CommonActions".GetTextBelowByText ("Current Energy") into actualcurrentEnergy
+	put split (actualcurrentEnergy , " ")  into listo
+	put first item of listo into actualcurrentEnergy
+	
+	--Fetching the Current energy from the files
+	if currentEnergyFromAPI=actualcurrentEnergy
+		LogSuccess "Current Energy is appearing from the TrackSetup API"
+	else
+		LogError "Current Energy is not appearing from the TrackSetup API"
+	end if
+	
+end VerifyCurrentEnergyFromTrackSetupAPI
+
+
+to handle VerifyButtonsAreDisabled
+	set the SearchRectangle to ScreenPart("RecommendedTrackArea")
+	--Verify "Override" button is disabled
+	"Utilities/CommonActions".ClickBtnByText ("Override")
+	set the SearchRectangle to empty
+	
+	set the SearchRectangle to ScreenPart("OrverrideTitlebarArea")
+	if "Utilities/CommonActions".IsTextPresentOnScreen("Run")
+		LogSuccess "Override button under Recommended Track area is disabled"
+	else
+		LogError "Override button under Recommended Track area is not disabled"
+	end if
+	set the SearchRectangle to empty
+	
+	--Verify "Recommended Run & Track" button is disabled
+	set the SearchRectangle to ScreenPart("RecommendedTrackArea")
+	if "Utilities/CommonActions".ClickBtnByText ("Assign Run & Track")
+		set the SearchRectangle to empty
+		set the SearchRectangle to ScreenPart("OrverrideTitlebarArea")
+		if "Utilities/CommonActions".IsTextPresentOnScreen("Run")
+			LogSuccess "Assign Run & Track button under Recommended Track area is disabled"
+		else
+			LogError "Assign Run & Track button under Recommended Track area is not disabled"
+			
+		end if
+	else
+		LogError "Unable to find 'Assign Run & Track' Image"
+	end if
+	set the SearchRectangle to empty
+	
+end VerifyButtonsAreDisabled
+
+to handle VerifyButtonsAreNotAppearing
+	set the SearchRectangle to ScreenPart("RecommendedRunArea")
+	--Verify "Override" button is disabled
+	if not "Utilities/CommonActions".IsTextPresentOnScreen("Override")
+		LogSuccess "'Override' button under Recommended Run area is not appearing after Search BEB"
+	else
+		LogError "'Override' button under Recommended Run area is appearing after Search BEB"
+	end if
+	set the SearchRectangle to empty
+	
+	set the SearchRectangle to ScreenPart("RecommendedTrackArea")
+	--Verify "Override" button is disabled
+	if not "Utilities/CommonActions".IsTextPresentOnScreen("Override")
+		LogSuccess "'Override' button under Recommended Track area is not appearing after Search BEB"
+	else
+		LogError "'Override' button under Recommended Track area is appearing after Search BEB"
+	end if
+	set the SearchRectangle to empty
+	
+	set the SearchRectangle to ScreenPart("RecommendedTrackArea")
+	--Verify "Override" button is disabled
+	if not "Utilities/CommonActions".IsTextPresentOnScreen("Assign Run & Track")
+		LogSuccess "'Assign Run & Track' button under Recommended Track area is not appearing after Search BEB"
+	else
+		LogError "'Assign Run & Track' button under Recommended Track area is appearing after Search BEB"
+	end if
+	
+	set the SearchRectangle to empty
+	
+end VerifyButtonsAreNotAppearing
+
+to handle VerifyElementIsNotPresent txtOfControl, screenPart, msg
+	set the SearchRectangle to ScreenPart(screenPart)
+	
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen(txtOfControl) is false
+		LogSuccess txtOfControl && "is appearing "&&msg&&" on the screen"
+	else
+		LogError txtOfControl && "is not appearing "&&msg&&" on the screen"
+	end if
+	set the SearchRectangle to empty	
+end VerifyElementIsNotPresent
+
+to handle VerifyButtonsAreAppearing
+	set the SearchRectangle to ScreenPart("RecommendedRunArea")
+	--Verify "Override" button is disabled
+	if "Utilities/CommonActions".IsTextPresentOnScreen("Override")
+		LogSuccess "'Override' button under Recommended Run area is appearing after Search BEB"
+	else
+		LogError "'Override' button under Recommended Run area is not appearing after Search BEB"
+	end if
+	set the SearchRectangle to empty
+	
+	set the SearchRectangle to ScreenPart("RecommendedTrackArea")
+	--Verify "Override" button is disabled
+	if  "Utilities/CommonActions".IsTextPresentOnScreen("Override")
+		LogSuccess "'Override' button under Recommended Track area is appearing after Search BEB"
+	else
+		LogError "'Override' button under Recommended Track area is not appearing after Search BEB"
+	end if
+	set the SearchRectangle to empty
+	
+	set the SearchRectangle to ScreenPart("RecommendedTrackArea")
+	--Verify "Override" button is disabled
+	if not "Utilities/CommonActions".IsTextPresentOnScreen("Assign Run & Track")
+		LogSuccess "'Assign Run & Track' button under Recommended Track area is appearing after Search BEB"
+	else
+		LogError "'Assign Run & Track' button under Recommended Track area is not appearing after Search BEB"
+	end if
+	
+	set the SearchRectangle to empty
+	
+end VerifyButtonsAreAppearing
+
+
+to handle EnsureAllChargersAreOccupied
+	Log "****Verifying all the charger locations are occupied by the buses"
+	put "Utilities/CommonActions".getCountOfImages("RunAndTrackAssignmentPage\imgActiveCharger") into activeChargerCount
+	put "Utilities/CommonActions".getCountOfImages("RunAndTrackAssignmentPage\imgChargerNotAvailable") into chargerNotAvailable
+	
+	if activeChargerCount = chargerNotAvailable
+		LogSuccess "All the Chargers are occupied by the buses in the track"
+	else
+		LogError "All the Chargers are not occupied by the buses in the track"
+	end if
+	
+end EnsureAllChargersAreOccupied
+
+to handle EnsureAtleastOneChargerIsAvailable
+	Log "****Verifying all the charger locations are occupied by the buses"
+	put "Utilities/CommonActions".getCountOfImages("RunAndTrackAssignmentPage\imgActiveCharger") into activeChargerCount
+	put "Utilities/CommonActions".getCountOfImages("RunAndTrackAssignmentPage\imgChargerNotAvailable") into chargerNotAvailable
+	
+	if activeChargerCount> chargerNotAvailable
+		LogSuccess "All the Chargers are not occupied by the buses in the track"
+	else
+		LogError "All the Chargers are occupied by the buses in the track"
+	end if
+	
+end EnsureAtleastOneChargerIsAvailable
+
+to handle VerifyAllChargerStatusAre txtChargerState
+	Log "****Verifying all the charger states are "&&txtChargerState
+	set the SearchRectangle to ScreenPart("TracksArea")
+	put "Utilities/CommonActions".getCountOfImages("RunAndTrackAssignmentPage\imgActiveCharger") into activeChargerCount
+	put "Utilities/CommonActions".getCountOfImages("RunAndTrackAssignmentPage\imgInactiveCharger") into inactiveChargerCount
+	put "Utilities/CommonActions".getCountOfImages("RunAndTrackAssignmentPage\imgMaintenanceCharger") into maintenanceChargerCount
+	put "Utilities/CommonActions".getCountOfImages("RunAndTrackAssignmentPage\imgChargingCharger") into chargingChargerCount
+	
+	
+	put sum (activeChargerCount, inactiveChargerCount, maintenanceChargerCount, chargingChargerCount) into totalChargers
+	if txtChargerState = "inactive"
+		if totalChargers =  inactiveChargerCount
+			LogSuccess "All the Changers are marked as Inactive"
+		else
+			LogError "All the Changers are not marked as Inactive"
+		end if
+	end if
+	set the SearchRectangle to empty
+end VerifyAllChargerStatusAre
+
+to handle VerifyBusStatusIsNotReady
+	Log"****Verifying the bus status is not ready"
+	set the SearchRectangle to ScreenPart("BusDetailsArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Current Energy") into actualcurrentEnergy
+	put split (actualcurrentEnergy , " ")  into listo
+	put first item of listo into actualcurrentEnergy
+	set the SearchRectangle to empty
+	
+	set the SearchRectangle to ScreenPart("RecommendedRunArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Required Energy") into actualReqEnergy
+	put split(actualReqEnergy, " ")into lst
+	put first item of lst into actualReqEnergy
+	log actualReqEnergy
+	set the SearchRectangle to empty
+	
+	if actualcurrentEnergy <  actualReqEnergy
+		LogSuccess "Bus is in Not Ready Status"
+	else
+		LogError "Bus is not in Not Ready Status"
+	end if
+	
+end VerifyBusStatusIsNotReady
+
+to handle VerifyCurrentEnergyIsmoreThanReqEnergy
+	Log"****Verifying the bus status is not ready"
+	set the SearchRectangle to ScreenPart("BusDetailsArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Current Energy") into actualcurrentEnergy
+	put split (actualcurrentEnergy , " ")  into listo
+	put first item of listo into actualcurrentEnergy
+	set the SearchRectangle to empty
+	
+	set the SearchRectangle to ScreenPart("RecommendedRunArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Required Energy") into actualReqEnergy
+	put split(actualReqEnergy, " ")into lst
+	put first item of lst into actualReqEnergy
+	log actualReqEnergy
+	set the SearchRectangle to empty
+	
+	if actualcurrentEnergy >  actualReqEnergy
+		LogSuccess "Current energy is more than Required Energy"
+	else
+		LogError "Current energy is not more than Required Energy"
+	end if
+	
+end VerifyCurrentEnergyIsmoreThanReqEnergy
+
+to handle VerifyEstimatedChargeTime value
+	Log "****Verifying the estimated Charge Time value"
+	set the SearchRectangle to ScreenPart("RecommendedRunArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Estimated Charge") into estimatedChargeTime
+	log estimatedChargeTime
+	
+	if estimatedChargeTime=value
+		LogSuccess "Estimated Charge Time value is appearing correctly as -->"&&value
+	else
+		LogError "Estimated Charge Time value is not appearing correctly as -->"&&value
+	end if
+	
+	set the SearchRectangle to empty
+end VerifyEstimatedChargeTime
+
+
+to handle VerifyChargerDetailsByHoverOnChargerIconWhereBusIsNotParked imgCharger
+	set the SearchRectangle to ScreenPart("TracksArea")
+	Log "******Verify Charger details by hovering on active charger icon where bus is not parked"
+	
+	"Utilities/CommonActions".MoveToElement(imgCharger)
+	--"Utilities/CommonActions".GetTextBelow("Charger Station Type:")
+	
+	set the SearchRectangle to ScreenPart("TracksArea")
+	
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Charger Station Type",  "100","-5","200","10") into stationtype
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Charger Rate:",  "100","0","200","0") into chargerrate
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Minimum Charger Rate:",  "100","0","200","0") into minchargerrate
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Charger Status:",  "100","0","300","0") into chargerstatus
+	
+	--Write tool tips to output files
+	"Utilities\exceloperations".CreateOutputFile "chargerdetails"
+	"Utilities\exceloperations".WriteIntoFile "chargerdetails", "chargerstationtype", stationtype
+	"Utilities\exceloperations".WriteIntoFile "chargerdetails", "ChargerRate", chargerrate
+	"Utilities\exceloperations".WriteIntoFile "chargerdetails", "MinimumChargerRate", minchargerrate
+	"Utilities\exceloperations".WriteIntoFile "chargerdetails", "ChargerStatus", chargerstatus
+	
+	set the SearchRectangle to empty	
+end VerifyChargerDetailsByHoverOnChargerIconWhereBusIsNotParked
+
+to handle VerifyBusDetailsByHoverOnBusIconWhichIsNotParkedAtChargerLocation imgBus
+	set the SearchRectangle to ScreenPart("TracksArea")
+	Log "******Verify Bus details by hovering on bus icon which is not parked at charger location"
+	
+	"Utilities/CommonActions".MoveToElement(imgBus)
+	
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Paired Bus ID:",  "100","-5","200","10") into busid
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Current Energy:",  "100","0","200","0") into curenergy
+	put split(curenergy," ") into lst
+	put first item of lst into curenergy
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Required Energy:",  "100","0","200","0") into reqenergy
+	put split(reqenergy," ") into lst
+	put first item of lst into reqenergy
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates( "Estimated Charge Time:",  "100","0","200","0") into estimatedcharge
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates( "Available Battery Capacity:",  "100","0","200","0") into availablebatterycapacity
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("SOC:",  "100","0","300","0") into soc
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates("Run Number:",  "100","0","200","10") into runno
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Book Out Date",  "100","-5","200","20") into bookoutdate
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Charging Priority",  "100","-5","200","20") into chargingpriority
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Bus Status",  "100","-5","200","20") into busstatus
+	--Write tool tips to output files
+	"Utilities\exceloperations".CreateOutputFile "busdetailsnotatchargerposition"
+	"Utilities\exceloperations".WriteIntoFile "busdetailsnotatchargerposition", "PairedBusID", busid
+	"Utilities\exceloperations".WriteIntoFile "busdetailsnotatchargerposition", "CurrentEnergy", curenergy
+	"Utilities\exceloperations".WriteIntoFile "busdetailsnotatchargerposition", "RequiredEnergy", reqenergy
+	"Utilities\exceloperations".WriteIntoFile "busdetailsnotatchargerposition", "EstimatedChargeTime", estimatedcharge
+	"Utilities\exceloperations".WriteIntoFile "busdetailsnotatchargerposition", "AvailableBatteryCapacity", availablebatterycapacity
+	"Utilities\exceloperations".WriteIntoFile "busdetailsnotatchargerposition", "SOC", soc
+	"Utilities\exceloperations".WriteIntoFile "busdetailsnotatchargerposition", "RunNumber", runno
+	"Utilities\exceloperations".WriteIntoFile "busdetailsnotatchargerposition", "BookOutDate", bookoutdate
+	"Utilities\exceloperations".WriteIntoFile "busdetailsnotatchargerposition", "ChargingPriority", chargingpriority
+	"Utilities\exceloperations".WriteIntoFile "busdetailsnotatchargerposition", "BusStatus", busstatus
+	
+	set the SearchRectangle to empty	
+end VerifyBusDetailsByHoverOnBusIconWhichIsNotParkedAtChargerLocation
+
+to handle VerifyBusAndChargerRateInKw imgBus
+	set the SearchRectangle to ScreenPart("ToolsTipArea")
+	Log "******Verify Charger details by hovering on bus icon which is parked at charger location"
+	
+	"Utilities/CommonActions".MoveToElement(imgBus)
+	
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinatesForDisabledElements ("Charger Rate:",  "100","0","200","0", "#2b312c") into chargerrate
+	--put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinatesForDisabledElements ("Maximum Charger Rate:",  "100","0","200","0", "#2b312c") into minchargerrate
+	
+	if "Utilities/CommonActions".containsValue( "kw", chargerrate)
+		LogSuccess "Charger Rate is appearing in kW"
+	else 
+		LogError "Charger Rate is not appearing in kW, actual value-->"&&chargerrate
+	end if
+	
+	set the SearchRectangle to empty	
+end VerifyBusAndChargerRateInKw
+
+to handle VerifyBusAndChargerDetailsByHoverOnBusOrChargerIconWhichIsParkedAtChargerLocation imgBus, outputfilename
+	if outputfilename=""
+		put "tooltipbusdetails" into outputfilename
+	end if
+	set the SearchRectangle to ScreenPart("TracksArea")
+	Log "******Verify Charger details by hovering on bus icon which is parked at charger location"
+	
+	"Utilities/CommonActions".MoveToElement(imgBus)
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Charger Station Type:",  "100","-5","200","10") into stationtype
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Charger Rate:",  "100","0","200","0") into chargerrate
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Minimum Charger Rate:",  "100","0","200","0") into minchargerrate
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Charger Status:",  "100","0","300","0") into chargerstatus
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Paired Bus ID:",  "100","-5","200","10") into busid
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Current Energy:",  "100","0","200","0") into curenergy
+	put split(curenergy," ") into lst
+	put first item of lst into curenergy
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Required Energy:",  "100","0","200","0") into reqenergy
+	put split(reqenergy," ") into lst
+	put first item of lst into reqenergy
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates( "Estimated Charge Time:",  "100","0","200","0") into estimatedcharge
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates( "Available Battery Capacity:",  "100","0","200","0") into availablebatterycapacity
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("SOC:",  "100","0","300","0") into soc
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates("Run Number:",  "100","0","200","10") into runno
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Book Out Date",  "100","-5","200","20") into bookoutdate
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Charging Priority",  "100","-5","200","20") into chargingpriority
+	put "Utilities/CommonActions".GetFieldValueFrontUsingCoordinates ("Bus Status",  "100","-5","200","20") into busstatus
+	
+	--Verify Verify the Estimated Charge Time in the tooltip
+	put CalculateEstimatedChargeTime (reqenergy, curenergy) into estimatedChargeTimeCalculated
+	if estimatedcharge=estimatedChargeTimeCalculated
+		LogSuccess "Estimated chagrge time in UI "&& estimatedcharge&&" and caluculated values are appearing correctly"&&estimatedChargeTimeCalculated
+	else
+		LogError  "Estimated chagrge time in UI "&& estimatedcharge&&" and caluculated values are not appearing correctly"&&estimatedChargeTimeCalculated
+	end if
+	
+	--Write tool tips to output files
+	"Utilities\exceloperations".CreateOutputFile outputfilename
+	"Utilities\exceloperations".WriteIntoFile outputfilename, "chargerstationtype", stationtype
+	"Utilities\exceloperations".WriteIntoFile outputfilename, "ChargerRate", chargerrate
+	"Utilities\exceloperations".WriteIntoFile outputfilename, "MinimumChargerRate", minchargerrate
+	"Utilities\exceloperations".WriteIntoFile outputfilename, "ChargerStatus", chargerstatus
+	
+	"Utilities\exceloperations".WriteIntoFile outputfilename, "PairedBusID", busid
+	"Utilities\exceloperations".WriteIntoFile outputfilename, "CurrentEnergy", curenergy
+	"Utilities\exceloperations".WriteIntoFile outputfilename, "RequiredEnergy", reqenergy
+	"Utilities\exceloperations".WriteIntoFile outputfilename, "EstimatedChargeTime", estimatedcharge
+	"Utilities\exceloperations".WriteIntoFile outputfilename, "AvailableBatteryCapacity", availablebatterycapacity
+	"Utilities\exceloperations".WriteIntoFile outputfilename, "SOC", soc
+	"Utilities\exceloperations".WriteIntoFile outputfilename, "RunNumber", runno
+	"Utilities\exceloperations".WriteIntoFile outputfilename, "BookOutDate", bookoutdate
+	"Utilities\exceloperations".WriteIntoFile outputfilename, "ChargingPriority", chargingpriority
+	"Utilities\exceloperations".WriteIntoFile outputfilename, "BusStatus", busstatus
+	
+	set the SearchRectangle to empty	
+end VerifyBusAndChargerDetailsByHoverOnBusOrChargerIconWhichIsParkedAtChargerLocation
+
+to handle VerifyBusDetailsAreNotNull outputFileName
+
+	set the SearchRectangle to ScreenPart("BusDetailsArea")
+	
+	put "Utilities/CommonActions".GetTextBelowByText ("Bus ID") into actualBusId
+	put "Utilities/CommonActions".GetTextBelowByText ("HDDTC",20) into actualHDDTC
+	log actualHDDTC
+	put "Utilities/CommonActions".GetTextBelowByText ("Consumption") into actualenergyConsumption
+	put split (actualenergyConsumption , " ")  into listo
+	put first item of listo into actualenergyConsumption
+	put "Utilities/CommonActions".GetTextBelowByText ("Odometer", 15) into actualodometer
+	put split (actualodometer , " ")  into listo
+	put first item of listo into actualodometer
+	put "Utilities/CommonActions".GetTextBelowByText ("Range") into actualRange
+	put split (actualRange , " ")  into listo
+	put first item of listo into actualRange
+	put "Utilities/CommonActions".GetTextBelowByText ("SOC") into actualSOC
+	put split (actualSOC , " ")  into listo
+	put first item of listo into actualSOC
+	put "Utilities/CommonActions".GetTextBelowByText ("Current Energy") into actualcurrentEnergy
+	put split (actualcurrentEnergy , " ")  into listo
+	put first item of listo into actualcurrentEnergy
+	
+	
+	"Utilities\exceloperations".CreateOutputFile outputFileName
+	"Utilities\exceloperations".WriteIntoFile  outputFileName, "BusID", actualBusId
+	"Utilities\exceloperations".WriteIntoFile outputFileName, "Consumption", actualenergyConsumption
+	"Utilities\exceloperations".WriteIntoFile outputFileName, "Odometer", actualodometer
+	"Utilities\exceloperations".WriteIntoFile outputFileName, "Range", actualRange
+	"Utilities\exceloperations".WriteIntoFile outputFileName, "SOC", actualSOC
+	"Utilities\exceloperations".WriteIntoFile outputFileName, "CurrentEnergy", actualcurrentEnergy
+	"Utilities\exceloperations".WriteIntoFile outputFileName, "hddtc", actualHDDTC
+	set the SearchRectangle to empty
+end VerifyBusDetailsAreNotNull
+
+to handle CompareCurrentEnergyAndRequiredEnergy currentEnergy, listRequiredEnergy
+	--Current Energy = Required Energy	
+	put "" into runtoselect
+	repeat with each item of listRequiredEnergy
+		put it into var
+		delete "[" in var
+		delete "]" in var
+		delete quote in var
+		delete "@" in var
+		log var
+		
+		if ( currentEnergy < var)
+			put var into runtoselect
+			Exit repeat
+			
+		end if
+	end repeat
+	return runtoselect
+end CompareCurrentEnergyAndRequiredEnergy
+
+to handle SelectARunWhereCurrentEnrgyLessThnReqEnnrgy 
+
+	--Get Current Energy
+	set the SearchRectangle to ScreenPart("BusDetailsArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Current Energy") into actualcurrentEnergy
+	put split(actualcurrentEnergy," ") into actualcurrentEnergy
+	put first item of actualcurrentEnergy into actualcurrentEnergy
+	
+	set the SearchRectangle to empty
+	wait 2
+	"Utilities/CommonActions".pageDown
+	put 1 into i
+	repeat until i>30
+		if EvaluateCurrentEnergyAndThresholdEnergyAndSelectARun (actualcurrentEnergy)=false
+			--"Utilities/CommonActions".pageDown
+			put false into flag
+			set the SearchRectangle to ScreenPart("TrackPaginationArea")
+			"Utilities/CommonActions".ClickBtnByTextWithProperties "Next", "#4a2825", 0,0
+			
+			set the SearchRectangle to empty
+		else
+			put true into flag
+			exit handler
+		End If
+		add 1 to i
+	end repeat
+	if flag=false
+		LogSuccess "Run is not found for the condition 'Current Energy < Required Energy', runNumber"
+	end if
+end SelectARunWhereCurrentEnrgyLessThnReqEnnrgy
+
+to handle EvaluateCurrentEnergyAndThresholdEnergyAndSelectARun actualcurrentEnergy
+	--Select a run
+	set the SearchRectangle to ScreenPart("SelectRunArea")
+	
+	put ImageRectangle(text:"Required Energy", waitFor:20) into ImageRectangleOfFieldName
+	
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100,20],ImageRectangleOfFieldName.BottomRight+[0,500]) as list into energyUpdated 
+
+	log energyUpdated 
+	delete "kWh" in energyUpdated
+	log energyUpdated
+	delete newline in energyUpdated
+	log energyUpdated
+	
+	put split(energyUpdated, space) into energyUpdated
+	
+	--Calculate the Threshold Energy
+	put CompareCurrentEnergyAndRequiredEnergy (actualcurrentEnergy, energyUpdated) into runNumber
+	log runNumber
+	if runNumber=""
+		put false into flag
+		Log "Searching for run having the condition 'Current Energy< Required Energy'"
+		--exit handler
+	else	
+		put ImageRectangle(text:runNumber, waitFor:20) into ImageRectangleOfEnergy
+		--put ImageRectangle(text:"79", waitFor:20) into ImageRectangleOfEnergy
+		put ImageRectangle(text:"Selection", waitFor:20) into ImageRectangleOfSelect
+		put ImageRectangle(text:"Book Out Date. Time", waitFor:20) into ImageRectangleOfBookOutDate
+		
+		put ImageRectangleOfSelect.topleft.x into x1
+		put ImageRectangleOfSelect.topright.x into x2
+		put ImageRectangleOfEnergy.topleft.y into y1
+		put (x1+x2)/2 rounded to 0 places into x
+		Click [x, y1]
+
+		ClickConfirmButton
+		put true into flag
+		LogSuccess "Run is found for the condition 'Current Energy< Required Energy', runNumber-->"&&runNumber
+	end if
+	
+	set the SearchRectangle to empty
+	return flag	
+end EvaluateCurrentEnergyAndThresholdEnergyAndSelectARun
+
+to handle ClickCheckAlertButton buttonName, msgToVerify,x, y
+
+	Log "****Click Alert button and verify the message"
+	if x=""
+		put 0 into x
+		put 0 into y
+	end if
+	set the SearchRectangle to ScreenPart("AlertsArea")
+	--"Utilities/GenericOperations".WaitForApiSynchronization
+	"Utilities/CommonActions".ClickElementByCoordinates buttonName,0,0
+	set the SearchRectangle to empty
+	--Steps to be developed --
+	set the SearchRectangle to ScreenPart("ToastMessageArea")
+	put 	"Utilities/CommonActions".GetTextByText (msgToVerify, x, y) into actualMsg
+	
+	if("Utilities/CommonActions".compareValues (msgToVerify, actualMsg))
+		LogSuccess "Alert was acknowledged successfully- message is apprearing correctly after click the button named "&&buttonName
+	else
+		LogError "Alert was acknowledged successfully- message is not apprearing correctly after click the button " &&buttonName
+	end if
+	
+	set the SearchRectangle to empty
+end ClickCheckAlertButton
+
+to handle CalculateCurrentEnergy currentEnergy, thresholdRatio, listRequiredEnergy
+	--Threshold Energy = Required Energy + (Energy Threshold Ratio x Available Battery Capacity)
+	
+	repeat with each item of listRequiredEnergy
+		put it into var
+		delete "[" in var
+		delete "]" in var
+		delete quote in var
+		delete "@" in var
+		log var
+		
+		put var + (thresholdRatio *  528) into thresholdEnergy
+		
+		if ( currentEnergy> var and currentEnergy> thresholdEnergy)
+			put var into runtoselect
+			Exit repeat
+			
+		end if
+	end repeat
+	return runtoselect
+end CalculateCurrentEnergy
+
+to handle SelectARunWhereCurrentEnrgyGreaterThnReqEnnrgyAndThrEnrgy threshouldRatio
+
+	--Get Current Energy
+	set the SearchRectangle to ScreenPart("BusDetailsArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Current Energy") into actualcurrentEnergy
+	put split(actualcurrentEnergy," ") into actualcurrentEnergy
+	put first item of actualcurrentEnergy into actualcurrentEnergy
+	
+	set the SearchRectangle to empty
+	wait 2
+	"Utilities/CommonActions".pageDown
+	put 1 into i
+	repeat until i>30
+		if EvaluateCurrentEnergyAndSelectATrack (actualcurrentEnergy,threshouldRatio)=false
+			put false into flag
+			set the SearchRectangle to ScreenPart("TrackPaginationArea")
+			"Utilities/CommonActions".ClickBtnByTextWithProperties "Next", "#4a2825", 0,0
+			set the SearchRectangle to empty
+		else
+			put true into flag
+			exit handler
+		End If
+		add 1 to i
+	end repeat
+	if flag=false
+		LogSuccess "Run is not found for the condition 'Current Energy>Threshold Energy and Current Energy> Required Energy', runNumber"
+	end if
+	
+end SelectARunWhereCurrentEnrgyGreaterThnReqEnnrgyAndThrEnrgy
+
+to handle EvaluateCurrentEnergyAndSelectATrack actualcurrentEnergy,threshouldRatio
+	--Select a run
+	set the SearchRectangle to ScreenPart("SelectRunArea")
+	
+	put ImageRectangle(text:"Required Energy", waitFor:20) into ImageRectangleOfFieldName
+	
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100, 20],ImageRectangleOfFieldName.BottomRight+[0,500]) as list into energyUpdated 
+
+	log energyUpdated 
+	delete "kWh" in energyUpdated
+	log energyUpdated
+	delete newline in energyUpdated
+	log energyUpdated
+	
+	
+	put split(energyUpdated, space) into energyUpdated
+	
+	--Calculate the Threshold Energy
+	put CalculateCurrentEnergy (actualcurrentEnergy,threshouldRatio, energyUpdated) into runNumber
+	log runNumber
+	if runNumber=""
+		put false into flag
+		Log "Searching for run having the condition Threshold Energy>Current Energy> Required Energy"
+		
+	else
+		put ImageRectangle(text:runNumber, waitFor:20) into ImageRectangleOfEnergy
+		put ImageRectangle(text:"Selection", waitFor:20) into ImageRectangleOfSelect
+		
+		put ImageRectangleOfSelect.topleft.x into x1
+		put ImageRectangleOfSelect.topright.x into x2
+		put ImageRectangleOfEnergy.topleft.y into y1
+		put (x1+x2)/2 rounded to 0 places into x
+		Click [x, y1]
+		put true into flag
+		ClickConfirmButton
+		
+	end if
+	return flag
+	set the SearchRectangle to empty
+end EvaluateCurrentEnergyAndSelectATrack
+
+
+
+to handle VerifyChargerStatus imgCharger
+	Log "****Verifying charger status is changed after Inititate charging"
+	--Steps to be developed --
+	set the SearchRectangle to ScreenPart("ToastMessageArea")
+	if ImageFound(imageName:imgCharger, waitFor:5)
+		LogSuccess "Chanrger image is changed after initiate charging"
+	else
+		LogError "Chanrger image is not changed after initiate charging"
+	end if
+	set the SearchRectangle to empty
+end VerifyChargerStatus
+
+
+on WaitUntilBusIsFullyCharged ImageName
+	Log "****Wait until Bus charge is at 100% SOC "
+	Repeat until imagefound(image:imageName,waitfor:2)
+		if the repeatindex is greater than 10 // Read more about the repeatIndex below
+			throw "image not found", imageName&&"not found when scrolling."	
+			LogError "image not found", imageName&&"not found when scrolling."
+		end if		
+		Typetext PageDown	
+		Wait 1		
+	end repeat
+	if the repeatindex is less than 10 
+		LogSuccess "image found", imageName&&"Bus charge is at 100% SOC "
+	end if
+end WaitUntilBusIsFullyCharged
+
+to handle RightClickCharger imgChargerIcon
+	Log "****Performing right click on the charger icon"
+	set the SearchRectangle to ScreenPart("TracksArea")
+	if "Utilities/commonactions".RightClickMouseWoSelectingOption(imgChargerIcon)
+		LogSuccess "Mouse right clicked successfully on charger"&&imgChargerIcon
+	else
+		LogError  "Mouse right clicked was not successful on charger "&&imgChargerIcon
+	end if
+	set the SearchRectangle to empty
+end RightClickCharger
+
+to handle VerifyOptionsAvailable txtOptionLabel
+	Log "****Verifying the options available"
+	put split(txtOptionLabel, ",") into lstOptions
+	repeat with each item of lstOptions
+		log it
+		put it into itm
+		if "Utilities/commonactions".IsTextPresentOnScreen(itm)
+			LogSuccess "Item/option is present on the screen"&&itm
+		else
+			LogError "Item/option is not present on the screen"&&itm
+		end if
+	end repeat 	
+end VerifyOptionsAvailable
+
+to handle ClickOption optionName
+	Log "****Clicking the options available"
+	if "Utilities/commonactions".ClickBtnByText(optionName)
+		LogSuccess "Item/option is clicked"&&optionName
+		if imagefound(text:"Successfully performed the action on the charger ")
+			LogSuccess "Message "&&"'--Successfully performed the action on the charger--'"&&"appearing correctly after click on "&&optionName
+		else
+			LogError "Message "&&"'--Successfully performed the action on the charger--'"&&"is not appearing correctly after click on "&&optionName
+		end if
+	else
+		LogError "Item/option is not clicked"&&optionName
+	end if
+end ClickOption
+
+to handle VerifyElementIsDisabled elementName
+	set the SearchRectangle to ScreenPart("TracksArea")
+	--log Click( text:"Reset", waitFor:10, lowresolutionmode:yes, contrastcolor:"#4a4816", contrast:on)
+	
+	--Verify "Override" button is disabled
+	"Utilities/CommonActions".ClickBtnByTextWithLowerContrast ("Reset")
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen(elementName)
+		LogSuccess elementName&&"  is disabled"
+	else
+		LogError elementName&&"  is not disabled"
+	end if
+	set the SearchRectangle to empty	
+end VerifyElementIsDisabled
+
+
+to handle VerifyImageIsPresent imgOfControl, screenPart, msg
+	set the SearchRectangle to ScreenPart(screenPart)
+	
+	
+	if "Utilities/CommonActions".IsImagePresentOnScreen(imgOfControl)
+		LogSuccess imgOfControl && "is appearing "&&msg&&" on the screen"
+	else
+		LogError imgOfControl && "is not appearing "&&msg&&" on the screen"
+	end if
+	set the SearchRectangle to empty	
+end VerifyImageIsPresent
+
+to handle ClickEmergencyStopAllButton cancelFlow
+	Log "****Clicking Emergency Stop All button"
+	set the SearchRectangle to ScreenPart("TracksArea")
+	"Utilities/CommonActions".pageDown
+	if "Utilities/CommonActions".ClickBtnByText("Emergency Stop All")
+		wait 5
+		if imagefound(text:"Are you sure you want to 'Stop all charging sessions")
+			LogSuccess "Clicked button successfully  - 'Emergency Stop All'"
+			if cancelFlow="Cancel"
+				if "Utilities/CommonActions".ClickBtnByText("Cancel")
+					LogSuccess "No action taken after Clicked 'Cancel' button on confirmation message after click on 'Emergency Stop All'"
+				else
+					LogError "Some action taken after Clicked 'Cancel' button on confirmation message after click on 'Emergency Stop All'"
+				end if
+			end if
+			if cancelFlow="Yes"
+				"Utilities/CommonActions".ClickBtnByText("Yes")
+				set the SearchRectangle to empty
+				set the SearchRectangle to ScreenPart("TitleBarArea")
+				if imagefound(text:"Successfully performed the action on the chargers", waitfor:10)
+					LogSuccess "Success message is appearing correctly after Clicked 'Yes' button on confirmation message after click on 'Emergency Stop All'"
+				else
+					LogError "Success message isnot  appearing correctly after Clicked 'Yes' button on confirmation message after click on 'Emergency Stop All'"
+				end if
+				set the SearchRectangle to empty
+			end if
+		end if
+	else
+		LogError "Unable to Click button  - 'Emergency Stop All'"
+	end if
+	set the SearchRectangle to empty
+end ClickEmergencyStopAllButton
+
+to handle VerifyBusIsNotInTracksFromAPI BusId,  xlsFileName, SheetName, BusIDCol, customerGarageId, RunID, API_Bus_Details_busVins, tenantId
+	Log "****Finding bus on the tracks"
+	--put "Utilities/GetAuthorizationToken".getAutherizationTokenForAPI into authToken
+	put "Utilities\exceloperations".ReadFromFile  ("authtoken", "token") into authToken
+	put "CCSS_Pages/BasePage".SetGlobalEnvironmentVariables into BaseURI
+	put QA_FindBusInTracks() into findBusAPI
+	put findBusAPI.responsebody into respbody1
+	put jsonvalue (respbody1) into responsebody2 	
+	repeat until responsebody2.buses is empty
+		put the last item of responsebody2.buses into var
+		log "Finding buses on tracks "&& var
+		if var.busName=BusId
+			log var.assignedRunNumber
+			log var.assignedRunId
+			if var.assignedRunNumber <> null
+				LogWarning "Bus is found on the track, please remove bus from the track first"
+				
+				RemoveBusFromAPI xlsFileName, SheetName, BusIDCol, customerGarageId, RunID, API_Bus_Details_busVins, tenantId
+			else
+				LogSuccess "Bus is not found on the track "
+			end if
+		end if
+		delete the last item of responsebody2.buses 
+	end repeat
+end VerifyBusIsNotInTracksFromAPI
+
+to handle RemoveBusFromAPI xlsFileName, SheetName, BusID, customerGarageId, RunID, API_Bus_Details_busVins, tenantId
+	Log "****Removing bus from the tracks"
+	--put "Utilities/GetAuthorizationToken".getAutherizationTokenForAPI into authToken
+	put "Utilities\exceloperations".ReadFromFile  ("authtoken", "token") into authToken
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, BusID) into BusId
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, customerGarageId) into customerGarageId
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, garageId) into garageId
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, RunID) into RunID
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, API_Bus_Details_busVins) into API_Bus_Details_busVins
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, tenantId) into tenantId
+	put "CCSS_Pages/BasePage".SetGlobalEnvironmentVariables into BaseURI
+	
+	put QA_RemoveBusFromTrack() into findBusAPI
+	put findBusAPI.responsebody into respbody1
+	put jsonvalue (respbody1) into responsebody2 
+	if responsebody2.message = "Bus "&BusId&" has been successfully set In Maintenance but not assigned to a position in the garage"
+		LogSuccess "Bus "&BusId&" is removed from the track"
+	else
+		LogError "Bus "&BusId&" is not removed from the track"
+	end if
+	
+end RemoveBusFromAPI
+
+to handle SetChargerLimitFromAPI API_SetChargerLimit_id, API_SetChargerLimit_chargerLimit
+	Log "****Setting Limit of Charger Limit using API"
+	--put "Utilities/GetAuthorizationToken".getAutherizationTokenForAPI into authToken
+	put "Utilities\exceloperations".ReadFromFile  ("authtoken", "token") into authToken
+	put "CCSS_Pages/BasePage".SetGlobalEnvironmentVariables into BaseURI
+	put QA_SetChargerLimit() into setChargerLimit
+	put setChargerLimit.responsebody into respbody1
+	put jsonvalue (respbody1) into responsebody2 	
+	if "Utilities/CommonActions".containsValue ("Successfully saved ecms power details for tenantId", responsebody2.message)
+		LogSuccess "Charger Limit set to -->"&&API_SetChargerLimit_chargerLimit&&"for tenant and Garage"&&responsebody2.message
+	else
+		LogError "Charger Limit not set to -->"&&API_SetChargerLimit_chargerLimit
+	end if
+	
+end SetChargerLimitFromAPI
+
+to handle ParkBusInTheTrack imgTrackOrCharger, busId, xlsFileName, SheetName, BusIDCol, customerGarageId, RunID, API_Bus_Details_busVins, tenantId
+	--Select any Bus from the IQ or search for a Bus which is not in the garage
+	--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "BusID") into BusId
+	--"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI busId, "CCSS_P1_TestData", "ChargerActions"
+	"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI xlsFileName, SheetName, BusIDCol, customerGarageId, RunID, API_Bus_Details_busVins, tenantId
+	--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "BusID") into BusId
+	"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB busId
+	
+	--Ensure that the Needs Maintenance Checkbox is not selected and click the Recommended Run & Track button
+	"CCSS_Pages/RunAndAssignmentTrackPage".UnCheckNeedsMaintenanceCheckBx
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+	
+	--Select a Charger Track Position using Track Override if the default track does not match the requirement
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+	"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick imgTrackOrCharger
+	--Click the Assign Run & Track button
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "no"
+	
+end ParkBusInTheTrack
+
+
+
+to handle CheckBusPriorityAndSwapBusesPalces outputFile1, outputFile2, BusImg, sBusImg
+
+
+	
+	
+end CheckBusPriorityAndSwapBusesPalces
+
+to handle VerifyBusStatus imgBus, busStatus
+	Log "****Verifying bus status"
+	--Steps to be developed --
+	set the SearchRectangle to ScreenPart("TracksArea")
+	if ImageFound(imageName:imgBus, waitFor:5)
+		LogSuccess "Bus Status is marked as : "&&busStatus
+	else
+		LogError "Bus Status is not marked as : "&&busStatus
+	end if
+	set the SearchRectangle to empty
+end VerifyBusStatus
+
+to handle VerifyBusDetailsInTooltip imgBus, fieldNameInTooltip, fieldValue
+
+	set the SearchRectangle to ScreenPart("TracksArea")
+	Log "******Verify Charger details by hovering on bus icon which is parked at charger location"
+	
+	"Utilities/CommonActions".MoveToElement(imgBus)
+	set the SearchRectangle to empty
+	set the SearchRectangle to ScreenPart("ToolTipArea")
+	--if fieldNameInTooltip="Bus Status"
+	put "Utilities/CommonActions".GetFieldValueFrontWoUsingPropertiesCoordinates (fieldNameInTooltip,  "100","-5","200","15") into busstatus
+	log busstatus
+	--end if
+	
+	if fieldValue=busstatus
+		LogSuccess "Bus Status is appearing correctly "&&busstatus
+	else
+		LogError "Bus Status is not appearing correctly "&&busstatus
+	end if
+	
+	set the SearchRectangle to empty	
+end VerifyBusDetailsInTooltip
+
+
+to handle VerifyDatesAreInDescOrder screenPart
+	Log "****Verifying the Notification Message after clicking AssignRunAndTrackButton"
+	--[da] [mon] [year]
+	put today into partDate
+	put formattedTime("%d %b", partDate) into partDate
+	
+	
+	put date().format
+	log calendarTitle
+	set the SearchRectangle to ScreenPart( screenPart)
+	
+	put [] into lstDates 
+
+	Set StatusRectangles to EveryImageRectangle(text:partDate) // 
+	Log "There are"&&the number of items of StatusRectangles&&"statuses to check."
+	repeat with each Rectangle of StatusRectangles
+		Set StatusIndicatorLocation to the TopRight of Rectangle plus [0,5] 
+
+		put 	ReadText (StatusIndicatorLocation) into txt
+		insert txt after lstDates
+		log txt
+	end repeat
+	log lstDates
+	
+	repeat each item of lstDates
+		put first item of lstDates into a
+		put second item of lstDates into b
+		if a is not empty and b=""
+			exit repeat
+		end if
+		put formattedTime("%d %b %H:%M",  a ) into prevBoTDate
+		log prevBoTDate
+		put formattedTime("%d %b %H:%M",  b ) into nxtBoTDate
+		log nxtBoTDate
+		if prevBoTDate > nxtBoTDate
+			logsuccess "Date is appearing in correct order, topdate "&&prevBoTDate&&" next date is "&&nxtBoTDate
+		else if prevBoTDate = nxtBoTDate
+			logsuccess "Date is appearing in correct order, topdate "&&prevBoTDate&&" next date is "&&nxtBoTDate
+		else
+			logerror "Date is not appearing in correct order, topdate "&&prevBoTDate&&" next date is "&&nxtBoTDate
+		end if
+		
+		delete first item of lstDates
+		--delete second item of lstDates
+	end repeat
+	
+	
+	set the SearchRectangle to empty
+end VerifyDatesAreInDescOrder
+
+
+to handle VerifyDatesAreInAscOrder screenPart
+	Log "****Verifying the Notification Message after clicking AssignRunAndTrackButton"
+	--[da] [mon] [year]
+	put today into partDate
+	put formattedTime("%d %b", partDate) into partDate
+	
+	
+	put date().format
+	log calendarTitle
+	set the SearchRectangle to ScreenPart( screenPart)
+	
+	put [] into lstDates 
+
+	Set StatusRectangles to EveryImageRectangle(text:partDate) // 
+	Log "There are"&&the number of items of StatusRectangles&&"statuses to check."
+	repeat with each Rectangle of StatusRectangles
+		Set StatusIndicatorLocation to the TopRight of Rectangle plus [0,5] 
+
+		put 	ReadText (StatusIndicatorLocation) into txt
+		insert txt after lstDates
+		log txt
+	end repeat
+	log lstDates
+	
+	repeat each item of lstDates
+		put first item of lstDates into a
+		put second item of lstDates into b
+		if a is not empty and b=""
+			exit repeat
+		end if
+		put formattedTime("%d %b %H:%M",  a ) into prevBoTDate
+		log prevBoTDate
+		put formattedTime("%d %b %H:%M",  b ) into nxtBoTDate
+		log nxtBoTDate
+		if prevBoTDate < nxtBoTDate
+			logsuccess "Date is appearing in correct order, topdate "&&prevBoTDate&&" next date is "&&nxtBoTDate
+		else if prevBoTDate = nxtBoTDate
+			logsuccess "Date is appearing in correct order, topdate "&&prevBoTDate&&" next date is "&&nxtBoTDate
+		else
+			logerror "Date is not appearing in correct order, topdate "&&prevBoTDate&&" next date is "&&nxtBoTDate
+		end if
+		
+		delete first item of lstDates
+		--delete second item of lstDates
+	end repeat
+	
+	
+	set the SearchRectangle to empty
+end VerifyDatesAreInAscOrder
+
+
+to handle verifyRecommendedTrackIs36 
+	Log "****Verifying Recommended Track is 36"
+	
+	set the SearchRectangle to ScreenPart("RecommendedTrackArea")
+	
+	put "Utilities/CommonActions".GetTextBelowByText ("Track No") into actualTrackNo
+	
+	If actualTrackNo<>""
+		LogSuccess "Recommended track is appearing as "&&actualTrackNo
+	else
+		LogError "Recommended track is not appearing as "&&actualTrackNo
+	End If
+	
+	set the SearchRectangle to empty
+end verifyRecommendedTrackIs36
+
+to handle VerifyRecommededRunsAreMarkedWithRecommendedLabel
+	Log "****Verifying Recommended Runs are marked with Recommended label"
+	
+	"Utilities/CommonActions".pageDown
+	put 1 into i
+	repeat until i>30
+		set the SearchRectangle to ScreenPart("AlertsArea")
+		if "Utilities/CommonActions".IsTextPresentOnScreen("Recomended")=false
+			--"Utilities/CommonActions".pageDown
+			put false into flag
+			set the SearchRectangle to ScreenPart("TrackPaginationArea")
+			"Utilities/CommonActions".ClickBtnByTextWithProperties "Next", "#4a2825", 0,0
+			
+			set the SearchRectangle to empty
+		else
+			put true into flag
+			exit repeat
+		End If
+		add 1 to i
+	end repeat
+	
+	If flag = true
+		LogSuccess "Recomended Runs are marked with Recomended label "
+	else
+		LogError  "Recomended Runs are not marked with Recomended label "
+	End If
+	
+	set the SearchRectangle to empty
+end VerifyRecommededRunsAreMarkedWithRecommendedLabel
+
+to handle SelectRecommendedRun
+
+	"Utilities/CommonActions".pageDown
+	set the SearchRectangle to ScreenPart("SelectRunArea")
+	put 1 into i
+	repeat until i>30
+		if "Utilities/CommonActions".IsTextPresentOnScreen("Recomended")=false
+			--"Utilities/CommonActions".pageDown
+			put false into flag
+			set the SearchRectangle to ScreenPart("TrackPaginationArea")
+			"Utilities/CommonActions".ClickBtnByTextWithProperties "Next", "#4a2825", 0,0
+			
+			set the SearchRectangle to empty
+		else
+			put ImageRectangle(text:"Recomended", waitFor:20) into ImageRectangleOfRecomendedrun
+			--put ImageRectangle(text:"79", waitFor:20) into ImageRectangleOfEnergy
+			put ImageRectangle(text:"Selection", waitFor:20) into ImageRectangleOfSelect
+			put ImageRectangle(text:"Book Out Date. Time", waitFor:20) into ImageRectangleOfBookOutDate
+			
+			put ImageRectangleOfSelect.topleft.x into x1
+			put ImageRectangleOfSelect.topright.x into x2
+			put ImageRectangleOfRecomendedrun.topleft.y into y1
+			put (x1+x2)/2 rounded to 0 places into x
+			Click [x, y1]
+			
+			ClickConfirmButton
+			put true into flag
+			
+			exit handler
+		End If
+		add 1 to i
+	end repeat
+	
+end SelectRecommendedRun
+
+to handle VerifyRecommendedTrackDetailsAreCalculated 
+
+	Log "****Verifying Recommended Track details are calculatd"
+	
+	set the SearchRectangle to ScreenPart("RecommendedTrackArea")
+	
+	put "Utilities/CommonActions".GetTextBelowByText ("Track No") into actualTrackNo
+	put "Utilities/CommonActions".GetTextBelowByText ("Position") into actualPosition
+	put "Utilities/CommonActions".GetTextBelowByText ("Track Type") into actualTrackType
+	
+	If  actualTrackNo <> ""
+		LogSuccess "Track number is appearing after selecting a recommended run"
+	else
+		LogError "Track number is not appearing after selecting a recommended run"
+	End If
+	
+	If  actualPosition <> ""
+		LogSuccess "Position is appearing after selecting a recommended run"
+	else
+		LogError "Position is not appearing after selecting a recommended run"
+	End If
+	
+	If  actualTrackType <> ""
+		LogSuccess "Track type is appearing after selecting a recommended run"
+	else
+		LogError "Track type is not appearing after selecting a recommended run"
+	End If
+	set the SearchRectangle to empty
+end VerifyRecommendedTrackDetailsAreCalculated
+
+to handle VerifyBookoutTimeIsMoreThanCurrentTime
+	Log "****Verifying Bookout time is more than current date and time"
+	
+	set the SearchRectangle to ScreenPart("TracksArea")
+	
+	put ImageRectangle(text:"Book Out Date. Time", waitFor:20) into ImageRectangleOfBookOutDate
+	set the SearchRectangle to empty
+	put ImageRectangleOfBookOutDate.topleft.x into x1
+	put ImageRectangleOfBookOutDate.topright.x into x2
+	put ImageRectangleOfBookOutDate.topleft.y into y1
+	put ImageRectangleOfBookOutDate.topright.x into y2
+	--	put ImageRectangleOfRecomendedrun.topleft.y into y1
+	put (x1+x2)/2 rounded to 0 places into x
+	put ReadText([[x1-15,y1-15], [x2+10,y2+10]]) into bookouttime
+	log bookouttime
+	
+	put split (bookouttime , newline) into lstBookouttime
+	
+	delete "Book Out Date. Time" from lstBookouttime
+	delete first item of lstBookouttime
+	delete newline from lstBookouttime
+	delete "," from lstBookouttime
+	log lstBookouttime
+	
+	put GetCurrentApplicationLoginDateTime() into todaysDate
+	CompareDateWithListOfDates todaysDate, lstBookouttime
+	
+	set the SearchRectangle to empty
+end VerifyBookoutTimeIsMoreThanCurrentTime
+
+to handle CompareDateWithListOfDates cdate, lstDates
+
+	repeat each item of lstDates
+		put first item of lstDates into a
+		--put second item of lstDates into b
+		if a is empty 
+			exit repeat
+		end if
+		put formattedTime("%b %d %H:%M",  a ) into prevBoTDate
+		log prevBoTDate
+		
+		if cdate < prevBoTDate
+			logsuccess "Book out date and times"&&prevBoTDate&&" is 15 minutes greater than the current logged in date and time"&&cdate
+		else 
+			logerror "Book out date and times"&&prevBoTDate&&" is not 15 minutes greater than the current logged in date and time"&&cdate
+		end if
+		
+		delete first item of lstDates
+		--delete second item of lstDates
+	end repeat
+	
+end CompareDateWithListOfDates
+
+to handle GetCurrentApplicationLoginDateTime
+	set the SearchRectangle to ScreenPart("LogoffArea")
+	put ReadText ([[1440,0],[1920,135]]) into curdate
+	log curdate
+	
+	--today's date
+	put today into partDate
+	put formattedTime("%d %b", partDate) into partDate
+	log partDate
+	
+	
+	put split(curdate, partDate) into lstPartDate
+	put second item of lstPartDate into lstPartDate
+	delete "Logout" from lstPartDate
+	
+	log lstPartDate
+	
+	put today into partDate
+	put formattedTime("%b %d", partDate) into partDate
+	log partDate
+	
+	
+	put partDate&lstPartDate into todaysDate
+	put formattedTime("%b %d %H:%M", todaysDate) into todaysDate
+	
+	put todaysDate + 15 minutes into todaysDate
+	
+	return todaysDate
+end GetCurrentApplicationLoginDateTime
+
+to handle RequiredEnergyLessThanBatteryCapacity
+	Log "****Compare Required Energy with the battery capacity"
+	set the SearchRectangle to ScreenPart("SelectRunArea")
+	
+	put ImageRectangle(text:"Required Energy", waitFor:20) into ImageRectangleOfFieldName
+	
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100, 20],ImageRectangleOfFieldName.BottomRight+[0,500]) as list into energyUpdated 
+
+	log energyUpdated 
+	delete "kWh" in energyUpdated
+	log energyUpdated
+	delete newline in energyUpdated
+	log energyUpdated
+	
+	
+	put split(energyUpdated, space) into energyUpdated
+	delete quote from energyUpdated
+	delete "[" from energyUpdated
+	delete "]" from energyUpdated
+	log energyUpdated
+	
+	
+	repeat each item of energyUpdated
+		put it into a
+		if a < 528
+			LogSuccess "Required energy "&&a&&" is less than Battery Capacity"&&528
+		else
+			LogError "Required energy "&&a&&" is greater than Battery Capacity"&&528
+		end if
+	end repeat
+	set the SearchRectangle to empty
+end RequiredEnergyLessThanBatteryCapacity
+
+
+to handle VerifyEstimtedChargeTimeIsNAForNonRecommendedRuns
+	Log "****Verify Estimated Charge Time is appearing as N/A for Non Recommended Runs"
+	set the SearchRectangle to ScreenPart("SelectRunArea")
+	
+	put ImageRectangle(text:"Estimate Charge", waitFor:20) into ImageRectangleOfFieldName
+	
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100, 20],ImageRectangleOfFieldName.BottomRight+[0,500]) as list into estimatedChargeTime
+
+	log estimatedChargeTime 
+	put split(estimatedChargeTime, newline) into   lstestimatedChargeTime
+	log lstestimatedChargeTime
+	delete newline in lstestimatedChargeTime
+	log lstestimatedChargeTime
+	
+	repeat each item of lstestimatedChargeTime
+		put it into a
+		if a = "N/A"
+			LogSuccess "Estimate Charge Time is appearing as N/A"
+		else
+			LogError "Estimate Charge Time is not appearing as N/A"
+		end if
+	end repeat
+	set the SearchRectangle to empty
+end VerifyEstimtedChargeTimeIsNAForNonRecommendedRuns
+
+to handle VerifyEstimtedChargeTimeIsNAInRunDetails
+	Log "****Verify Estimated Charge Time is appearing as N/A under Run Details section"
+	
+	set the SearchRectangle to ScreenPart("RecommendedRunArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Estimated Charge Time",15) into estdChargeTime
+	log estdChargeTime
+	
+	if estdChargeTime = "N/A"
+		LogSuccess "Estimate Charge Time is appearing as N/A under Run Details section"
+	else
+		LogError "Estimate Charge Time is not appearing as N/A under Run Details section"
+	end if
+	
+	set the SearchRectangle to empty
+end VerifyEstimtedChargeTimeIsNAInRunDetails
+
+to handle ClickConfirmButtonWOSelectingARun toastMsg
+
+	Log "****Click on Confirm button"
+	"Utilities/CommonActions".ClickBtnByText "Confirm"
+	--wait 2
+	Log "****Verifying toast message"
+	verifyToastMessage toastMsg 
+	set the SearchRectangle to empty
+	
+end ClickConfirmButtonWOSelectingARun
+
+to handle VerifyBookoutTimeInAscOrder
+	Log "****Verifying Bookout time is in Ascending order"
+	set the SearchRectangle to ScreenPart("SelectRunArea")
+	
+	put ImageRectangle(text:"Book Out Date. Time", waitFor:20) into ImageRectangleOfFieldName
+	
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100, 20],ImageRectangleOfFieldName.BottomRight+[0,500]) as list into bookoutTime
+
+	log bookoutTime 
+	put split(bookoutTime, newline) into   lstbookoutTime
+	log lstbookoutTime
+	delete newline in lstbookoutTime
+	log lstbookoutTime
+	
+	repeat each item of lstbookoutTime
+		put first item of lstbookoutTime into a
+		put second item of lstbookoutTime into b
+		if a is not empty and b=""
+			exit repeat
+		end if
+		put formattedTime("%d %b %H:%M",  a ) into prevBoTDate
+		log prevBoTDate
+		put formattedTime("%d %b %H:%M",  b ) into nxtBoTDate
+		log nxtBoTDate
+		if prevBoTDate < nxtBoTDate
+			logsuccess "Date is appearing in correct order, topdate "&&prevBoTDate&&" next date is "&&nxtBoTDat
+		else
+			logerror "Date is not appearing in correct order, topdate "&&prevBoTDate&&" next date is "&&nxtBoTDate
+		end if
+		
+		delete first item of lstbookoutTime
+		--delete second item of lstDates
+	end repeat
+	
+end VerifyBookoutTimeInAscOrder
+
+to handle VerifyTenRunsInOnePage
+	Log "****Verifying 10 runs are displaying in one page of Override Runs section"
+	set the SearchRectangle to ScreenPart("SelectRunArea")
+	
+	put ImageRectangle(text:"Book Out Date. Time", waitFor:20) into ImageRectangleOfFieldName
+	
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100, 20],ImageRectangleOfFieldName.BottomRight+[0,500]) as list into bookoutTime
+
+	log bookoutTime 
+	put split(bookoutTime, newline) into   lstbookoutTime
+	log lstbookoutTime
+	delete newline in lstbookoutTime
+	log lstbookoutTime
+	
+	put 0 into count
+	repeat each item of lstbookoutTime
+		add 1 to count
+	end repeat
+	
+	if count = 10
+		LogSuccess "10 runs are appearing in the Override Run's single page "
+	else
+		LogError "10 runs are not appearing in the Override Run's single page "
+	end if
+	set the SearchRectangle to empty
+end VerifyTenRunsInOnePage
+
+to handle VerifySelectedRunIsDeselectedAfterPagination imgRadioBtnUnselected, imgRadioBtnSelected
+	Log "**** Verifying Selected Run is Deselected after the pagination"
+	"Utilities/CommonActions".pageDown
+	set the SearchRectangle to ScreenPart("SelectRunArea")
+	
+	"Utilities/CommonActions".ClickBtnByImage imgRadioBtnUnselected
+	if "Utilities/CommonActions".IsImagePresentOnScreen( imgRadioBtnSelected) = true
+		LogSuccess "Selection radio buttton selected properly"
+	else
+		LogError "Selection radio buttton not selected"
+	end if
+	
+	set the SearchRectangle to empty
+	
+	set the SearchRectangle to ScreenPart("TrackPaginationArea")
+	"Utilities/CommonActions".ClickBtnByTextWithProperties "Next", "#4a2825", 0,0
+	set the SearchRectangle to empty
+	
+	set the SearchRectangle to ScreenPart("TrackPaginationArea")
+	"Utilities/CommonActions".ClickBtnByTextWithProperties "Previous", "#4a2825", 0,0
+	
+	set the SearchRectangle to empty
+	set the SearchRectangle to ScreenPart("SelectRunArea")
+	if "Utilities/CommonActions".IsImagePresentOnScreen( imgRadioBtnSelected) = true
+		LogError "Selection radio buttton is not deselected after pagination"
+	else
+		LogSuccess "Selection radio buttton is deselected after pagination"
+	end if
+	set the SearchRectangle to empty
+	
+end VerifySelectedRunIsDeselectedAfterPagination
+
+to handle VerifyErrorMessages txtErrorMsg
+	set the SearchRectangle to ScreenPart("OverrideCommentsBoxArea")
+	if "Utilities/CommonActions".IsTextPresentOnScreen(txtErrorMsg) = true
+		LogSuccess "Selection radio buttton selected properly"
+	else
+		LogError "Selection radio buttton not selected"
+	end if
+	
+	set the SearchRectangle to empty
+end VerifyErrorMessages
+
+to handle SelectNextDayBooukoutDateRun
+	Log "****Selecting Next Day Bookout time "
+	put GetCurrentApplicationLoginDateTime() into todaysDate
+	
+	repeat until i>30
+		set the SearchRectangle to ScreenPart("TracksArea")
+		
+		put ImageRectangle(text:"Book Out Date. Time", waitFor:20) into ImageRectangleOfBookOutDate
+		set the SearchRectangle to empty
+		put ImageRectangleOfBookOutDate.topleft.x into x1
+		put ImageRectangleOfBookOutDate.topright.x into x2
+		put ImageRectangleOfBookOutDate.topleft.y into y1
+		put ImageRectangleOfBookOutDate.topright.x into y2
+		--	put ImageRectangleOfRecomendedrun.topleft.y into y1
+		put (x1+x2)/2 rounded to 0 places into x
+		put ReadText([[x1-15,y1-15], [x2+10,y2+10]]) into bookouttime
+		log bookouttime
+		
+		put split (bookouttime , newline) into lstBookouttime
+		
+		delete "Book Out Date. Time" from lstBookouttime
+		delete first item of lstBookouttime
+		delete newline from lstBookouttime
+		delete "," from lstBookouttime
+		log lstBookouttime
+		put FindNextDayBookoutDate (todaysDate, lstBookouttime) into flag
+		if flag=false
+			--"Utilities/CommonActions".pageDown
+			put false into flag
+			set the SearchRectangle to ScreenPart("TrackPaginationArea")
+			"Utilities/CommonActions".ClickBtnByTextWithProperties "Next", "#4a2825", 0,0
+			set the SearchRectangle to empty
+		else
+			--put true into flag
+			put ImageRectangle(text:flag, waitFor:20) into ImageRectangleOfEnergy
+			put ImageRectangle(text:"Selection", waitFor:20) into ImageRectangleOfSelect
+			put ImageRectangleOfSelect.topleft.x into x1
+			put ImageRectangleOfSelect.topright.x into x2
+			put ImageRectangleOfEnergy.topleft.y into y1
+			put (x1+x2)/2 rounded to 0 places into x
+			Click [x, y1]
+			--put true into flag
+			LogSuccess "Next Day Bookout Date run is selected successfully-->"&&flag
+			ClickConfirmButton
+			exit handler
+		End If
+		add 1 to i
+	end repeat
+	set the SearchRectangle to empty
+end SelectNextDayBooukoutDateRun
+
+to handle FindNextDayBookoutDate cdate, lstDates
+	put false into datetoselect
+	repeat each item of lstDates
+		put first item of lstDates into a
+		--put second item of lstDates into b
+		if a is empty 
+			exit repeat
+		end if
+		put formattedTime("%b %d %H:%M",  a ) into prevBoTDate
+		log prevBoTDate
+		
+		if cdate < prevBoTDate
+			log "Book out date and times"&&prevBoTDate&&" is next day of the current logged in date and time"&&cdate
+			put prevBoTDate into datetoselect
+			exit repeat
+		else 
+			log "Book out date and times"&&prevBoTDate&&" is not next day of the current logged in date and time"&&cdate
+			put false into datetoselect
+		end if
+		
+		delete first item of lstDates
+		--delete second item of lstDates
+	end repeat
+	return datetoselect
+end FindNextDayBookoutDate
+
+to handle SelectCurrentDateBooukoutDateRun
+	Log "****Selecting the top run in Override Run section"
+	"Utilities/CommonActions".pageDown
+	set the SearchRectangle to ScreenPart("SelectRunArea")
+	
+	"Utilities/CommonActions".ClickBtnByImage imgRadioBtnUnselected
+	if "Utilities/CommonActions".IsImagePresentOnScreen( imgRadioBtnSelected) = true
+		LogSuccess "Selection radio buttton selected properly"
+	else
+		LogError "Selection radio buttton not selected"
+	end if
+	
+	set the SearchRectangle to empty
+	
+	Log "Selected the run->"&&imgRadioBtnUnselected
+	ClickConfirmButton
+	
+	set the SearchRectangle to empty
+end SelectCurrentDateBooukoutDateRun
+
+
+
+

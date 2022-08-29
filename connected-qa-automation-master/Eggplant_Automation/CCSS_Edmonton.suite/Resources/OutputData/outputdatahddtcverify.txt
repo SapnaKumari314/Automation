@@ -1,0 +1,8 @@
+
+BusID:8027
+Consumption:1.3
+Odometer:33445
+Range:373
+SOC:N/A
+CurrentEnergy:583
+hddtc:2

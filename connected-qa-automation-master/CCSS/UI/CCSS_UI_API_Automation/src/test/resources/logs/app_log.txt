@@ -1,0 +1,13 @@
+INFO    2021-02-02 11:25:10,666 [main] test.java.com.proterra.testcases.ccss.BaseTestClass  - Config properties file loaded
+INFO    2021-02-02 11:25:12,601 [main] test.java.com.proterra.testcases.ccss.BaseTestClass  - Driver Initialized !!!
+INFO    2021-02-02 11:25:12,921 [main] test.java.com.proterra.testcases.ccss.BaseTestClass  - Test Started
+INFO    2021-02-02 11:25:52,930 [main] test.java.com.proterra.testcases.ccss.BaseTestClass  - Test Completed
+INFO    2021-02-02 11:25:52,932 [main] test.java.com.proterra.testcases.ccss.BaseTestClass  - Test Started
+INFO    2021-02-02 11:26:09,595 [main] test.java.com.proterra.testcases.ccss.BaseTestClass  - Test Completed
+INFO    2021-02-02 11:26:09,597 [main] test.java.com.proterra.testcases.ccss.BaseTestClass  - Test Started
+INFO    2021-02-02 11:26:49,656 [main] test.java.com.proterra.testcases.ccss.BaseTestClass  - Test Completed
+INFO    2021-02-02 11:26:49,657 [main] test.java.com.proterra.testcases.ccss.BaseTestClass  - Test Started
+INFO    2021-02-02 11:27:01,816 [main] test.java.com.proterra.testcases.ccss.BaseTestClass  - Test Completed
+INFO    2021-02-02 11:27:01,817 [main] test.java.com.proterra.testcases.ccss.BaseTestClass  - Test Started
+INFO    2021-02-02 11:27:01,990 [main] test.java.com.proterra.testcases.ccss.BaseTestClass  - Test Completed
+INFO    2021-02-02 11:27:03,019 [main] test.java.com.proterra.testcases.ccss.BaseTestClass  - Test Suite Execution Completed !!!

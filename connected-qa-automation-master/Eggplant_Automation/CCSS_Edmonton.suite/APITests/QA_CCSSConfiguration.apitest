@@ -1,0 +1,23 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = requestId;
+	    showCheckedNumber = <*BY>;
+	    value = "GET_CONFIGURATION-74f5a852-c6d0-4db1-97a2-a38d25f3bece";
+	}
+    );
+    authenticationType = None;
+    httpVerb = GET;
+    oauth1Token = "";
+    password = "";
+    requestBody = "";
+    requestBodyFormat = "Form Url Encoded";
+    requestHeaders = "<![CDATA[Authorization:[[authToken]]
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "[[BaseURI]]/tenants/b9ed83eb-5a8d-489c-9639-076d408be8a4/garages/a4ac820a-9d67-4bd8-af67-9d9b30d0aaea/configurations?requestId=GET_CONFIGURATION-74f5a852-c6d0-4db1-97a2-a38d25f3bece";
+    userName = "";
+}

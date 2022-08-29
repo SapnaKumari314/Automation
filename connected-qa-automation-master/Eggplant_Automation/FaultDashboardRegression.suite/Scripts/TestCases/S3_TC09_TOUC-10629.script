@@ -1,0 +1,98 @@
+﻿(***
+@Author: Shalini Vijayakumar
+@Date: 18/July/2022
+@TC_ID: TOUC_10629
+@TC_Description: Verify user is able to view the Joule Buses Critical fault as per the red fault priority option for vehicle
+@Prerequisite: Critical fault to be created for Jouley bus
+***)
+
+BeginTestCase TOUC_10629
+Log "###########   Started execution of Test Case--> TOUC_10629  ##############"
+Log "#######################################################"
+--"1.Login as an superadmin in Apex Portal.
+Set DatasheetPath to Resourcepath("TestData\S3_TC09_TOUC-10629.xlsx")
+"LoginPage".OpenApplication
+
+"LoginPage".Login "ProterraAdmin"
+
+--2.Under Historical Data on Left menu choose Fault Dashboard
+"ApexPages/FaultDashboardSearchCriteria".NavigateTo "HISTORICAL DATA","FAULT DASHBOARD"
+
+--3.Select the vehicle in toggle and select the options as below
+--customer dropdown = all
+--Vehicle name = selected vehicle 
+--Fault status = all and select the from & to date 
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "CustomerName") into CustomerName
+"ApexPages/FaultDashboardSearchCriteria".SelectCustomer CustomerName
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "AssetName") into AssetID
+
+get  "ApexPages/FaultDashboardSearchCriteria".AssetTypeSelection ("Vehicle")
+
+get "ApexPages/FaultDashboardSearchCriteria".SelectAssetID ("Vehicle",AssetID)
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FaultStatus") into FaultStatus
+
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultPriority ("Red")
+
+"ApexPages/FaultDashboardSearchCriteria".SelectFaultStatus FaultStatus
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDateTime") into FromDateTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDateTime") into ToDateTime
+If uppercase(FaultStatus) is not "ACTIVE"
+	"ApexPages/FaultDashboardSearchCriteria".SelectDateRange FromDateTime,ToDateTime
+End if
+
+get "ApexPages/FaultDashboardSearchCriteria".ClickGetDataBtn
+--Select the red option in in fault and verify the data fields in sequential view and verify the Data
+
+"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Sequential"
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDate") into FromDate
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDate") into ToDate
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromTime") into FromTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToTime") into ToTime
+If uppercase(FaultStatus) is not "ACTIVE"
+	put "ApexPages/FaultDashboardVehicle".Fetch_VehicleFault_TimeofFaultRowValues into faultdateTime
+	
+	get "ApexPages/FaultDashboardCharger".VerifyTimeofFaultRange (FromDate,ToDate,FromTime,ToTime,faultdateTime)
+end if
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom ( DatasheetPath, "TestData", "VIN") into VINID
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "SPN") into SPN
+---fetch priority coloumn values and verify it as per the selection
+put "ApexPages/FaultDashboardVehicle".Extract_DatafieldRowSeries_from_FD_WithReferenceValue (VINID,"Priority") into PriorityColRows
+"ApexPages/FaultDashboardCharger".Verify_FilteredDatafieldColumn "Priority",PriorityColRows,"Red"
+
+---Apply filters for VIN and SPN
+"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "All"
+
+put [] into FDUIList
+set 	iDataIteration to 0
+repeat for each item VINNumber in VINID
+	set 	iDataIteration to iDataIteration+1
+	
+	"ApexPages/FaultDashboardSearchCriteria".SelectFilterDropdown "VIN",VINNumber,"VEHICLE"
+	"ApexPages/FaultDashboardSearchCriteria".SelectFilterDropdown "SPN",item repeatindex() of SPN,"VEHICLE"
+	put "ApexPages/FaultDashboardVehicle".Extract_DatafieldRowSeries_from_FD_WithReferenceValue (VINNumber,"SPN_ALL") into SPNRows
+	"ApexPages/FaultDashboardCharger".Verify_FilteredDatafieldColumn "SPN",SPNRows,item repeatindex() of SPN
+	
+	---Fetch the data field values from front end
+	put "ApexPages/FaultDashboardVehicle".FetchUIDashboardData ("FDDashboardFiltered",VINNumber) into UIDatalist
+	put UIDatalist into item iDataIteration of FDUIList
+end repeat
+
+"LoginPage".Logout
+-------------------------------------Backend Validation (Open Search Dashboard and database)---------------------------------------------------------
+--launch and login open search dashboard
+"OpenSearchDashboard".OpenApplication_OpenSearch 
+"OpenSearchDashboard".OpenSearchLogin ""
+--navigate to dev tools open in opensearch dashboard
+"OpenSearchDashboard".NavigateTo "Dev Tools"
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "HeaderID") into VehicleHeaderID
+
+repeat for each item UIData in FDUIList
+	"ApexPages/DataValidation".Vehicle_ComapareUIandOpenSearchBackEndValues UIData,VehicleHeaderID,FromDateTime,ToDateTime,"JOULEY"
+End repeat
+
+"OpenSearchDashboard".LogoutOpensearchDashboard
+Log "#############  Finished execution of Test Case--> TOUC_10629 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_10629

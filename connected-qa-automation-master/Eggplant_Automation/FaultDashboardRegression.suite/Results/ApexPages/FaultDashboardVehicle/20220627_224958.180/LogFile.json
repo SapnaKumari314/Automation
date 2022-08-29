@@ -1,0 +1,20 @@
+{
+	"entries": [
+		{
+				"message": "Running ApexPages/FaultDashboard.script",
+				"identifier": "START",
+				"timestamp": "2022-06-27 22:49:58.182 +0530"
+			},
+		{
+				"message": "(Duration:\"0.165\", Errors:\"0\", Exceptions:\"0\", StartTime:\"2022-06-27 22:49:58 +0530\", Successes:\"1\", TestCase:\"ApexPages/FaultDashboard.script\", Warnings:\"0\")",
+				"identifier": "EndTestCase",
+				"timestamp": "2022-06-27 22:49:58.355 +0530"
+			},
+		{
+				"message": "Execution Time 0:00:00 ApexPages/FaultDashboard.script",
+				"identifier": "SUCCESS",
+				"timestamp": "2022-06-27 22:49:58.408 +0530"
+			}
+	],
+	"createdTimestamp": "2022-06-27 22:49:58.189 +0530"
+}

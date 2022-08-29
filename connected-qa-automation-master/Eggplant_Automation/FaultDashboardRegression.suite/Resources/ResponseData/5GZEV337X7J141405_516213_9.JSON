@@ -1,0 +1,62 @@
+{
+  "took" : 2,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 1,
+      "relation" : "eq"
+    },
+    "max_score" : 18.172407,
+    "hits" : [
+      {
+        "_index" : "pcan_historical_faults",
+        "_type" : "_doc",
+        "_id" : "5GZEV337X7J141405_516213_9_73_2022-07-02T07:11:14.246Z",
+        "_score" : 18.172407,
+        "_source" : {
+          "id" : "5GZEV337X7J141405_516213_9_73_2022-07-02T07:11:14.246Z",
+          "type_" : "fault",
+          "busName" : "5GZEV337X7J141405",
+          "hdrUid" : "26b9fe644fd1",
+          "firstOcurrenceInFile" : "2022-07-02T07:11:14Z",
+          "updatedTimestamp" : "2022-07-02T07:16:14Z",
+          "spnSignalName" : "Vehicle_Fault_SPN1",
+          "spnSignalFaultValue" : 516213,
+          "fmiSignalName" : "Vehicle_Fault_FMI1",
+          "fmiSignalFaultValue" : 9,
+          "faultSourceName" : "Vehicle_Fault_SourceAddr1",
+          "faultSourceValue" : 73,
+          "faultLocation" : {
+            "lat" : 0.0,
+            "lon" : 0.0
+          },
+          "notes" : "",
+          "faultPriority" : "0",
+          "faultName" : "Port B Shunt update rate too high",
+          "faultDescription" : "Abnormal Update Rate"
+
+          "faultTroubleshoot" : "This most likely means that there are multiple shunts in the high voltage junction box that are configured as port A shunts. Port A, port B, and overhead shunts have different configurations. Verify configuration on all charge port shunts.",
+          "mil" : false,
+          "ail" : false,
+          "ril" : true,
+          "pil" : false,
+          "resolved" : true,
+          "busMetadata" : {
+            "busAlias" : "5GZEV337X7J141405",
+            "fleetName" : "Unknown",
+            "timezone" : "UTC",
+            "busName" : "5GZEV337X7J141405",
+            "vinNum" : "5GZEV337X7J141405"
+          },
+          "resolvedTimestamp" : "2022-07-02T07:16:14Z"
+        }
+      }
+    ]
+  }
+}

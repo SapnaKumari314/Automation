@@ -1,0 +1,23 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = requestId;
+	    showCheckedNumber = <*BY>;
+	    value = "GET_LOGICAL_CHARGE_QUEUE-7984759c-5552-4878-ac31-9dfc3b1f0ea3";
+	}
+    );
+    authenticationType = None;
+    httpVerb = GET;
+    oauth1Token = "";
+    password = "";
+    requestBody = "";
+    requestBodyFormat = "Form Url Encoded";
+    requestHeaders = "<![CDATA[authorization:eyJraWQiOiI3YmJXbTdTK0FsUXUrbkhNSTg5MnZpSkVNUzdqbWljUlJOdlJQaGJWYW1NPSIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIwMGJiNWM3NS02M2ZlLTQxYzQtYjg4MC04M2VhODExZThjYzgiLCJ6b25laW5mbyI6ImI5ZWQ4M2ViLTVhOGQtNDg5Yy05NjM5LTA3NmQ0MDhiZThhNCIsImN1c3RvbTpmZWRVc2VyUm9sZSI6InRlbmFudF9hZG1pbiIsImN1c3RvbTp1c2VyTmFtZSI6InZubTY2ZytxYS1sYXVuY2gyMDIwX2VhZG1pbkBnbWFpbC5jb20iLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAudXMtZWFzdC0xLmFtYXpvbmF3cy5jb21cL3VzLWVhc3QtMV9ZTHU1MG96SWsiLCJjdXN0b206YXNzaWduZWRSb2xlIjoiYWRtaW4iLCJjdXN0b206dGVuYW50SWQiOiJiOWVkODNlYi01YThkLTQ4OWMtOTYzOS0wNzZkNDA4YmU4YTQiLCJjdXN0b206cGhvbmUiOiI5NTYwNDM4MDYxIiwiY3VzdG9tOnVzZXJSb2xlIjoiVEVOQU5UX0FETUlOIiwiY3VzdG9tOmxhc3RNb2RpZmllZFRpbWUiOiIxNjQ3MDU4MDYyMTc1IiwiYXV0aF90aW1lIjoxNjQ3ODYzNzk2LCJleHAiOjE2NDc4NjczOTYsImlhdCI6MTY0Nzg2Mzc5NiwiZW1haWwiOiJ2bm02NmcrcWEtbGF1bmNoMjAyMF9lYWRtaW5AZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsImN1c3RvbTppbnRlcm5hbFVzZXIiOiIwIiwiY3VzdG9tOmxhc3ROYW1lIjoibWFtZ2FpbiIsImN1c3RvbTpyb2xlSW5mb3JtYXRpb24iOiJ0ZW5hbnRfYWRtaW4iLCJjb2duaXRvOnVzZXJuYW1lIjoiMDBiYjVjNzUtNjNmZS00MWM0LWI4ODAtODNlYTgxMWU4Y2M4IiwiY3VzdG9tOnVzZXJJZCI6ImMxNjY5YzlkLWVhNzgtNGMyYS1hMmQ4LWQ2YjIyYTM1Y2M2OSIsImF1ZCI6IjJnZDlsNmN2Z3RhNmxvczRtN21oZW9tMHU3IiwiY3VzdG9tOmNyZWF0ZWRUaW1lIjoiMTY0NjA0MjUyNzQ2NiIsImV2ZW50X2lkIjoiMWM3YTJhOGYtYjdmOS00M2ExLWE1YzgtZDllZjNkZmM0MWUzIiwiY3VzdG9tOmZpcnN0TmFtZSI6InZpdmVrIiwidG9rZW5fdXNlIjoiaWQiLCJjdXN0b206YWRkcmVzc0xpbmUxIjoiNDgtQiwgSy4gUC4gS3NoZXRyYSwgUCBPIC0gS290aSwgQXRob29yd2FsYSwgTmVhci0gSG90ZWwgS1NTIElOTiwgQ2VsZWJyYXRpb24gR2FyZGVuIiwiY3VzdG9tOmFkZHJlc3NJZCI6ImFjYTE2MTdmLTZhMDktNDA3Ny05OTA0LTM1MGRmOWFiNmI1NyJ9.gp-eZgr4KDb6yeZh7OQqQwoXuww2ke6ArJZWpptjgbZeLWEoNk9orkhzkk4KXW3h77YhACGB9ebgqcuaUylqLtrrmN-iX30hSXe14kT3ae6i9U7DEpPjaenBe7Ir_TQLnhXqG7_430IFsfBWKEuN3RGWH5sn4f0LAxT2gBd5OfzzwvbAlPTPGqYG-JcHZKTzbfJGK8FB_kJ9jPoUVhQGFgec45CbGSll1bulony2pnFoMowThNbhsSx0c7NrpX81FOIw0NR34AogUHimcmboSvw9IubZD_2Vj3sHnDkm1PWwL22TUzqOIKRPec766vosUmZjPKNXopIAGq8-3RQRug
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "https://exp-api.proterra.com/exp-ccss-qa-launch2020/v1/tenants/b9ed83eb-5a8d-489c-9639-076d408be8a4/trackSetups/a4ac820a-9d67-4bd8-af67-9d9b30d0aaea/logicalChargeQueue?requestId=GET_LOGICAL_CHARGE_QUEUE-7984759c-5552-4878-ac31-9dfc3b1f0ea3";
+    userName = "";
+}

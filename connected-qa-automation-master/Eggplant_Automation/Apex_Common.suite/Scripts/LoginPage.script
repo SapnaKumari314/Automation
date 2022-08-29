@@ -1,0 +1,165 @@
+﻿
+//Testing GIt
+
+-----------Login Page
+(*set the SearchRectangle to ScreenPart("LoginArea")
+log 123
+log ReadText(ScreenPart("LoginArea"))*)
+(*
+set global mediumTimeout to 15
+set the suitevariables to  {BasicTimeout:"6", MediumTimeout:"12"}
+
+log suitevariables.BasicTimeout
+*)
+
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		LogoffArea:[[.80,0],[1,.290]],
+		LoginArea:[[.45,.375],[.75,.75]],
+		APILoadingIconArea:[[.25,.375],[.75,.75]],
+	}
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+End ScreenPart
+-----------------------------------------------------
+
+--Description: This handler is used to Open the application on a certain browser
+---Input : None
+---output: None
+---Created by:Vivek
+
+to OpenApplication 
+	try
+		--To set global wait variables over the suite
+		set Global ConfigValues to {MinTimeOut:"4",BasicTimeOut:"15",MediumTimeOut:"20",LongTimeOut:"35"}
+		
+		"Utilities/ExcelOperations".readTestDataFrom Resourcepath("Configurations\Config.xlsx"), "QA_Env", "ApplicationURL"
+		Set appUrl to the result
+		"Utilities/ExcelOperations".readTestDataFrom Resourcepath("Configurations\Config.xlsx"), "QA_Env", "BrowserName"
+		Set browserName to the result
+		
+		"Utilities/ExcelOperations".readTestDataFrom Resourcepath("Configurations\Config.xlsx"), "QA_Env", "IterationNumber",2
+		Set IterationNo to the result
+		set Global iIteration to IterationNo
+		
+		"Utilities/GenericOperations".LaunchApplication browserName, appUrl
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,openApplication)
+	End try
+end openApplication
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Description: This handler is used to Login to the Apex application
+---Input : None
+---output: None
+---Created by:Himaja
+
+to  handle Login userRole
+	try
+		
+		Global ConfigValues
+		
+		Typetext controlKey,0 --To set the browser zoom size to 100%
+		wait 2
+		set the SearchRectangle to ScreenPart("LogoffArea")
+		Wait 5
+		(*if ImageFound(Image:"CommonImages/img_ProfileIcon", waitFor: ConfigValues.BasicTimeOut) Then
+			Try
+				Click{Image:"CommonImages/img_ProfileIcon", waitFor:ConfigValues.BasicTimeOut} 
+				Click {text:"Logout",waitFor:ConfigValues.LongTimeOut,Validwords:"Logout",SearchRectangle:ScreenPart("LogoffArea"),contrast:on}
+				click FoundImageLocation()
+				"Utilities/GenericOperations".Success "Logout clicked successfully"
+			Catch theException	
+				Log "Application logged out"
+			End try
+		end if*)
+		
+		set the SearchRectangle to empty
+		if userRole=""
+			"Utilities/ExcelOperations".readTestDataFrom Resourcepath("Configurations\Config.xlsx"), "QA_Env", "UserID"
+			Set UserID to the result
+			"Utilities/ExcelOperations".readTestDataFrom Resourcepath("Configurations\Config.xlsx"), "QA_Env", "Password"
+			Set Password to the result
+		else if userRole="ProterraAdmin"
+			"Utilities/ExcelOperations".readTestDataFrom Resourcepath("Configurations\Config.xlsx"), "QA_Env", "ProterraAdminUserID"
+			Set UserID to the result
+			"Utilities/ExcelOperations".readTestDataFrom Resourcepath("Configurations\Config.xlsx"), "QA_Env", "ProterraAdminPassword"
+			Set Password to the result
+		end if
+		
+		set the SearchRectangle to ScreenPart("LoginArea")
+		if  ImageFound(text:"Email", waitFor: ConfigValues.LongTimeOut) Then
+			click ImageLocation(text:"Email", WaitFor:ConfigValues.LongTimeOut)+[0,20]
+			put FoundImageLocation() into Loc
+			Put Loc+[-40,10] into Pos1
+			Put Loc+[300,150] into Pos2
+			typetext controlKey, a
+			typetext UserID
+			"Utilities/GenericOperations".Success "User name entered successfully" 
+		else
+			"Utilities/GenericOperations".Error "Unable to enter User name successfully"
+		end if
+		
+		if  ImageFound(text:"Password", waitFor: ConfigValues.BasicTimeOut,Validwords:"Password",SearchRectangle:[Pos1,Pos2],validCharacters:"Password") Then
+		Click FoundImageLocation()
+		typetext controlKey, a
+		typetext Password
+		"Utilities/GenericOperations".Success "Password entered successfully"
+		else
+			LogError "Unable to enter Password successfully"
+		end if	
+		if  ImageFound(text:"Sign In", waitFor: ConfigValues.MediumTimeOut)  Then
+			click item 2 of EveryImageLocation(text:"Sign In", waitfor:ConfigValues.BasicTimeOut)
+			"Utilities/GenericOperations".Success "Sign In clicked successfully"
+			if ImageFound(Image:"CommonImages/img_ProfileIcon", waitFor:ConfigValues.LongTimeOut,SearchRectangle:ScreenPart("LogoffArea")) then
+				"Utilities/GenericOperations".Success  "Logged in to application successfully!!"
+			else
+				Throw "Unable to login to application"
+			end if
+			
+		else
+			"Utilities/GenericOperations".Error  "Unable to click on Sign In"
+			
+		end if
+		set the SearchRectangle to empty
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Login)
+	End try
+end Login
+
+--Description: Handler to logout of Apex Application
+---Input : None
+---output: None
+---Created by:Himaja
+to Logout 
+	try 
+		Global ConfigValues
+		set the SearchRectangle to ScreenPart("LogoffArea")
+		if ImageFound(Image:"CommonImages/img_ProfileIcon", waitFor:ConfigValues.MediumTimeOut)
+			click FoundImageLocation()
+			Click {text:"Logout",waitFor:ConfigValues.LongTimeOut,Validwords:"Logout",SearchRectangle:ScreenPart("LogoffArea"),contrast:on}
+			click FoundImageLocation()
+			set the SearchRectangle to ScreenPart("LoginArea")
+			if  ImageFound(text:"Email", waitFor: ConfigValues.LongTimeOut) Then
+				LogSuccess "Logout clicked successfully"
+			Else
+				LogError "Application is not logged out"
+			end if
+			
+		else
+			
+			LogError "Unable to click Logout"
+		end if
+		set the SearchRectangle to empty
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,Logout)
+	End try
+end Logout
+
+

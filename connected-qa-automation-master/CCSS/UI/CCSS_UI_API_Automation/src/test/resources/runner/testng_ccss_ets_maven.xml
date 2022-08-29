@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Suite" parallel="tests">
+	<parameter name="env.Name" value="qa" />
+	<parameter name="browser.name" value="chrome" />
+	<parameter name="browser.headless" value="true" />
+
+	<listeners>
+
+		<listener
+			class-name="main.java.com.proterra.ExtentListeners.ExtentListeners"></listener>
+	</listeners>
+
+
+	<!-- listener class-name="main.java.com.proterra.ExtentListeners.ExtentListeners"></listener> 
+		</listeners -->
+
+	<test name="Proterra_ETS_Functionality_Test">
+		<!-- parameter name="environment" value="${environment}" /> <parameter 
+			name="browserName" value="${browser.type}" /> <parameter name="browserHeadless" 
+			value="${browser.headless}" / -->
+
+
+		<classes>
+			<class
+				name="test.java.com.proterra.testcases.ets.Login.LoginUIAPI_Test" />
+			<class
+				name="test.java.com.proterra.testcases.ets.RecommendedRunAndTrackAssignment.RecommendedRunAndTrackAssignment_Test" />
+
+
+		</classes>
+	</test>
+
+</suite> <!-- Suite -->

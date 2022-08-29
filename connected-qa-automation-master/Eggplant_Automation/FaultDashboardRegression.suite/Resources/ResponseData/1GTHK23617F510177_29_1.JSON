@@ -1,0 +1,61 @@
+{
+  "took" : 2,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 1,
+      "relation" : "eq"
+    },
+    "max_score" : 17.896957,
+    "hits" : [
+      {
+        "_index" : "pcan_historical_faults",
+        "_type" : "_doc",
+        "_id" : "1GTHK23617F510177_29_1_0_2022-07-21T05:50:03.195Z",
+        "_score" : 17.896957,
+        "_source" : {
+          "id" : "1GTHK23617F510177_29_1_0_2022-07-21T05:50:03.195Z",
+          "type_" : "fault",
+          "busName" : "1GTHK23617F510177",
+          "hdrUid" : "26b9fe644fd1",
+          "firstOcurrenceInFile" : "2022-07-21T05:50:03Z",
+          "updatedTimestamp" : "2022-07-21T05:50:03Z",
+          "spnSignalName" : "Vehicle_Fault_SPN1",
+          "spnSignalFaultValue" : 29,
+          "fmiSignalName" : "Vehicle_Fault_FMI1",
+          "fmiSignalFaultValue" : 1,
+          "faultSourceName" : "Vehicle_Fault_SourceAddr1",
+          "faultSourceValue" : 0,
+          "faultLocation" : {
+            "lat" : 38.8554039,
+            "lon" : -77.00524902
+          },
+          "notes" : "",
+          "faultPriority" : "0",
+          "faultName" : "Accelerator Pedal Position 2",
+          "faultDescription" : "Data Valid but Below Normal Operational Range, Most Severe Level"
+
+          "faultTroubleshoot" : "Accelerator pedal 2 percentage value is in range but disagrees with pedal 1 percentage value. Accelerator pedal may need replacement. Check source voltage to pedal, it should be between 4.75V and 5.25V. Plug in a known good pedal if available and see if code persists. ",
+          "mil" : false,
+          "ail" : false,
+          "ril" : true,
+          "pil" : false,
+          "resolved" : false,
+          "busMetadata" : {
+            "busAlias" : "1GTHK23617F510177",
+            "fleetName" : "Unknown",
+            "timezone" : "UTC",
+            "busName" : "1GTHK23617F510177",
+            "vinNum" : "1GTHK23617F510177"
+          }
+        }
+      }
+    ]
+  }
+}

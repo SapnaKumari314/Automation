@@ -1,0 +1,55 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 11/Apr/22
+@TC_ID: TOUC_3395
+@TC_Description: CCSS-Tooltip: Tooltip on Track Override screen
+***)
+
+(***
+Pre-requisites:
+1. Buses with different statuses should be parked in the garage
+2. Chargers with different statuses should be available
+(We are moving buses before execution)
+***)
+
+
+BeginTestCase TOUC_3395
+
+Log "###########   Started execution of Test Case--> TOUC_3395   ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Hover over a Bus Icon for a Bus which is not parked at a charger location
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".UnCheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgBlackTrack"
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "bus_image_run_and_track_screen") into BusImg
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetailsByHoverOnBusIconWhichIsNotParkedAtChargerLocation BusImg
+
+--Hover over a Bus or Charger Icon for a Bus which is parked at a charger location
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".CheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgActiveCharger"
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusAndChargerDetailsByHoverOnBusOrChargerIconWhichIsParkedAtChargerLocation "RunAndTrackAssignmentPage\imgChargerNotAvailable"
+
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyChargerDetailsByHoverOnChargerIconWhereBusIsNotParked  "RunAndTrackAssignmentPage\imgActiveCharger"
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3395 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3395
+

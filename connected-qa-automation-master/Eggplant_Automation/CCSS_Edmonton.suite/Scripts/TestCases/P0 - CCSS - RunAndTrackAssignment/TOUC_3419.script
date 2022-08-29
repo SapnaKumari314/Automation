@@ -1,0 +1,47 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 19/Aug/22
+@TC_ID: TOUC_3819
+@TC_Description: CCSS-RRT-Recommended Track Algorithm: Data displayed on the Recommended Track module
+***)
+
+BeginTestCase TOUC_3819
+
+Log "###########   Started execution of Test Case--> TOUC_3819   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+--Remove bus from the track
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P0_TestData", "RunAndTackAssignment", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+------------------------
+
+--Select a Bus from the Incoming Queue
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "BusID") into BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+--Uncheck the Needs Maintenance (if selected)
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+
+--Click Recommended Run and Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+
+--Click the Override Button from Run Details
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+
+
+--Verify that all the Recommended and Non Recommended Runs are displayed
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlFileName&".xlsx", xlSheetName, "ThresholdRatio") into threshouldRatio
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectARunWhereCurrentEnrgyGreaterThnReqEnnrgyAndThrEnrgy threshouldRatio
+
+--Verify the Track Details
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyRecommendedTrackDetailsAreCalculated
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3819 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3819
+

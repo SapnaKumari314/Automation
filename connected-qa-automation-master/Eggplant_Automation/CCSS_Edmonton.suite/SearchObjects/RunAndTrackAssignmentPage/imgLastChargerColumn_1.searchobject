@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		23,
+		358,
+		493,
+		498
+	],
+	"lastmodifieddate": 1660832910.355,
+	"createddate": 1660832739.5349998,
+	"name": "RunAndTrackAssignmentPage/imgLastChargerColumn_1",
+	"lastfounddate": 1660833527.2049999,
+	"ocrcapturestring": "1 2\t3\t4\t5\t6 7 8 9 10 1 1 0 8035 0 0 0 0 2 0 0 0 0 0 3 0 0 0 0 0 4 0 0 0 0 0 5 0 0    6      7      1 9",
+	"lastfoundlocation": [
+		23,
+		458,
+		493,
+		498
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[247,451]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/imgLastChargerColumn_1.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com",
+				"capturerect": [
+					23,
+					358,
+					493,
+					498
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "1 2\t3\t4\t5\t6 7 8 9 10 1 1 0 8035 0 0 0 0 2 0 0 0 0 0 3 0 0 0 0 0 4 0 0 0 0 0 5 0 0    6      7      1 9"
+			}
+	]
+}

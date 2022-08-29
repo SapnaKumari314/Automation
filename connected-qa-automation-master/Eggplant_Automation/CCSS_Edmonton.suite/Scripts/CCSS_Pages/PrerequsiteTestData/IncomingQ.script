@@ -1,0 +1,30 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 21/Aug/22
+@Description: This script is the Test Data automation for IQ scripts
+***)
+
+
+to handle ReadTestDataSheet sheetName, columnNameToRead
+	Log "*****Reading test data file - Prerequisite_TestData and test data for Incoming Queue"
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\Prerequisite_TestData_IncomingQ.xlsx", sheetName, columnNameToRead) into columnValue
+	return columnValue
+end ReadTestDataSheet
+
+to handle AddBusInIncomingQ sheetName, VIN_Number
+	Log "*****Adding bus in Incoming Queue"
+	put ReadTestDataSheet("Config", "tenantId" ) into tenantId
+	put ReadTestDataSheet("Config", "garageId" ) into garageId
+	put ReadTestDataSheet(sheetName, VIN_Number ) into VIN_Number
+	put ReadTestDataSheet("Config", "AddBusInIQ_API_URL" ) into AddBusInIQ_API_URL
+	put ReadTestDataSheet("Config", "AuthorizationToken" ) into AuthorizationToken
+	
+	put "CCSS_Pages/BasePage".SetGlobalEnvironmentVariables into BaseURI
+	put QA_AssignBus_To_IQ() into summaryAPI
+	put summaryAPI.responsebody into respbody1
+	--log respbody1
+	
+	put jsonvalue (respbody1) into responsebody2 
+	log responsebody2
+	put responsebody2.buses.(busVinVal)._source.PCes_usi_SystemEnergy_kwh into currentEnergy
+end AddBusInIncomingQ

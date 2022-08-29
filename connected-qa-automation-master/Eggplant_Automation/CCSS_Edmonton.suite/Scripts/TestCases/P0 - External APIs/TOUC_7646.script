@@ -1,0 +1,31 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 19/July/22
+@TC_ID: TOUC_7646
+@TC_Description: (EXTERNAL_API): Audit Events API: Verify garages/{garageId}/audit/events API
+***)
+
+BeginTestCase TOUC_7646
+
+Log "###########   Started execution of Test Case--> TOUC_7646   ##############"
+Log "#######################################################"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "TOUC_7646", "type") into type
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "TOUC_7646", "startTimestamp") into startTimestamp
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "TOUC_7646", "endTimestamp") into endTimestamp
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "TOUC_7646", "garageid") into garageid
+
+put  "CCSS_Pages/API".RunAPIForTestScript( "TOUC_7646", "", startTimestamp, endTimestamp, "", type, garageid) into responseBody
+log responseBody
+
+--Fetch response to validate - need to implement the output validation
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "TOUC_7646", "ResponseToValidate") into ResponseToValidate
+log responseToValidate
+
+"CCSS_Pages/API".CompareJsonResponses responseToValidate, responseBody
+
+
+Log "#############  Finished execution of Test Case--> TOUC_7646 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_7646

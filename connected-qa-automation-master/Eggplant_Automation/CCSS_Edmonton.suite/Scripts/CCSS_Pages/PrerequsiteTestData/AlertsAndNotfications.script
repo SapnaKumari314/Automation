@@ -1,0 +1,581 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 22/Jul/22
+@Description: This script is the Test Data automation for LCQ scripts
+***)
+
+-----------------------------------------Run and Assignment Page - Test Data automation Garage Overview
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		LogoffArea:[[.75,0],[1,.125]],
+		GarageDropdownArea:[[.75,0],[0.90,.125]],
+		SearchBEBArea:[[0,0.125],[.25,.375]],
+		BusDetailsArea:[[0,.125],[.40,.5]],
+		RecommendedRunArea:[[0.25,.125],[.65,.50]],
+		RecommendedTrackArea:[[0.5,.125],[1,.50]],
+		AlertsArea:[[0,.40],[0.20,1]],
+		NotificationsArea:[[0.15,.375],[0.5,1]],
+		TracksArea:[[0,.35],[1,1]],
+		TracksAreaGarageOverview:[[0,.275],[1,1]],
+		BusChargerStatusArea:[[0.25,.875],[1,1]],
+		ToastMessageArea:[[0.25,.06],[1,.25]],
+		TitleBarArea:[[0,0],[.75, .40]],
+		MenuArea:[[0,.05],[.15, .45]],
+		SelectRunArea:[[0,0.35],[1,1]],
+		IncomingQueueArea:[[0,0.125],[1,.24]],
+		OverrideCommentsBoxArea:[[.25,0.25],[.75,.75]],
+		OrverrideTitlebarArea:[[0,0.455],[1,.49]],
+		ToolsTipArea:[[0.25,0.15],[.55,.75]],
+		TrackPaginationArea:[[0.7,0.90],[1,.95]],
+		AlertsHtmlCodeArea:[[0.5,0],[1,.75]],
+		FindRequiredEnergyArea:[[0.25,0.40],[0.5,1]],
+	}
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+
+End ScreenPart
+-----------------------------------------------------
+
+
+to handle ReadTestDataSheet sheetName, columnNameToRead
+	Log "*****Reading test data file - Prerequisite_TestData and test data for Garage Overview"
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\Prerequisite_TestData_AlertsAndNotifications.xlsx", sheetName, columnNameToRead) into columnValue
+	return columnValue
+end ReadTestDataSheet
+
+
+to handle UpdateBatteryCapacityAndThresholdRatio sheetName
+	
+	Log "*****Test Data Creation - Updating Battery Capacity and Threshold Ratio through API"
+	put "Utilities\exceloperations".ReadFromFile  ("authtoken", "token") into authToken
+	
+	--Reading required parameters for API from the sheet
+	put ReadTestDataSheet(sheetName, tenantId ) into tenantId
+	put ReadTestDataSheet(sheetName, garageId ) into garageId
+	put ReadTestDataSheet(sheetName, energyThresholdRatio ) into energyThresholdRatio
+	put ReadTestDataSheet(sheetName, globalVehicleBatteryCapacity ) into globalVehicleBatteryCapacity
+	put "CCSS_Pages/BasePage".SetGlobalEnvironmentVariables into BaseURI
+	put TD_UpdateBatteryCapacityThresholdRatio() into summaryAPI
+	put summaryAPI.responsebody into respbody1
+	--log respbody1
+	
+	put jsonvalue (respbody1) into responsebody2 
+	log responsebody2
+	put responsebody2.message into successMsg
+	
+	if successMsg="Successfully updated the configuration details"
+		LogSuccess "Battery Capacity And Threshold Ratio updated successfully to "&& energyThresholdRatio &&"and"&& globalVehicleBatteryCapacity
+	else
+		LogError "Battery Capacity And Threshold Ratio not updated successfully"
+	end if
+	
+end UpdateBatteryCapacityAndThresholdRatio
+
+to handle UpdateActiveChargerLimit sheetName
+	Log "*****Test Data Creation - Update Active Charger Limit"
+	
+	put "Utilities\exceloperations".ReadFromFile  ("authtoken", "token") into authToken
+	--Reading required parameters for API from the sheet
+	put ReadTestDataSheet(sheetName, chargerLimit ) into chargerLimit
+	put ReadTestDataSheet(sheetName, tenantId ) into tenantId
+	put ReadTestDataSheet(sheetName, garageId ) into garageId
+	put "CCSS_Pages/BasePage".SetGlobalEnvironmentVariables into BaseURI
+	put TD_UpdateActiveChargerLimit() into summaryAPI
+	put summaryAPI.responsebody into respbody1
+	--log respbody1
+	
+	put jsonvalue (respbody1) into responsebody2 
+	log responsebody2
+	put responsebody2.message into successMsg
+	
+	if successMsg contains "Successfully saved ecms power details for tenantId"
+		LogSuccess "Active Charger Limit updated successfully to "&& chargerLimit
+	else
+		LogError "Active Charger Limit not updated successfully"
+	end if
+	
+end UpdateActiveChargerLimit
+
+to handle RemoveBusFromAPI xlsFileName, SheetName, BusID, RunID, API_Bus_Details_busVins, preReqTDSheetName
+	Log "****Removing bus from the tracks"
+	--put "Utilities/GetAuthorizationToken".getAutherizationTokenForAPI into authToken
+	put "Utilities\exceloperations".ReadFromFile  ("authtoken", "token") into authToken
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, BusID) into BusId
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, customerGarageId) into customerGarageId
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, RunID) into RunID
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, API_Bus_Details_busVins) into API_Bus_Details_busVins
+	--	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, tenantId) into tenantId
+	put ReadTestDataSheet(preReqTDSheetName, tenantId ) into tenantId
+	put ReadTestDataSheet(preReqTDSheetName, garageId ) into garageId
+	
+	put "CCSS_Pages/BasePage".SetGlobalEnvironmentVariables into BaseURI
+	
+	put QA_RemoveBusFromTrack() into findBusAPI
+	put findBusAPI.responsebody into respbody1
+	put jsonvalue (respbody1) into responsebody2 
+	if responsebody2.message = "Bus "&BusId&" has been successfully set In Maintenance but not assigned to a position in the garage"
+		LogSuccess "Bus "&BusId&" is removed from the track"
+	else
+		LogError "Bus "&BusId&" is not removed from the track"
+	end if
+	
+end RemoveBusFromAPI
+
+to handle CreateBusWithAnStatusAndAssignOnTrack busStatus, imgChargerOrNoncharger, xlFileName, xlSheetName,BusIdCol, customerGarageId, RunID,  API_Bus_Details_busVins, preReqTDSheetName, toastMsg, priorityType
+
+	--Select any Bus from the IQ or search for a Bus which is not in the garage
+	--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "BusID") into BusId
+	
+	put ReadTestDataSheet(preReqTDSheetName, tenantId ) into tenantId
+	put ReadTestDataSheet(preReqTDSheetName, garageId ) into garageId
+	
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlFileName&".xlsx", xlSheetName, BusIdCol) into BusId
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlFileName&".xlsx", xlSheetName, customerGarageId) into customerGarageId
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlFileName&".xlsx", xlSheetName, RunID) into RunID
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlFileName&".xlsx", xlSheetName, API_Bus_Details_busVins) into API_Bus_Details_busVins
+	--	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlsFileName&".xlsx", SheetName, tenantId) into tenantId
+	"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusIsNotInTracksFromAPI BusId, xlFileName, xlSheetName, BusIdCol, customerGarageId, RunID, API_Bus_Details_busVins, tenantId
+	
+	--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "BusID") into BusId
+	typetext pageUp
+	"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+	
+	--Ensure that the Needs Maintenance Checkbox is not selected and click the Recommended Run & Track button
+	"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+	
+	if busStatus="not ready"
+		--Select a Run such that the 
+		--Current Energy < Required Energy
+		--using the Run override if the default run does not match the requirement
+		if priorityType="low_for_high"
+			SelectARunWhereCurrentEnrgyLessThnReqEnnrgy "low_for_high"
+		else if priorityType="no"
+			--			"Utilities/CommonActions".CreateOutputFile "buspriority"
+			SelectARunWhereCurrentEnrgyLessThnReqEnnrgy "no"
+		else if priorityType="low"
+			SelectARunWhereCurrentEnrgyLessThnReqEnnrgy "low"
+		else if priorityType="high"
+			SelectARunWhereCurrentEnrgyLessThnReqEnnrgy "high"
+		end if 
+	else if busStatus="ready"
+		--Select a Run such that the 
+		--Threshold Energy > Current Energy  > Required Energy
+		"CCSS_Pages/RunAndAssignmentTrackPage".SelectARunWhereThrEnrgyIsGreaterThnCurrentEnrgyGreaterThnReqEnnrgy "0.1"
+		
+		--using the Run override if the default run does not match the requirement
+		--		put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlFileName&".xlsx", xlSheetName, "ThresholdRatio") into threshouldRatio
+		
+	else if  busStatus="topped up"
+		--Select a Run such that the 
+		--Current Energy  > Threshold Energy 
+		--& Current Energy  > Required Energy
+		--using the Run override if the default run does not match the requirement
+		put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlFileName&".xlsx", xlSheetName, "ThresholdRatio") into threshouldRatio
+		"CCSS_Pages/RunAndAssignmentTrackPage".SelectARunWhereCurrentEnrgyGreaterThnReqEnnrgyAndThrEnrgy threshouldRatio
+	end if 
+	
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+	
+	--Select a Non Charger Track Position using Track Override if the default track does not match the requirement
+	"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick imgChargerOrNoncharger
+	--Click the Assign Run & Track button
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "no"
+	--Verify Toast msg
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\"&xlFileName&".xlsx", xlSheetName, toastMsg) into ToastMsg
+	"CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage ToastMsg
+	
+end CreateBusWithAnStatusAndAssignOnTrack
+
+--
+to handle SelectARunWhereCurrentEnrgyLessThnReqEnnrgy priorityFlag
+
+	--Get Current Energy
+	set the SearchRectangle to ScreenPart("BusDetailsArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Current Energy") into actualcurrentEnergy
+	put split(actualcurrentEnergy," ") into actualcurrentEnergy
+	put first item of actualcurrentEnergy into actualcurrentEnergy
+	
+	set the SearchRectangle to empty
+	wait 2
+	"Utilities/CommonActions".pageDown
+	put 1 into i
+	
+	if priorityFlag="low_for_high"
+		set the SearchRectangle to ScreenPart("TrackPaginationArea")
+		"Utilities/CommonActions".ClickBtnByTextWithProperties "Next", "#4a2825", 0,0
+		"Utilities/CommonActions".ClickBtnByTextWithProperties "Next", "#4a2825", 0,0
+		set the SearchRectangle to empty
+		
+		repeat until i>30
+			
+			if EvaluateCurrentEnergyAndThresholdEnergyAndSelectARun (actualcurrentEnergy, priorityFlag)=false
+				--"Utilities/CommonActions".pageDown
+				put false into flag
+				set the SearchRectangle to ScreenPart("TrackPaginationArea")
+				"Utilities/CommonActions".ClickBtnByTextWithProperties "Next", "#4a2825", 0,0
+				
+				set the SearchRectangle to empty
+			else
+				put true into flag
+				exit handler
+			End If
+			add 1 to i
+		end repeat
+	else 
+		repeat until i>30
+			if EvaluateCurrentEnergyAndThresholdEnergyAndSelectARun (actualcurrentEnergy, priorityFlag)=false
+				--"Utilities/CommonActions".pageDown
+				put false into flag
+				set the SearchRectangle to ScreenPart("TrackPaginationArea")
+				"Utilities/CommonActions".ClickBtnByTextWithProperties "Next", "#4a2825", 0,0
+				
+				set the SearchRectangle to empty
+			else
+				put true into flag
+				exit handler
+			End If
+			add 1 to i
+		end repeat
+	end if
+	
+	if flag=false
+		LogSuccess "Run is not found for the condition 'Current Energy < Required Energy', runNumber"
+	end if
+end SelectARunWhereCurrentEnrgyLessThnReqEnnrgy
+
+to handle EvaluateCurrentEnergyAndThresholdEnergyAndSelectARun actualcurrentEnergy, priorityFlag
+	--Select a run
+	set the SearchRectangle to ScreenPart("SelectRunArea")
+	
+	--Reading Required Energy from the Run
+	put ImageRectangle(text:"Required Energy", waitFor:20) into ImageRectangleOfFieldName
+	log ImageRectangleOfFieldName.TopRight
+	log ImageRectangleOfFieldName.BottomRight
+	put ReadText(ImageRectangleOfFieldName.TopRight+[-100,20],ImageRectangleOfFieldName.BottomRight+[0,500]) as list into energyUpdated 
+
+	log energyUpdated 
+	delete "kWh" in energyUpdated
+	log energyUpdated
+	delete newline in energyUpdated
+	put split(energyUpdated, space) into energyUpdated
+	delete "[" in energyUpdated
+	delete "]" in energyUpdated
+	delete "@" in energyUpdated
+	delete quote in energyUpdated
+	delete space in energyUpdated
+	log energyUpdated
+	
+	put CompareCurrentEnergyAndRequiredEnergy (actualcurrentEnergy, energyUpdated) into runNumber
+	log runNumber
+	if runNumber=""
+		put false into flag
+		Log "Searching for run having the condition 'Current Energy< Required Energy'"
+		--exit handler
+	else
+		if priorityFlag = "low_for_high" 
+			---If no priority i.e. first time select
+			Try
+				set the SearchRectangle to empty
+				set the SearchRectangle to ScreenPart("FindRequiredEnergyArea")
+				put ImageRectangle(text:runNumber, waitFor:20) into ImageRectangleOfEnergy
+				set the SearchRectangle to empty
+				set the SearchRectangle to ScreenPart("SelectRunArea")
+				throw "Bad Problem", "Something went wrong"
+			Catch theException
+				LogWarning "Seems some error on Required Energy: "&&runNumber				
+				--throw theException — re-throw the exception (if desired)
+			End try
+			--put ImageRectangle(text:"79", waitFor:20) into ImageRectangleOfEnergy
+			put ImageRectangle(text:"Selection", waitFor:20) into ImageRectangleOfSelect
+			put ImageRectangle(text:"Book Out Date. Time", waitFor:20) into ImageRectangleOfBookOutDate
+			
+			--This code is to capture the parameter used to evaluate priority of runs
+			--if priorityFlag = "no"
+			put ImageRectangleOfBookOutDate.topleft.x into x1
+			put ImageRectangleOfBookOutDate.topright.x into x2
+			put ImageRectangleOfEnergy.topleft.y into y1
+			put ImageRectangleOfEnergy.bottomright.y into y2
+			put ReadText([[x1-15,y1-15], [x2+10,y2+10]]) into bookouttime
+			"Utilities/ExcelOperations".CreateOutputFile "firstbuspriority"
+			log bookouttime
+			"Utilities/ExcelOperations".WriteIntoFile "firstbuspriority", "requiredenergy", runNumber
+			"Utilities/ExcelOperations".WriteIntoFile "firstbuspriority", "bookouttime", bookouttime
+			"Utilities/ExcelOperations".WriteIntoFile "firstbuspriority", "currentEnergy", actualcurrentEnergy
+		end if
+		
+		if priorityFlag = "no" 
+			---If no priority i.e. first time select
+			Try
+				set the SearchRectangle to empty
+				set the SearchRectangle to ScreenPart("FindRequiredEnergyArea")
+				put ImageRectangle(text:runNumber, waitFor:20) into ImageRectangleOfEnergy
+				set the SearchRectangle to empty
+				set the SearchRectangle to ScreenPart("SelectRunArea")
+				throw "Bad Problem", "Something went wrong"
+			Catch theException
+				LogWarning "Seems some error on Required Energy: "&&runNumber				
+				--throw theException — re-throw the exception (if desired)
+			End try
+			--put ImageRectangle(text:"79", waitFor:20) into ImageRectangleOfEnergy
+			put ImageRectangle(text:"Selection", waitFor:20) into ImageRectangleOfSelect
+			put ImageRectangle(text:"Book Out Date. Time", waitFor:20) into ImageRectangleOfBookOutDate
+			
+			--This code is to capture the parameter used to evaluate priority of runs
+			--if priorityFlag = "no"
+			put ImageRectangleOfBookOutDate.topleft.x into x1
+			put ImageRectangleOfBookOutDate.topright.x into x2
+			put ImageRectangleOfEnergy.topleft.y into y1
+			put ImageRectangleOfEnergy.bottomright.y into y2
+			put ReadText([[x1-15,y1-15], [x2+10,y2+10]]) into bookouttime
+			"Utilities/ExcelOperations".CreateOutputFile "firstbuspriority"
+			log bookouttime
+			"Utilities/ExcelOperations".WriteIntoFile "firstbuspriority", "requiredenergy", runNumber
+			"Utilities/ExcelOperations".WriteIntoFile "firstbuspriority", "bookouttime", bookouttime
+			"Utilities/ExcelOperations".WriteIntoFile "firstbuspriority", "currentEnergy", actualcurrentEnergy
+		end if
+		
+		if priorityFlag = "low" 
+			---If no priority i.e. first time select
+			set the SearchRectangle to empty
+			set the SearchRectangle to ScreenPart("FindRequiredEnergyArea")
+			put ImageRectangle(text:runNumber, waitFor:20) into ImageRectangleOfEnergy
+			set the SearchRectangle to empty
+			set the SearchRectangle to ScreenPart("SelectRunArea")
+			--put ImageRectangle(text:"79", waitFor:20) into ImageRectangleOfEnergy
+			put ImageRectangle(text:"Selection", waitFor:20) into ImageRectangleOfSelect
+			put ImageRectangle(text:"Book Out Date. Time", waitFor:20) into ImageRectangleOfBookOutDate
+			
+			--This code is to capture the parameter used to evaluate priority of runs
+			--if priorityFlag = "no"
+			put ImageRectangleOfBookOutDate.topleft.x into x1
+			put ImageRectangleOfBookOutDate.topright.x into x2
+			put ImageRectangleOfEnergy.topleft.y into y1
+			put ImageRectangleOfEnergy.bottomright.y into y2
+			put ReadText([[x1-15,y1-15], [x2+10,y2+10]]) into bookouttime
+			--"Utilities/ExcelOperations".CreateOutputFile "firstbuspriority"
+			log bookouttime
+			--"Utilities/ExcelOperations".ReadFromFile "firstbuspriority", "requiredenergy", 
+			put 	"Utilities/ExcelOperations".ReadFromFile ( "firstbuspriority", "bookouttime") into prevbusbookouttime
+			put compareBookoutTimes (prevbusbookouttime, bookouttime) into comparedbookouttimeresult
+			if comparedbookouttimeresult = "less"
+				Log "Run found for the next bus with low priority"
+			else if comparedbookouttimeresult = "greater"
+				Log "Bookout time if high for the current run"
+				put false into flag
+				return flag
+			else if comparedbookouttimeresult = "equal" 
+				Log "Bookout time if equal for the current run"
+				put "Utilities/ExcelOperations".ReadFromFile ("firstbuspriority", "requiredenergy") into prevbusreqenergy
+				put "Utilities/ExcelOperations".WriteIntoFile ("firstbuspriority", "currentEnergy") into prevbuscurrentenergy
+				put prevbusreqenergy - prevbuscurrentenergy into prevbusenergydiff
+				put runNumber - actualcurrentEnergy into currentbusenergydiff	
+				if prevbusenergydiff < currentbusenergydiff
+					put runNumber into runNumber
+				end if 
+			end if
+		end if		
+		--end if
+		
+		if priorityFlag = "high" 
+			---If no priority i.e. first time select
+			set the SearchRectangle to empty
+			set the SearchRectangle to ScreenPart("FindRequiredEnergyArea")
+			put ImageRectangle(text:runNumber, waitFor:20) into ImageRectangleOfEnergy
+			set the SearchRectangle to empty
+			set the SearchRectangle to ScreenPart("SelectRunArea")
+			--put ImageRectangle(text:"79", waitFor:20) into ImageRectangleOfEnergy
+			put ImageRectangle(text:"Selection", waitFor:20) into ImageRectangleOfSelect
+			put ImageRectangle(text:"Book Out Date. Time", waitFor:20) into ImageRectangleOfBookOutDate
+			
+			--This code is to capture the parameter used to evaluate priority of runs
+			--if priorityFlag = "no"
+			put ImageRectangleOfBookOutDate.topleft.x into x1
+			put ImageRectangleOfBookOutDate.topright.x into x2
+			put ImageRectangleOfEnergy.topleft.y into y1
+			put ImageRectangleOfEnergy.bottomright.y into y2
+			put ReadText([[x1-15,y1-15], [x2+10,y2+10]]) into bookouttime
+			--"Utilities/ExcelOperations".CreateOutputFile "firstbuspriority"
+			log bookouttime
+			--"Utilities/ExcelOperations".ReadFromFile "firstbuspriority", "requiredenergy", 
+			put 	"Utilities/ExcelOperations".ReadFromFile ( "firstbuspriority", "bookouttime") into prevbusbookouttime
+			put compareBookoutTimes (prevbusbookouttime, bookouttime) into comparedbookouttimeresult
+			if comparedbookouttimeresult = "less"
+				--Log "Bookout time if high for the current run"
+				put false into flag
+				return flag
+			else if comparedbookouttimeresult = "greater"
+				Log "Bookout time found with greater value  for the current run"
+			else if comparedbookouttimeresult = "equal" 
+				Log "Bookout time if equal for the current run"
+				put "Utilities/ExcelOperations".ReadFromFile ("firstbuspriority", "requiredenergy") into prevbusreqenergy
+				put "Utilities/ExcelOperations".WriteIntoFile ("firstbuspriority", "currentEnergy") into prevbuscurrentenergy
+				put prevbusreqenergy - prevbuscurrentenergy into prevbusenergydiff
+				put runNumber - actualcurrentEnergy into currentbusenergydiff	
+				
+				if prevbusenergydiff > currentbusenergydiff
+					put runNumber into runNumber
+					
+				end if		
+			end if
+		end if
+		set the SearchRectangle to empty
+		set the SearchRectangle to ScreenPart("FindRequiredEnergyArea")
+		
+		put ImageRectangle(text:runNumber, waitFor:20) into ImageRectangleOfEnergy
+		set the SearchRectangle to empty
+		
+		set the SearchRectangle to ScreenPart("SelectRunArea")
+		--put ImageRectangle(text:"79", waitFor:20) into ImageRectangleOfEnergy
+		put ImageRectangle(text:"Selection", waitFor:20) into ImageRectangleOfSelect
+		
+		put ImageRectangleOfSelect.topleft.x into x1
+		put ImageRectangleOfSelect.topright.x into x2
+		put ImageRectangleOfEnergy.topleft.y into y1
+		put (x1+x2)/2 rounded to 0 places into x
+		Click [x, y1]
+		
+		"CCSS_Pages/RunAndAssignmentTrackPage".ClickConfirmButton
+		
+		put true into flag
+		LogSuccess "Run is found for the condition 'Current Energy< Required Energy', runNumber-->"&&runNumber
+	end if
+	
+	set the SearchRectangle to empty
+	return flag	
+end EvaluateCurrentEnergyAndThresholdEnergyAndSelectARun
+
+
+to handle CompareCurrentEnergyAndRequiredEnergy currentEnergy, listRequiredEnergy
+	--Current Energy = Required Energy	
+	put "" into runtoselect
+	repeat with each item of listRequiredEnergy
+		put it into var
+		delete "[" in var
+		delete "]" in var
+		delete quote in var
+		delete "@" in var
+		log var
+		
+		if ( currentEnergy < var)
+			put var into runtoselect
+			Exit repeat
+			
+		end if
+	end repeat
+	return runtoselect
+end CompareCurrentEnergyAndRequiredEnergy
+
+
+to handle CompareCurrentEnergyAndRequiredEnergyWithPreviousBusRun currentEnergy, mergedREandBookoutTime
+	--Current Energy = Required Energy	
+	--put "Utilities/ExcelOperations".ReadFromFile  ("firstbuspriority", "runnumber") into previousBusRunNumber	
+	put "Utilities/ExcelOperations".ReadFromFile  ("firstbuspriority", "bookouttime") into previousBusBookoutTime
+	
+	--put 1 into count
+	--put "Utilities/ExcelOperations".ReadFromFile  ("outputdatarequiredenergy_and_bookouttime", "run "&count) into previousBusRunNumber	
+	
+	put "" into runtoselect
+	--put 300 into currentEnergy
+	--put ["301 -> Jul 08,11:01","367 -> Jul 08,11:02","346 -> Jul 08,11:02","432 -> Jul 08,11:03","414 -> Jul 08,11:03","461 -> Jul 08,11:04","434 -> Jul 08,11:04","411 -> Jul 08,11:05","400 -> Jul 08,11:08"] into mergedREandBookoutTime
+	repeat with each item of mergedREandBookoutTime
+		put it into var
+		log var
+		
+		put split (var, "->") into arrVals
+		put first item of arrVals into requiredEnergy
+		put second item of arrVals into bookoutTime
+		
+		--Logic to select a current bus run which has "lesser priority" than previous bus based on Required Energy and Bookout time
+		if (currentEnergy < requiredEnergy)
+			if (compareBookoutTimes(previousBusBookoutTime, bookoutTime)="less")
+				put requiredEnergy into runtoselect
+				Exit repeat
+			else if (compareBookoutTimes(previousBusBookoutTime, bookoutTime)="equal")
+				Log "Implement 3rd logic"
+				--Get required energy of first bus from API - logicalChargeQueue
+				--Minus/difference the Current Energy and Required energy for bus1
+				--Minus/difference the Current Energy and Required energy for bus2
+				--Compare the differences 
+				--Which ever is less select that run
+				
+			end if 
+		end if
+		
+	end repeat
+	return runtoselect
+	
+end CompareCurrentEnergyAndRequiredEnergyWithPreviousBusRun
+
+to handle compareBookoutTimes previousBusBookoutTime, bookoutTime
+	--put "Jul 06,11:02" into previousBusBookoutTime
+	--put "Jul 06,11:01" into bookoutTime
+	--put "less" into flag
+	Split previousBusBookoutTime by ","
+	Split bookoutTime by ","
+	put formattedTime("%Y-%m-%d",  item 1 of previousBusBookoutTime ) into prevBoTDate
+	log prevBoTDate
+	put formattedTime("%Y-%m-%d",  item 1 of bookoutTime ) into currBoTDate
+	log currBoTDate
+	
+	put formattedTime("%H-%M-%S",  item 2 of previousBusBookoutTime ) into prevBoTTime
+	log prevBoTTime
+	put formattedTime("%H-%M-%S",  item 2 of bookoutTime ) into currBoTTime
+	log currBoTTime
+	put false into flag1
+	--if flag = "less"
+	--This logic will return less if previous bus book out time is less than current bus
+	if prevBoTDate < currBoTDate 
+		Log "Previous Bookout Date less than current date "&&prevBoTDate && currBoTDate 
+		put "less" into flag1
+	else if prevBoTDate = currBoTDate
+		Log "Bookout Date matched "&&prevBoTDate && currBoTDate 
+		if prevBoTTime < currBoTTime
+			Log "Bookout Time matched "&&prevBoTTime && currBoTTime
+			put "less" into flag1
+		else	if prevBoTTime > currBoTTime
+			put "greater" into flag1
+		else if prevBoTTime = currBoTTime
+			put "equal" into flag1
+		end if
+	else if prevBoTDate > currBoTDate
+		put "greater" into flag1
+	end if
+	return flag1
+	
+end compareBookoutTimes
+
+to handle ParkBusInTheTrack BusId
+	"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+	
+	--Ensure that the Needs Maintenance Checkbox is not selected and click the Recommended Run & Track button
+	"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "no"
+	
+end ParkBusInTheTrack
+
+to handle AddBusInIncomingQ sheetName
+
+	put ReadTestDataSheet(sheetName, tenantId ) into tenantId
+	put ReadTestDataSheet(sheetName, garageId ) into garageId
+	put ReadTestDataSheet(sheetName, VIN_Number ) into VIN_Number
+	put ReadTestDataSheet(sheetName, AddBusInIQ_API_URL ) into AddBusInIQ_API_URL
+	put ReadTestDataSheet(sheetName, AuthorizationToken ) into AuthorizationToken
+	
+	put "CCSS_Pages/BasePage".SetGlobalEnvironmentVariables into BaseURI
+	put QA_AssignBus_To_IQ() into summaryAPI
+	put summaryAPI.responsebody into respbody1
+	--log respbody1
+	
+	put jsonvalue (respbody1) into responsebody2 
+	log responsebody2
+	put responsebody2.buses.(busVinVal)._source.PCes_usi_SystemEnergy_kwh into currentEnergy
+end AddBusInIncomingQ
+

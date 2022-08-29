@@ -1,0 +1,29 @@
+﻿(***
+@Author: Mohammed Gouse
+@Date: 30/March/22
+@TC_ID: TOUC_2817
+@TC_Description: CCSS-ECMS-Online Power Capacity: Update the online power capacity value
+***)
+
+BeginTestCase TOUC_2817
+
+Log "###########   Started execution of Test Case--> TOUC_2817   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Energy Management", "Energy Management", 1
+"CCSS_Pages/EnergyManagement".VerifyOnlinePowerCapacityPercentAndkW
+"CCSS_Pages/EnergyManagement".VerifyOnlinePowerCapacityPercentSetBetweenZeroToHundred
+"CCSS_Pages/EnergyManagement".UpdateOnlinePowerCapacitykWWithSpecialCharacter
+"CCSS_Pages/EnergyManagement".UpdateOnlinePowerCapacityMoreThanIncomingPower
+"CCSS_Pages/EnergyManagement".UpdateOnlinePowerCapacityLessThanZerokW
+"CCSS_Pages/EnergyManagement".UpdateOnlinePowerCapacitykWIsEqualToIncomingPower
+
+"CCSS_Pages/EnergyManagement".UpdateOnlinePowerCapacityPercentIsSetEqualToIncomingPower
+
+Log "#############  Finished execution of Test Case--> TOUC_2817 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_2817

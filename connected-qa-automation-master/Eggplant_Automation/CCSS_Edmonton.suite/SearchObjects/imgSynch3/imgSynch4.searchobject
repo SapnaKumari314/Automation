@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		874,
+		509,
+		138,
+		87
+	],
+	"lastmodifieddate": 1647957469.3899999,
+	"createddate": 1647951756.6040001,
+	"name": "imgSynch3/imgSynch4",
+	"lastfounddate": 1660740702.546,
+	"ocrcapturestring": "o",
+	"lastfoundlocation": [
+		956,
+		530,
+		25,
+		23
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[69,43]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "imgSynch3/imgSynch4.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com",
+				"capturerect": [
+					874,
+					509,
+					138,
+					87
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "■>"
+			}
+	]
+}

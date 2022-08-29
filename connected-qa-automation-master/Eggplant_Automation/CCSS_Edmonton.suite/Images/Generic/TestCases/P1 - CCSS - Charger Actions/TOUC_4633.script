@@ -1,0 +1,39 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 14/Apr/22
+@TC_ID: TOUC_4633
+@TC_Description: CCSS-CC-Charger Actions: Charger Action warning for low LCQ priority Buses
+***)
+
+
+(***
+prerequisite: Charger positions should be empty
+***)
+
+BeginTestCase TOUC_4633
+
+Log "###########   Started execution of Test Case--> TOUC_4633  ##############"
+Log "#######################################################"
+
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Click Menu and click Charger Control screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+
+--Right Click on the charger icon and Click the Terminate Charging action
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "InitiateChargingBtn") into InitiateChargingBtn
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "InitiateChargingMsg7") into InitiateChargingMsg7
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "InitiateChargingConfirmMsg2") into InitiateChargingConfirmMsg2
+
+"CCSS_Pages/ChargerControl".RightClickOnIconAndSelectOption "activecharger", InitiateChargingBtn, InitiateChargingMsg7, InitiateChargingConfirmMsg2
+
+
+
+Log "#############  Finished execution of Test Case--> TOUC_4633 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_4633

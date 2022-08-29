@@ -1,0 +1,46 @@
+{
+	"lastmodifieddate": 1648747432.089,
+	"lastfoundlocation": [
+		29,
+		772,
+		83,
+		110
+	],
+	"originalcapturelocation": [
+		29,
+		861,
+		83,
+		110
+	],
+	"createddate": 1648747432.089,
+	"lastfounddate": 1650695716.5599999,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[42,76]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/imgBlackTrack/imgBlackTrack2.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"capturerect": [
+					29,
+					861,
+					83,
+					110
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com"
+			}
+	],
+	"name": "RunAndTrackAssignmentPage/imgBlackTrack/imgBlackTrack2"
+}

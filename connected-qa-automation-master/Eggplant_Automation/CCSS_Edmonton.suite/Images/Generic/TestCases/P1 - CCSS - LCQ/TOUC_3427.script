@@ -1,0 +1,42 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 27/Apr/22
+@TC_ID: TOUC_3427
+@TC_Description: CCSS-LCQ: Logical Charge Queue component
+***)
+
+BeginTestCase TOUC_3427
+
+Log "###########   Started execution of Test Case--> TOUC_3427  ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Pre-Req : Pre-Req : Buses should be present at Parking layout
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P1_TestData", "LCQ", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+
+--Navigate to the Proterra CCSS Home Page
+--Click on a Bus at Incoming Queue at 'Run & Track Assignment' screen
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "BusID") into BusId
+"CCSS_Pages/GarageOverview".CreateBusWithAnStatusAndAssignOnTrack "not ready", BusId,"RunAndTrackAssignmentPage\imgActiveCharger" ,"CCSS_P1_TestData", "LCQ", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+
+--Navigate to Garage Overview screen by selecting 'Garage Overview' link from main menu
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+
+--Navigate to Logical Charge Queue section
+"CCSS_Pages/GarageOverview".NavigateToElement "Logical Charge Queue", "LogicalChargeQueueArea"
+
+--Verify Bus ID
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "BusID") into BusId
+"CCSS_Pages/GarageOverview".VerifyLCQDetails BusId
+
+
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3427 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3427

@@ -1,0 +1,1124 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 23/Feb/22
+@Description: Its a Global Library to use across the test cases.
+@For testing purposes only
+***)
+
+--Utilities - Common Eggplant methods to perform basic operations
+to handle ClickBtnByImage textImage
+	put true into flag
+	MoveTo [12,120]
+	
+	If ImageFound(image:textImage, waitFor:10) then
+		Click textImage
+		Log "Element Clicked successfully--> "&&textImage
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		put false into flag
+		LogWarning "Unable to find the image--> "&&textImage
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+	return flag
+end ClickBtnByImage
+
+to handle ClickBelowOfBtnByImage textImage
+	put true into flag
+	
+	If ImageFound(image:textImage, waitFor:10) then
+		Click (ImageLocation(image:textImage, WaitFor:20) + [0,15])
+		Log "Element Clicked successfully--> "&&textImage
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		put false into flag
+		LogWarning "Unable to find the image--> "&&textImage
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+	return flag
+end ClickBelowOfBtnByImage
+
+to handle ClickBtnByText textLabel
+
+	put true into flag
+	If ImageFound(text:textLabel, waitFor:30) then
+		Click (ImageLocation(text:textLabel, WaitFor:30) + [0,15])
+		Log "Element Clicked successfully:----> "&&textLabel
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		put false into flag
+		LogWarning "Unable to find the image:----> "&&textLabel
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+	return flag
+end ClickBtnByText
+
+to handle ClickBtnByTextWithProperties textLabel, contrastcolor, x, y
+
+	put true into flag
+	If ImageFound(text:textLabel, waitFor:30,  contrastcolor:"#4a2825", contrast:on) then
+		Click (ImageLocation(text:textLabel, WaitFor:30,  contrastcolor:contrastcolor, contrast:on) + [x,y])
+		Log "Element Clicked successfully:----> "&&textLabel
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		put false into flag
+		LogWarning "Unable to find the image:----> "&&textLabel
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+	return flag
+end ClickBtnByTextWithProperties
+
+to handle ClickBtnByTextWithLowerContrast textLabel
+	put true into flag
+	If ImageFound(text:textLabel, waitFor:10, lowresolutionmode:yes, contrastcolor:"#4a4816", contrast:on) then
+		Click (ImageLocation(text:textLabel, WaitFor:20, lowresolutionmode:yes, contrastcolor:"#4a4816", contrast:on) + [0,15])
+		Log "Element Clicked successfully:----> "&&textLabel
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		put false into flag
+		LogWarning "Unable to find the image:----> "&&textLabel
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+	return flag
+end ClickBtnByTextWithLowerContrast
+
+to handle ClickElementByCoordinates txtlabel, x, y
+	put true into flag
+	If ImageFound(text:txtlabel, waitFor:10)
+		Log "Element Clicked successfully:----> "&&txtlabel
+		Click (ImageLocation(text:txtlabel, WaitFor:20) + [x,y])
+	else
+		put false into flag
+		LogWarning "Element Not found:----> "&&txtlabel
+	End If
+	return flag
+end ClickElementByCoordinates
+
+to handle ClickAnElementInListByText textLabel, itemInList
+	Set StatusRectangles to EveryImageRectangle(text:textLabel) // Stores the return of EveryImageRectangle in a variable called StatusRectangles.
+	put item itemInList of StatusRectangles into img
+	Log "There are"&&the number of items of StatusRectangles&&"statuses to check."
+	subtract 10 from item 1 of img
+	log item 1 of img
+	subtract 10 from item 2 of img
+	log item 2 of img
+	add 10 to item 3 of img
+	log item 3 of img
+	add 10 to item 4 of img
+	log item 4 of img
+	
+	set the SearchRectangle to img
+	put true into flag
+	if ImageFound(text:textLabel)
+		Click ImageLocation(text:textLabel) 
+		put true into flag
+		Log "Item clicked successfully--> "&&textLabel
+		"Utilities/GenericOperations".CaptureScreenshot
+	else
+		LogWarning "Item not clicked successfully--> "&&textLabel
+		"Utilities/GenericOperations".CaptureScreenshot
+		put true into flag
+	end if
+	
+	set the SearchRectangle to []
+
+end ClickAnElementInListByText
+
+to handle SelectLabel textLabel
+	If ImageFound(text:textLabel, waitFor:10) then
+		click item 2 of EveryImageLocation(text:"textLabel", waitfor: 10) 
+		typetext downArrow
+		typetext returnKey
+		--Click (ImageLocation(text:textLabel, WaitFor:20) + [0,15])
+		Log "Element Clicked successfully--> "&&textLabel
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		LogWarning "Unable to find the image--> "&&textLabel
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+end SelectLabel
+
+to handle EnterTextBoxByImage imageTextBox, data
+	If ImageFound(imageName:imageTextBox, waitFor:10) then
+		TypeText imageTextBox
+		Log "Text "&&data&&"entered successfully in text box - "&&imageTextBox
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		LogWarning "Unable to find the Text box - "&&imageTextBox
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+end EnterTextBoxByImage
+
+to handle EnterTextBoxByTextBelow textLabel, data, yCoordinate
+	if yCoordinate = ""
+		put 15 into yCoordinate
+	end if
+	If ImageFound(text:textLabel, waitFor:40) then
+		Click ImageLocation(text:textLabel, WaitFor:40) + [0, yCoordinate]
+		TypeText controlKey, a
+		TypeText data
+		Log "Text "&&data&&" entered successfully in text box- "&&textLabel
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		LogWarning "Unable to find the Text box - "&&textLabel
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+end EnterTextBoxByTextBelow
+
+to handle EnterTextBoxByText textLabel, data
+	If ImageFound(text:textLabel, waitFor:20) then
+		wait 2
+		Click ImageLocation(text:textLabel, WaitFor:20)
+		wait 2
+		TypeText controlKey, a
+		TypeText data
+		Log "Text "&&data&&" entered successfully in text box- "&&textLabel
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		LogWarning "Unable to find the Text box- "&&textLabel
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+end EnterTextBoxByText
+
+--Need to correct
+to handle GetTextByImage imageTextBox
+	If ImageFound(imageName:imageTextBox, waitFor:10) then
+		TypeText imageTextBox
+		Log "Text entered successfully in text box"
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		LogWarning "Unable to find the Text box "
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+end GetTextByImage
+
+
+to handle getCoordinates elementName
+	--put ImageLocation (text:elementName, WaitFor:20) into cor
+	--put EveryImageRectangle(text:elementName) into cor
+	--(822,91,1093,140)
+	return (ImageLocation(text:elementName))
+end getCoordinates
+
+to handle getCoordinatesOfImage imgName
+	--put ImageLocation (text:elementName, WaitFor:20) into cor
+	--put EveryImageRectangle(text:elementName) into cor
+	--(822,91,1093,140)
+	return (ImageLocation(image:imgName))
+end getCoordinatesOfImage
+
+to handle getCoordinatesImage elementName
+	--put ImageLocation (text:elementName, WaitFor:20) into cor
+	--put EveryImageRectangle(text:elementName) into cor
+	--(822,91,1093,140)
+	return (ImageLocation(image:elementName))
+end getCoordinatesImage
+
+to handle GetTextBelowByText textBoxText, belowYCoorodinate
+	if belowYCoorodinate is "" then
+		put 0 into belowYCoorodinate 
+	end if
+	
+	If ImageFound(text:textBoxText, waitFor:10) then
+		put ReadText((ImageLocation(text:textBoxText, WaitFor:20) + [-10,15+belowYCoorodinate])) into val
+		Log "Text" && val&&" fetched successfully from "&&textBoxText
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		LogWarning "Unable to find the field:---> "&&textBoxText
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+	return val
+end GetTextBelowByText
+
+to handle ReadMultiLineText textToRead
+	if ImageFound(text:textToRead)
+		put ReadText((ImageLocation(text:textToRead, WaitFor:20))) into firstLine
+		log firstLine
+		put ReadText((ImageLocation(text:textToRead, WaitFor:20) + [0,12])) into secondLine
+		log secondLine
+		Log "Text fetched successfully:---> " && firstLine && secondLine
+		"Utilities/GenericOperations".CaptureScreenshot
+		--put "Utilities/CommonActions".GetTextBelowByText (partialNotificationMsg) into actualMsg
+		return firstLine && secondLine
+	else 
+		LogWarning "Unable to find the text on the given area--> "&&textToRead
+		return ""
+	End If
+end ReadMultiLineText
+
+to handle GetTextByText textBoxText, x, y
+	if x=""
+		put 30 into x
+		put 15 into y
+	end if
+	If ImageFound(text:textBoxText, waitFor:10) then
+		put ReadText((ImageLocation(text:textBoxText, WaitFor:2) + [x,y])) into val
+		Log "Text " && val&&" fetched successfully from field- "&&textBoxText
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		LogWarning "Unable to find the Text for field:---> "&&textBoxText
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+	delete "yf " in val
+	return val
+end GetTextByText
+
+to handle ReadTextInRectangle txtMsg, x1,y1,x2,y2
+	WaitFor 5, text:txtMsg
+	put ReadText([x1,y1], [x2,y2]) into txt
+	return txt
+	
+end ReadTextInRectangle
+
+to handle IsTextPresentOnScreen textBoxText
+	put true into flag
+	If ImageFound(text:textBoxText, waitFor:10) then
+		put true into flag
+		Log "Text"&&textBoxText&&" Is present on the screen"
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		LogWarning  "Text"&&textBoxText&&" Is not present on the screen"
+		put false into flag
+	End if
+	return flag
+end IsTextPresentOnScreen
+
+to handle IsImagePresentOnScreen imgIcon
+	put true into flag
+	If ImageFound(image:imgIcon, waitFor:10) then
+		put true into flag
+		Log "Image "&&textBoxText&&" Is present on the screen"
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		LogWarning  " Image "&&textBoxText&&" Is not present on the screen"
+		put false into flag
+	End if
+	return flag
+end IsImagePresentOnScreen
+
+to handle IsTextNotPresentOnScreen textBoxText
+	put true into flag
+	If ImageFound(text:textBoxText, waitFor:10) then
+		put false into flag
+		LogWarning "Text"&&textBoxText&&" Is present on the screen"
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		Log  "Text"&&textBoxText&&" Is not present on the screen"
+		put true into flag
+	End if
+	return flag
+end IsTextNotPresentOnScreen
+
+to handle GetTextByCoordinates x,y
+	--If ImageFound(text:textBoxText, waitFor:10) then
+	put ReadText(x,y) into val
+	if val is not equal to ""
+		Log "Text " && val&&"fetched successfully from the coordinates -  x="&&x&&",y="&&y
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		LogWarning "No text found at the given coordinates -  x="&&x&&",y="&&y
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+	return val
+end GetTextByCoordinates
+
+to handle SelectCheckBox selectedChkBox, unselectedChkBox
+	put true into flag
+	If ImageFound(imageName:selectedChkBox, waitFor:4) then
+		--Click checkBoxImage
+		Log "Checkbox "&&selectedChkBox&&" is already checked"
+		"Utilities/GenericOperations".CaptureScreenshot
+	else If ImageFound(imageName:unselectedChkBox, waitFor:10) then
+		Click unselectedChkBox
+		Log "Checkbox "&&unselectedChkBox&&" is checked successfully"
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		put false into flag
+		LogWarning "Check box"&&unselectedChkBox&&" is not found"
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+	return flag
+end SelectCheckBox
+
+to handle UnSelectCheckBoxByImage checkBoxImage,  checkBoxImage2
+	put true into flag
+	If ImageFound(imageName:checkBoxImage, waitFor:10) then
+		Click checkBoxImage
+		Log "Checkbox"&&checkBoxImage&&" unchecked successfully"
+		"Utilities/GenericOperations".CaptureScreenshot
+	else If ImageFound(imageName:checkBoxImage2, waitFor:10) then
+		Log "Checkbox "&&checkBoxImage2&&" is already unselected"
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		put false into flag
+		LogWarning "Check box is not found"
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+end UnSelectCheckBoxByImage
+
+to handle UnSelectCheckBox checkBoxLabel
+	put true into flag
+	If ImageFound(text:checkBoxLabel, waitFor:10) then
+		Click checkBoxLabel
+		Log "Checkbox "&&checkBoxLabel&&" unchecked successfully"
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		put false into flag
+		LogWarning "Unable to find the checkbox "&&checkBoxLabe
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+end UnSelectCheckBox
+
+to handle SelectRadioBox unSelectedImageFile
+	If ImageFound(imageName:unSelectedImageFile, waitFor:10) then
+		Click unSelectedImageFile
+		Log "Radiobox checked successfully"
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		LogWarning "Unable to find the radiobox "
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+end SelectRadioBox
+
+to handle UnSelectRadioBox selectedImageFile
+	If ImageFound(imageName:selectedImageFile, waitFor:10) then
+		Click selectedImageFile
+		Log "Radiobox unchecked successfully"
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		LogWarning "Unable to find the radiobox "
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+end UnSelectRadioBox
+
+to handle ClearTextBox imageTextBox
+	If ImageFound(imageName:imageTextBox, waitFor:10) then
+		TypeText ""
+		Log "Text box cleared successfully"
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		LogWarning "Unable to find the Text box"
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+end ClearTextBox
+
+to handle GetTextOfLabel imageLabel
+	If ImageFound(imageName:imageLabel, waitFor:10) then
+		TypeText ""
+		LogSuccess "Text fetched successfully from label"
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		LogWarning "Unable to find the label"
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+end GetTextOfLabel
+
+to handle compareValues expResult, actualResult
+	put true into flag
+	if expResult = actualResult then
+		Log "Expected Value "&&expResult&&" is matching with actual value"&&actualResult
+		"Utilities/GenericOperations".CaptureScreenshot
+		put true into flag
+	else 
+		put false into flag
+		LogWarning "Expected Value "&&expResult&&" is not matching with actual value"&&actualResult
+		"Utilities/GenericOperations".CaptureScreenshot
+	end if
+	return flag
+end compareValues
+
+to handle containsValue expResult, actualResult
+	put true into flag
+	if  actualResult contains  expResult then
+		put true into flag
+		Log "Expected Value "&&expResult&&" is matching with actual result "&&actualResult
+		"Utilities/GenericOperations".CaptureScreenshot
+	else 
+		put false into flag
+		LogWarning "Expected Value "&&expResult&&" is matching with actual result "&&actualResult
+		"Utilities/GenericOperations".CaptureScreenshot
+	end if
+	return flag
+end containsValue
+
+to scrollGridDownTillElementFound itemToSearchInGrid
+	--put	ImageRectangle(text:"Bus ID")
+	pageDown
+	put 1 into count 
+	Moveto remotescreensize()*(1/2) 
+	repeat until imagefound(text:itemToSearchInGrid,waitFor:0)
+		if count is less than 3
+			ScrollWheelDown 1
+			add 1 to count 
+		else 
+			dragHorizontalCursor
+			Exit repeat
+		end if
+		wait 1 
+	end repeat
+	--click "NewAddress"
+end scrollGridDownTillElementFound
+
+to pageDown
+	Click  [189,412]
+	TypeText pageDown
+	Log "Page is scrolled down using pageDown key"
+	
+end pageDown
+
+to pageUp
+	Click  [189,412]
+	TypeText pageUp
+	Log "Page is scrolled down using pageDown key"
+end pageUp
+
+to scrollCursorRightHorizontally itemToSearchInGrid, imgHorizontalScroll
+	if imagefound(imgHorizontalScroll)=false
+		exit handler
+		put false into flagImageFound
+	end if
+	set horizontalScrollLocation to ImageLocation(image:imgHorizontalScroll)
+	log horizontalScrollLocation
+	put item 1 of  horizontalScrollLocation into x
+	put item 2 of  horizontalScrollLocation into y
+	Log x
+	Log y
+	put true into flagImageFound
+	Moveto remotescreensize()*(1/2) 
+	--put x into i
+	--repeat until imagefound(text:itemToSearchInGrid,waitFor:0)
+	repeat until imagefound(image:itemToSearchInGrid,waitFor:0)
+		set horizontalScrollLocation to ImageLocation(image:imgHorizontalScroll)
+		put item 1 of  horizontalScrollLocation into xBeforeScroll
+		add 200 to x 
+		if x>1900
+			set x to 1900
+		end if
+		
+		MoveTo imgHorizontalScroll
+		MouseButtonDown 1 //Holds down the left mouse button
+		--MoveTo the remoteScreenSize*(3/4) 
+		MoveTo [x,y]
+		MouseButtonUp 1 //Releases the left mouse button
+		
+		MoveTo [500,500]
+		set horizontalScrollLocation to ImageLocation(image:imgHorizontalScroll)
+		put item 1 of  horizontalScrollLocation into xAfterScroll
+		
+		if xBeforeScroll = xAfterScroll
+			put false into flagImageFound
+			Exit repeat
+		end if
+	end repeat
+	return flagImageFound
+end scrollCursorRightHorizontally
+
+to scrollCursorLeftHorizontally itemToSearchInGrid, imgHorizontalScroll
+	if imagefound(imgHorizontalScroll)=false
+		exit handler
+		put false into flagImageFound
+	end if
+	set horizontalScrollLocation to ImageLocation(image:imgHorizontalScroll)
+	log horizontalScrollLocation
+	put item 1 of  horizontalScrollLocation into x
+	put item 2 of  horizontalScrollLocation into y
+	Log x
+	Log y
+	put true into flagImageFound
+	--put x into i
+	--repeat until imagefound(text:itemToSearchInGrid,waitFor:0)
+	repeat until imagefound(image:itemToSearchInGrid,waitFor:0)
+		set horizontalScrollLocation to ImageLocation(image:imgHorizontalScroll)
+		put item 1 of  horizontalScrollLocation into xBeforeScroll
+		
+		subtract 200 from x
+		
+		if x<800
+			set x to 800
+		end if
+		
+		MoveTo imgHorizontalScroll
+		MouseButtonDown 1 //Holds down the left mouse button
+		--MoveTo the remoteScreenSize*(3/4) 
+		MoveTo [x,y]
+		MouseButtonUp 1 //Releases the left mouse button
+		
+		MoveTo [500,500]
+		set horizontalScrollLocation to ImageLocation(image:imgHorizontalScroll)
+		put item 1 of  horizontalScrollLocation into xAfterScroll
+		
+		if xBeforeScroll = xAfterScroll
+			put false into flagImageFound
+			Exit repeat
+		end if
+	end repeat
+	return flagImageFound
+end scrollCursorLeftHorizontally
+---VerifyText
+---ScrollPage
+--ScroolGrids
+---
+to scrollCursorDownVertically itemToSearchInGrid, imgVerticalScroll
+	if imagefound(imgVerticalScroll)=false
+		exit handler
+		put false into flagImageFound
+	end if
+	set verticalScrollLocation to ImageLocation(image:imgVerticalScroll)
+	log verticalScrollLocation
+	put item 1 of  verticalScrollLocation into x
+	put item 2 of  verticalScrollLocation into y
+	Log x
+	Log y
+	put true into flagImageFound
+	--put x into i
+	(***set the SearchRectangle to [908,620,986,708]
+	if ImageFound(text:"8027",waitFor:20)
+		Log "image founnd"
+	end if**)
+	--repeat until imagefound(text:itemToSearchInGrid,waitFor:0)
+	repeat until imagefound(image:itemToSearchInGrid,waitFor:0)
+		set verticalScrollLocation to ImageLocation(image:imgVerticalScroll)
+		put item 1 of  verticalScrollLocation into xBeforeScroll
+		add 200 to y 
+		if y>1900
+			set y to 1900
+		end if
+		
+		MoveTo imgVerticalScroll
+		MouseButtonDown 1 //Holds down the left mouse button
+		--MoveTo the remoteScreenSize*(3/4) 
+		MoveTo [x,y]
+		MouseButtonUp 1 //Releases the left mouse button
+		
+		MoveTo [500,500]
+		set verticalScrollLocation to ImageLocation(image:imgVerticalScroll)
+		put item 1 of  verticalScrollLocation into xAfterScroll
+		
+		if xBeforeScroll = xAfterScroll
+			put false into flagImageFound
+			Exit repeat
+		end if
+	end repeat
+	return flagImageFound
+end scrollCursorDownVertically
+
+to scrollCursorUpVertically itemToSearchInGrid, imgVerticalScroll
+	if imagefound(imgVerticalScroll)=false
+		exit handler
+		put false into flagImageFound
+	end if
+	set verticalScrollLocation to ImageLocation(image:imgVerticalScroll)
+	log verticalScrollLocation
+	put item 1 of  verticalScrollLocation into x
+	put item 2 of  verticalScrollLocation into y
+	Log x
+	Log y
+	put true into flagImageFound
+	--put x into i
+	repeat until imagefound(image:itemToSearchInGrid,waitFor:0)
+		--		repeat until imagefound(text:itemToSearchInGrid,waitFor:0)
+		set verticalScrollLocation to ImageLocation(image:imgVerticalScroll)
+		put item 1 of  verticalScrollLocation into xBeforeScroll
+		subtract 200 from y
+		
+		if y<800
+			set y to 800
+		end if
+		
+		MoveTo imgVerticalScroll
+		MouseButtonDown 1 //Holds down the left mouse button
+		--MoveTo the remoteScreenSize*(3/4) 
+		MoveTo [x,y]
+		MouseButtonUp 1 //Releases the left mouse button
+		
+		MoveTo [500,500]
+		set verticalScrollLocation to ImageLocation(image:imgVerticalScroll)
+		put item 1 of  verticalScrollLocation into xAfterScroll
+		
+		if xBeforeScroll = xAfterScroll
+			put false into flagImageFound
+			Exit repeat
+		end if
+	end repeat
+	return flagImageFound
+end scrollCursorUpVertically
+
+to handle scrollMouseWheelUp textLabel
+	moveto the remotescreensize times .5 //Moves the mouse cursor to the center of the SUT screen
+	
+	repeat until repeatIndex < 3 //Repeats until the "ContactUsLink" image is visible on the SUT
+		if the repeatIndex > 3 then 
+			Exit repeat
+			
+		end if
+		--if the repeatIndex > 3 then Throw "Image not found.","Contact Us link not found." //Throws an exception if the repeat loop repeats more than 3 times
+		--if the repeatIndex > 3 then
+		scrollwheelup 1 //Scrolls one increment
+		--end if	
+		wait 1 //Waits 1 second to allow the UI to settle after the scroll
+		
+	end repeat
+end scrollMouseWheelUp
+
+to handle scrollMouseWheelDown textLabel, noOfTimes
+	--moveto the remotescreensize times .5 //Moves the mouse cursor to the center of the SUT screen
+	moveto text:textLabel
+	click  text:textLabel
+	repeat until repeatIndex < noOfTimes //Repeats until the "ContactUsLink" image is visible on the SUT
+		if the repeatIndex > noOfTimes then 
+			Exit repeat
+			
+		end if
+		--if the repeatIndex > 3 then Throw "Image not found.","Contact Us link not found." //Throws an exception if the repeat loop repeats more than 3 times
+		--if the repeatIndex > 3 then
+		scrollwheelup 1 //Scrolls one increment
+		--end if	
+		wait 1 //Waits 1 second to allow the UI to settle after the scroll
+		
+	end repeat
+end scrollMouseWheelDown
+
+to DragAndDropImage imgToDrag
+	put imageLocation(imgToDrag) into ElementLoc 
+	Drag ElementLoc
+	Drop [ElementLoc.x+200,ElementLoc.y+300]
+	"Utilities/GenericOperations".CaptureScreenshot
+end DragAndDropImage
+
+to DragImageAndDropIntoImage imgToDrag,imgToDrop
+	--put imageLocation(imgToDrag) into ElementLoc
+	DragAndDrop imgToDrag,imgToDrop
+	--Drag ElementLoc
+	--Drop imgToDrop
+	"Utilities/GenericOperations".CaptureScreenshot
+end DragImageAndDropIntoImage
+
+to handle SearchImageOnScreen imgName
+	if imagefound(image:imgName,waitFor:0) then
+		put true into flag
+	else
+		put false into flag
+	end if
+	return flag
+end SearchImageOnScreen
+
+
+to handle ReadTextFromDynamicSearchRectangle labelName, shiftXLeft, shiftYTop, shiftXBottm, shiftYBottm
+
+	--put imageRectangle(text:"Search BEB") into myRectangle
+	Put imageRectangle(text:labelName) into myRectangle
+	Set imageTop = top(myRectangle)
+	set imageLeft = left (myRectangle)
+	
+	Set imageRight = right(myRectangle)
+	Set imageBottn = bottom(myRectangle)
+	
+	log imageTop
+	log imageLeft
+	log imageRight
+	log imageBottn
+	set UL = [imageLeft+shiftXLeft, imageTop+shiftYTop]
+	set BR = [imageRight+shiftXBottm, imageBottn+shiftYBottm]
+	
+	log UL, BR
+	set the SearchRectangle to [UL,BR]
+	put ReadText(UL, BR) into textRequired
+	Log "Data retrieved from the area "&&textRequired
+	set the SearchRectangle to empty
+	return textRequired
+	
+end ReadTextFromDynamicSearchRectangle
+
+to handle EnterValueForAField fieldName, data
+	put ImageRectangle(text:fieldName, waitFor:20) into ImageRectangleOfFieldName
+	log ReadText(ImageRectangleOfFieldName.TopRight+[100,0],ImageRectangleOfFieldName.BottomRight+[800,0])
+	put ReadText(ImageRectangleOfFieldName.TopRight+[100,0],ImageRectangleOfFieldName.BottomRight+[800,0]) into fieldValue
+	put true into flag
+	if ImageFound(text:fieldValue, WaitFor:20) then
+		put FoundImageLocation() into FoundFieldLocation
+		Click FoundFieldLocation
+		DoubleClick FoundFieldLocation
+		put ReadText(FoundFieldLocation) into fieldValueBeforeTextEntered
+		Log fieldValueBeforeTextEntered
+		
+		TypeText data
+		
+		put FoundImageLocation() into FoundFieldLocation
+		Click FoundFieldLocation
+		DoubleClick FoundFieldLocation
+		put ReadText(FoundFieldLocation) into fieldValueAfterTextEntered
+		Log fieldValueAfterTextEntered
+		
+		if fieldValueBeforeTextEntered is equal to fieldValueAfterTextEntered then
+			LogSuccess fieldName && "Field is Same after Entered Text and" && fieldName && "is Non-Editable"
+			"Utilities/GenericOperations".CaptureScreenshot
+		else
+			put false into flag
+			LogWarning fieldName && "Field is Not Same after Entered Text and" && fieldName && "is Editable"
+			"Utilities/GenericOperations".CaptureScreenshot
+		End if
+	else
+		put false into flag
+		LogWarning fieldName && "Not Found"
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+	return flag
+end EnterValueForAField
+
+
+to handle EnterValueWrtAField fieldName, val
+	put false into flag
+	DoubleClick text:fieldName, waitfor:5
+	Log "field double clicked"
+	wait 5
+	TypeText tabKey
+	TypeText val
+	Log "Entered "&&val&&" value in the field --->"&&fieldName
+	"Utilities/GenericOperations".CaptureScreenshot
+	put true into flag
+	return flag
+end EnterValueWrtAField
+
+to handle GetValueWrtAField fieldName
+	put false into flag
+	DoubleClick text:fieldName, waitfor:5
+	Log "field double clicked"
+	wait 5
+	TypeText tabKey
+	TypeText controlKey, a
+	TypeText controlKey, c
+	put remoteClipboard() into ConfNum
+	
+	Log "Getting value "&&ConfNum&&" value from the field --->"&&fieldName
+	"Utilities/GenericOperations".CaptureScreenshot
+	put true into flag
+	return ConfNum
+end GetValueWrtAField
+
+(**Handler No : 38**)
+--------------------------------
+(***
+@author : Mohammed Gouse
+@date : 22/March/22
+@description : To verify given Field is Editable or Non-Editable
+***)
+
+to handle IsFieldEditable fieldName
+
+	put ImageRectangle(text:fieldName, waitFor:20) into ImageRectangleOfFieldName
+	log ReadText(ImageRectangleOfFieldName.TopRight+[100,-15],ImageRectangleOfFieldName.BottomRight+[800,10])
+	put ReadText(ImageRectangleOfFieldName.TopRight+[100,-15],ImageRectangleOfFieldName.BottomRight+[800,10]) into fieldValue
+	
+	if ImageFound(text:fieldValue, WaitFor:20) then
+		put FoundImageLocation() into FoundFieldLocation
+		Click FoundFieldLocation 
+		DoubleClick FoundFieldLocation              
+		put ReadText(FoundFieldLocation) into fieldValueBeforeTextEntered
+		Log fieldValueBeforeTextEntered
+		
+		TypeText "1" 
+		
+		put FoundImageLocation() into FoundFieldLocation
+		Click FoundFieldLocation 
+		DoubleClick FoundFieldLocation              
+		put ReadText(FoundFieldLocation) into fieldValueAfterTextEntered
+		Log fieldValueAfterTextEntered
+		
+		if fieldValueBeforeTextEntered is equal to fieldValueAfterTextEntered then
+			LogSuccess fieldName && "Field is Same after Entered Text and" && fieldName && "is Non-Editable"
+			"Utilities/GenericOperations".CaptureScreenshot
+		else
+			LogWarning fieldName && "Field is Not Same after Entered Text and" && fieldName && "is Editable"
+			"Utilities/GenericOperations".CaptureScreenshot
+		End if
+	else
+		LogWarning fieldName && "Not Found"
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+end IsFieldEditable
+
+to handle IsBelowFieldEditableAsPerCoordinates fieldName, x1,y1,x2,y2
+	put ImageRectangle(text:fieldName, waitFor:20) into ImageRectangleOfFieldName
+	log ReadText(ImageRectangleOfFieldName.BottomLeft+[x1,y1],ImageRectangleOfFieldName.BottomRight+[x2,y2])
+	put ReadText(ImageRectangleOfFieldName.BottomLeft+[x1,y1],ImageRectangleOfFieldName.BottomRight+[x2,y2]) into fieldValue
+
+	if fieldValue contains("https")
+		put "https" into fieldValue
+	end if 
+	
+	
+	if ImageFound(text:fieldValue, WaitFor:20) then
+		put FoundImageLocation() into FoundFieldLocation
+		Click FoundFieldLocation 
+		DoubleClick FoundFieldLocation              
+		put ReadText(FoundFieldLocation) into fieldValueBeforeTextEntered
+		Log fieldValueBeforeTextEntered
+		
+		TypeText "1" 
+		
+		put FoundImageLocation() into FoundFieldLocation
+		Click FoundFieldLocation 
+		DoubleClick FoundFieldLocation              
+		put ReadText(FoundFieldLocation) into fieldValueAfterTextEntered
+		Log fieldValueAfterTextEntered
+		
+		if fieldValueBeforeTextEntered is equal to fieldValueAfterTextEntered then
+			LogSuccess fieldName && "Field is Same after Entered Text and" && fieldName && "is Non-Editable"
+			"Utilities/GenericOperations".CaptureScreenshot
+		else
+			LogWarning fieldName && "Field is Not Same after Entered Text and" && fieldName && "is Editable"
+			"Utilities/GenericOperations".CaptureScreenshot
+		End if
+	else
+		LogWarning fieldName && "Not Found"
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+end IsBelowFieldEditableAsPerCoordinates
+
+to handle GetFieldValue fieldName,x1,y1,x2,y2
+
+	if x1="" or y1="" or x2="" or y2=""
+		
+		put 100 into x1
+		put 0 into y1
+		put 800 into x2
+		put 0 into y2
+	end if
+	put ImageRectangle(text:fieldName, waitFor:20) into ImageRectangleOfFieldName
+	log ReadText(ImageRectangleOfFieldName.TopRight+[x1,y1],ImageRectangleOfFieldName.BottomRight+[x2,y2])
+	put ReadText(ImageRectangleOfFieldName.TopRight+[x1,y1],ImageRectangleOfFieldName.BottomRight+[x2,y2]) into fieldValue
+
+	if ImageFound(text:fieldValue, WaitFor:20) then
+		put FoundImageLocation() into FoundFieldLocation
+		Click FoundFieldLocation 
+		DoubleClick FoundFieldLocation              
+		put ReadText(FoundFieldLocation) into fieldValueBeforeTextEntered
+		Log fieldValueBeforeTextEntered
+		
+		TypeText "1" 
+		
+		put FoundImageLocation() into FoundFieldLocation
+		Click FoundFieldLocation 
+		DoubleClick FoundFieldLocation              
+		put ReadText(FoundFieldLocation) into fieldValueAfterTextEntered
+		Log fieldValueAfterTextEntered
+		
+		if fieldValueBeforeTextEntered is equal to fieldValueAfterTextEntered then
+			LogSuccess fieldName && "Field is Same after Entered Text and" && fieldName && "is Non-Editable"
+			"Utilities/GenericOperations".CaptureScreenshot
+		else
+			LogWarning fieldName && "Field is Not Same after Entered Text and" && fieldName && "is Editable"
+			"Utilities/GenericOperations".CaptureScreenshot
+		End if
+	else
+		LogWarning fieldName && "Not Found"
+		"Utilities/GenericOperations".CaptureScreenshot
+	End if
+	--return fieldValueAfterTextEntered
+end GetFieldValue
+
+to handle GetFieldValueBelowUsingCoordinates fieldName,x1,y1,x2,y2
+	if ImageFound(text:fieldName)
+		put ImageRectangle(text:fieldName, waitFor:20) into ImageRectangleOfFieldName
+		log ReadText(ImageRectangleOfFieldName.BottomLeft+[x1,y1],ImageRectangleOfFieldName.BottomRight+[x2,y2], dpi:72)
+		put ReadText(ImageRectangleOfFieldName.BottomLeft+[x1,y1],ImageRectangleOfFieldName.BottomRight+[x2,y2], dpi:72) into fieldValue
+		if fieldValue=""
+			Log "Text is not present on the Field name- "&&fieldName&&" for given coordinates, x1,y1,x2,y2 - "&&x1&&y1&&x2&&y2
+		else
+			Log "Text is present on the Field name- "&&fieldName&&" for given coordinates, x1,y1,x2,y2 - "&&x1&&y1&&x2&&y2
+		end if
+	else
+		LogWarning "Field name- "&&fieldName&&" is not present on the screen"
+	end if
+	
+	return fieldValue
+	
+end GetFieldValueBelowUsingCoordinates
+
+to handle GetFieldValueFrontUsingCoordinates fieldName,x1,y1,x2,y2
+	if ImageFound(text:fieldName)
+		put ImageRectangle(text:fieldName, waitFor:20) into ImageRectangleOfFieldName
+		log ReadText(ImageRectangleOfFieldName.TopRight+[x1,y1],ImageRectangleOfFieldName.BottomRight+[x2,y2],enableaggressivetextextraction:on, enhanceLocalContrast: On, dpi:72,contrastcolor:"#d3ffea", contrast:on)
+		put ReadText(ImageRectangleOfFieldName.TopRight+[x1,y1],ImageRectangleOfFieldName.BottomRight+[x2,y2],enableaggressivetextextraction:on, enhanceLocalContrast: On, dpi:72) into fieldValue
+		if fieldValue=""
+			Log "Text is not present on the Field name- "&&fieldName&&" for given coordinates, x1,y1,x2,y2 - "&&x1&&y1&&x2&&y2
+		else
+			Log "Text is present on the Field name- "&&fieldName&&" for given coordinates, x1,y1,x2,y2 - "&&x1&&y1&&x2&&y2
+		end if
+	else
+		LogWarning "Field name- "&&fieldName&&" is not present on the screen"
+	end if
+	
+	return fieldValue
+	
+end GetFieldValueFrontUsingCoordinates
+
+to handle GetFieldValueFrontWoUsingPropertiesCoordinates fieldName,x1,y1,x2,y2
+	if ImageFound(text:fieldName)
+		put ImageRectangle(text:fieldName, waitFor:20) into ImageRectangleOfFieldName
+		log ReadText(ImageRectangleOfFieldName.TopRight+[x1,y1],ImageRectangleOfFieldName.BottomRight+[x2,y2])
+		put ReadText(ImageRectangleOfFieldName.TopRight+[x1,y1],ImageRectangleOfFieldName.BottomRight+[x2,y2]) into fieldValue
+		if fieldValue=""
+			Log "Text is not present on the Field name- "&&fieldName&&" for given coordinates, x1,y1,x2,y2 - "&&x1&&y1&&x2&&y2
+		else
+			Log "Text is present on the Field name- "&&fieldName&&" for given coordinates, x1,y1,x2,y2 - "&&x1&&y1&&x2&&y2
+		end if
+	else
+		LogWarning "Field name- "&&fieldName&&" is not present on the screen"
+	end if
+	
+	return fieldValue
+	
+end GetFieldValueFrontWoUsingPropertiesCoordinates
+
+to handle GetFieldValueFrontUsingCoordinatesForDisabledElements fieldName,x1,y1,x2,y2, colorid
+	if ImageFound(text:fieldName,  lowresolutionmode:yes, contrastcolor:colorid, contrast:on)
+		put ImageRectangle(text:fieldName, waitFor:20, lowresolutionmode:yes, contrastcolor:colorid, contrast:on) into ImageRectangleOfFieldName
+		log ReadText(ImageRectangleOfFieldName.TopRight+[x1,y1],ImageRectangleOfFieldName.BottomRight+[x2,y2],  lowresolutionmode:yes, contrastcolor:colorid, contrast:on)
+		put ReadText(ImageRectangleOfFieldName.TopRight+[x1,y1],ImageRectangleOfFieldName.BottomRight+[x2,y2], lowresolutionmode:yes, contrastcolor:colorid, contrast:on) into fieldValue
+		if fieldValue=""
+			Log "Text is not present on the Field name- "&&fieldName&&" for given coordinates, x1,y1,x2,y2 - "&&x1&&y1&&x2&&y2
+		else
+			Log "Text is present on the Field name- "&&fieldName&&" for given coordinates, x1,y1,x2,y2 - "&&x1&&y1&&x2&&y2
+		end if
+	else
+		LogWarning "Field name- "&&fieldName&&" is not present on the screen"
+	end if
+	
+	return fieldValue
+	
+end GetFieldValueFrontUsingCoordinatesForDisabledElements
+
+to handle MoveToElement imgElement
+	put true into flag
+	if imagefound(image:imgElement, waitfor:10)
+		put true into flag
+		moveto imgElement
+		Log "Image found successfully-->"&&imgElement
+	else
+		put false into flag
+		LogWarning "Image not found -->"&&imgElement
+	end if
+	return flag
+end MoveToElement
+
+to handle MoveToElementByText imgElement
+	put true into flag
+	if imagefound(text:imgElement, waitfor:10)
+		put true into flag
+		MoveTo text:imgElement, waitFor:4
+		
+		Log "Image found successfully-->"&&imgElement
+	else
+		put false into flag
+		LogWarning "Image not found -->"&&imgElement
+	end if
+	return flag
+end MoveToElementByText
+
+to handle getCountOfImages imgName
+	Put EveryImageLocation(imgName) into  countOfImages
+	log "Total images named- "&&imgName&&" found on the UI --> "&& countOfImages
+	return countOfImages
+	
+end getCountOfImages
+
+
+(**Handler No : **)
+--------------------------------
+(***
+@author : Mohammed Gouse
+@date : 06/April/22
+@description : To Verify Button is editable or non-editable 
+***)
+to handle VerifyButtonIsEnabledOrDisabled buttonName, verificationImageName
+	moveto  text:buttonName 
+	if ImageFound(image:verificationImageName) then
+		Log buttonName && "Button Is Enabled"
+	else
+		LogWarning buttonName && "Button Is Disabled"                     
+	end if
+end VerifyButtonIsEnabledOrDisabled
+
+
+to handle RightClickMouse imgName,x,y, optionToSelect, imgOrOCR
+	put true into flag
+	if imgOrOCR="image"
+		if ImageFound(image:imgName, waitFor:14) then
+			moveto (ImageLocation(image:imgName, WaitFor:30))		
+			RightClick			
+			Log "Right click of mouse is done on image-->"&&imgName
+			if ImageFound(text:optionToSelect, waitFor:14)
+				Click text:optionToSelect
+				Log "Option clicked on the menu-->"&&optionToSelect
+				put true into flag
+			end if 
+		end if 
+	else
+		if ImageFound(text:imgName, waitFor:14) then
+			moveto (ImageLocation(text:imgName, WaitFor:30)+[x,y])		
+			RightClick			
+			Log "Right click of mouse is done on image-->"&&imgName
+			if ImageFound(text:optionToSelect, waitFor:14)
+				Click text:optionToSelect
+				Log "Option clicked on the menu-->"&&optionToSelect
+				put true into flag
+			end if 
+		end if 
+	end if
+	
+	return flag
+end RightClickMouse
+
+
+to handle RightClickMouseWoSelectingOption imgName
+	put true into flag
+	if ImageFound(image:imgName, waitFor:14) then
+		RightClick imgName
+		Log "Right click of mouse is done on image-->"&&imgName
+	else
+		put false into flag
+		LogWarning  "Image is not found for the right click of mouse-->"&&imgName                    
+	end if
+	return flag
+end RightClickMouseWoSelectingOption
+
+
+to handle CompareDates previousBusBookoutTime, bookoutTime
+	--put "Jul 06,11:02" into previousBusBookoutTime
+	--put "Jul 06,11:01" into bookoutTime
+	--put "less" into flag
+	Split previousBusBookoutTime by ","
+	Split bookoutTime by ","
+	put formattedTime("%Y-%m-%d",  item 1 of previousBusBookoutTime ) into prevBoTDate
+	log prevBoTDate
+	put formattedTime("%Y-%m-%d",  item 1 of bookoutTime ) into currBoTDate
+	log currBoTDate
+	
+	put formattedTime("%H-%M-%S",  item 2 of previousBusBookoutTime ) into prevBoTTime
+	log prevBoTTime
+	put formattedTime("%H-%M-%S",  item 2 of bookoutTime ) into currBoTTime
+	log currBoTTime
+	put false into flag1
+	--if flag = "less"
+	--This logic will return less if previous bus book out time is less than current bus
+	if prevBoTDate < currBoTDate 
+		Log "Previous Bookout Date less than current date "&&prevBoTDate && currBoTDate 
+		put "less" into flag1
+	else if prevBoTDate = currBoTDate
+		Log "Bookout Date matched "&&prevBoTDate && currBoTDate 
+		if prevBoTTime < currBoTTime
+			Log "Bookout Time matched "&&prevBoTTime && currBoTTime
+			put "less" into flag1
+		else	if prevBoTTime > currBoTTime
+			put "greater" into flag1
+		else if prevBoTTime = currBoTTime
+			put "equal" into flag1
+		end if
+	else if prevBoTDate > currBoTDate
+		put "greater" into flag1
+	end if
+	return flag1
+	
+end CompareDates
+
+

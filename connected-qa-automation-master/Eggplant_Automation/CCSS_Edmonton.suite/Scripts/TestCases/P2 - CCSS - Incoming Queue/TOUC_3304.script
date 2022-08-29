@@ -1,0 +1,27 @@
+﻿(***
+@Author: Mohammed Gouse
+@Date: 22/March/22
+@TC_ID: TOUC_3304
+@TC_Description: CCSS-RRT-IQ: Click On Bus in IQ
+***)
+
+BeginTestCase TOUC_3304
+
+Log "########### Started execution of Test Case--> TOUC_3304 ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+"CCSS_Pages/PrerequsiteTestData/IncomingQ".AddBusInIncomingQ "BusesData", "VIN_Number"
+"CCSS_Pages/PrerequsiteTestData/IncomingQ".AddBusInIncomingQ "BusesData", "VIN_Number2"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "P2_TestData", "Bus In Queue") into busID
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusInIncomingQueue busID
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectBusFromIQueueIfAvailable busID
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetails busID
+
+Log "############# Finished execution of Test Case--> TOUC_3304 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3304

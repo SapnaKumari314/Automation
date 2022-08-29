@@ -1,0 +1,42 @@
+{
+	"lastmodifieddate": 1647001052.148,
+	"ocrcapturestring": "0 ProterraEdmonton\tX + O A Not secure qa-launch2020-ccss-ecms.connected.proterra.com.s3-website-us-east-1.amazonaws.eom/#/runTrackAssign   0 X Q. Search BEB No buses are in queue Bus Details    Assigned Run   Assigned Track   Bus ID Current Energy soc Range Run ID Required Energy Estimated Charge Time Track No Position Track Type 8027 408 kwh N/A 155 km 501 493 kWh N/A 7 1 Charging Odometer Energy HDDTC Needs Maintenance Book Out Date. Time Distance Run Status     Consumption   Mar 09,11:54 192 km Assigned    31961 km 2.1 kWh/km 0 □       Recommended Run & Track Alerts (01) Notifications 11 Mar 04:13 Book Out Delay - Bus 8027 is estimated to have indefinite book out delay... 1 2 3 5 6 7 4 A B C D 2 3 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 1 4 0 0 0 0 0 9027 9035 1 fl 0 0 0 0 0 2 0 0 0 0 0 3 0 0 0 0 0 4 0 0 5 ■■ P w ■\t< 4 19 [| fteady/ lopped Up a Ready Not Ready Delay a Busin U Maintenance 1 Diesel Bus\tCharging Active In-Active Maintenance Emergency Stop All I          , .\t11:33 AM /X\tO dy 3/11/2022 □",
+	"originalcapturelocation": [
+		0,
+		0,
+		1920,
+		1080
+	],
+	"createddate": 1646998393.368,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"deleted": true,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[960,540]",
+					"Tolerance": "_73",
+					"Discrepancy": "_0",
+					"SearchType": "Smoothed for Text"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "0ProterraEdmontonXOANotsecureq.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com",
+				"capturerect": [
+					0,
+					0,
+					1920,
+					1080
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "0 ProterraEdmonton\tX + O A Not secure qa-launch2020-ccss-ecms.connected.proterra.com.s3-website-us-east-1.amazonaws.eom/#/runTrackAssign   0 X Q. Search BEB No buses are in queue Bus Details    Assigned Run   Assigned Track   Bus ID Current Energy soc Range Run ID Required Energy Estimated Charge Time Track No Position Track Type 8027 408 kwh N/A 155 km 501 493 kWh N/A 7 1 Charging Odometer Energy HDDTC Needs Maintenance Book Out Date. Time Distance Run Status     Consumption   Mar 09,11:54 192 km Assigned    31961 km 2.1 kWh/km 0 □       Recommended Run & Track Alerts (01) Notifications 11 Mar 04:13 Book Out Delay - Bus 8027 is estimated to have indefinite book out delay... 1 2 3 5 6 7 4 A B C D 2 3 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 1 4 0 0 0 0 0 9027 9035 1 fl 0 0 0 0 0 2 0 0 0 0 0 3 0 0 0 0 0 4 0 0 5 ■■ P w ■\t< 4 19 [| fteady/ lopped Up a Ready Not Ready Delay a Busin U Maintenance 1 Diesel Bus\tCharging Active In-Active Maintenance Emergency Stop All I          , .\t11:33 AM /X\tO dy 3/11/2022 □"
+			}
+	],
+	"name": "0ProterraEdmontonXOANotsecureq"
+}

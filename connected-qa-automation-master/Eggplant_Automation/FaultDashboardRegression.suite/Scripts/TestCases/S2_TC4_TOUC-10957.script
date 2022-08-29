@@ -1,0 +1,51 @@
+﻿(***
+@Author: Shalini Vijayakumar
+@Date: 25/July/2022
+@TC_ID: TOUC_10957
+@TC_Description: S2_10286_TC4_Verify data fields in fault dashboard for the Joule with Low fault in active state in sequential view
+***)
+
+BeginTestCase TOUC_10957
+Log "###########   Started execution of Test Case--> TOUC_10957  ##############"
+Log "#######################################################"
+--"1.Login as an superadmin in Apex Portal.
+"LoginPage".OpenApplication
+
+"LoginPage".Login "ProterraAdmin"
+set DatasheetPath to Resourcepath("TestData\S2_TC4_TOUC-10957.xlsx")
+--2.Under Historical Data on Left menu choose Fault Dashboard
+
+"ApexPages/FaultDashboardSearchCriteria".NavigateTo "HISTORICAL DATA","FAULT DASHBOARD"
+
+--3.Select the vehicle option and select the customer in dropdown with the appropriate vehicle name,status,date and click on Get Data in sequential format and select the Low fault in priority and click on get data
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "CustomerName") into CustomerNames
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "AssetName") into VehicleName
+
+"ApexPages/FaultDashboardSearchCriteria".SelectCustomer CustomerNames
+
+get  "ApexPages/FaultDashboardSearchCriteria".AssetTypeSelection ("Vehicle")
+
+get "ApexPages/FaultDashboardSearchCriteria".SelectAssetID ("Vehicle",VehicleName)
+
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultPriority ("Green")
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultStatus ("Active")
+get "ApexPages/FaultDashboardSearchCriteria".ClickGetDataBtn
+
+"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Sequential"
+--4.Click on the data fields and verify the Screen PopUp
+--verify the data fields in sequential view
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "SequentialHeaders") into DatafieldColnames
+"ApexPages/FaultDashboardVehicle".ValidateDatafieldColumnNames_Vehicle DatafieldColnames
+
+"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "All"
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "VIN") into VINID
+"ApexPages/FaultDashboardSearchCriteria".SelectFilterDropdown "VIN",VINID,"VEHICLE"
+
+"ApexPages/FaultDashboardVehicle".ToClickOnSpecificDatafieldColumnDataAndOpenFaultPopup VINID,"Vehicle Name,SPN,VIN,FMI,Priority,Status,Fault name,Fault description,Time of fault,Fault duration (hh:mm:ss),Source Address"
+
+"LoginPage".Logout
+
+Log "#############  Finished execution of Test Case--> TOUC_10957 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_10957

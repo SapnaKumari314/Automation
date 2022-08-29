@@ -1,0 +1,39 @@
+{
+	"lastmodifieddate": 1657569973.2309999,
+	"originalcapturelocation": [
+		1480,
+		404,
+		25,
+		28
+	],
+	"createddate": 1657569973.2309999,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Tolerance": "_1",
+					"HotSpot": "[12,14]",
+					"Scale": "    1",
+					"Discrepancy": "_0",
+					"SearchType": "Precise to Pixel"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "CustomizeCheckbox/CheckBoxUnselected.png",
+				"connectionname": "SUT",
+				"type": 1,
+				"capturerect": [
+					1480,
+					404,
+					25,
+					28
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com"
+			}
+	],
+	"name": "CustomizeCheckbox/CheckBoxUnselected"
+}

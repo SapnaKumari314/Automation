@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		1781,
+		871,
+		139,
+		55
+	],
+	"lastmodifieddate": 1646817336.1389999,
+	"createddate": 1646817280.145,
+	"name": "trackVerticalScrollBar",
+	"lastfounddate": 1653569574.7179999,
+	"ocrcapturestring": "7",
+	"lastfoundlocation": [
+		1900,
+		795,
+		7,
+		8
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[69,27]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "Generic/trackVerticalScrollBar.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com",
+				"capturerect": [
+					1781,
+					871,
+					139,
+					55
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "J"
+			}
+	]
+}

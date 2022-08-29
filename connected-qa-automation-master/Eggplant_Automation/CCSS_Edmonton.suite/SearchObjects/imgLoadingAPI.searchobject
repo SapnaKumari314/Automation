@@ -1,0 +1,49 @@
+{
+	"originalcapturelocation": [
+		845,
+		495,
+		171,
+		94
+	],
+	"lastmodifieddate": 1647434598.1430001,
+	"createddate": 1646752981.5799999,
+	"name": "imgLoadingAPI",
+	"lastfounddate": 1647434466.5450001,
+	"ocrcapturestring": "5\t6\t7\t8 o",
+	"lastfoundlocation": [
+		101,
+		165,
+		32,
+		33
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"deleted": true,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[85,47]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "Generic/imgLoadingAPI.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com",
+				"capturerect": [
+					845,
+					495,
+					171,
+					94
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "o"
+			}
+	]
+}

@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		1629,
+		487,
+		22,
+		26
+	],
+	"lastmodifieddate": 1657099065.0880001,
+	"createddate": 1657099065.0880001,
+	"name": "ScrollImages/Customize_ScrollDown",
+	"lastfounddate": 1657109202.9229999,
+	"ocrcapturestring": "L",
+	"lastfoundlocation": [
+		1629,
+		487,
+		22,
+		26
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[11,13]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "ScrollImages/Customize_ScrollDown.png",
+				"connectionname": "SUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					1629,
+					487,
+					22,
+					26
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "L"
+			}
+	]
+}

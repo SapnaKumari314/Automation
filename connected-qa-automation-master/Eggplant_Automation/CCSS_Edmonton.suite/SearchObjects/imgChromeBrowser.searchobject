@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		12,
+		35,
+		117,
+		31
+	],
+	"lastmodifieddate": 1646754110.072,
+	"createddate": 1646753791.9960001,
+	"name": "imgChromeBrowser",
+	"lastfounddate": 1659635633.526,
+	"ocrcapturestring": "c",
+	"lastfoundlocation": [
+		78,
+		45,
+		16,
+		14
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[58,15]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "Generic/imgChromeBrowser.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com",
+				"capturerect": [
+					12,
+					35,
+					117,
+					31
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "c"
+			}
+	]
+}

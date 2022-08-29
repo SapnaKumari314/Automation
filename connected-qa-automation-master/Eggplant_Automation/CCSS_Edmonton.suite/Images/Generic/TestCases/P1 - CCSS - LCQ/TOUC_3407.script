@@ -1,0 +1,66 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 25/Apr/22
+@TC_ID: TOUC_3407
+@TC_Description: CCSS-RRT-LCQ Algorithm: Alert sorting as per the LCQ when a bus enters the garage for charging with higher priority and existing bus charger action was acknowledged
+***)
+
+BeginTestCase TOUC_3407
+
+Log "###########   Started execution of Test Case--> TOUC_3407 ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Set Charger Limit to 1 from the Energy Management Screen
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "API_SetChargerLimit_id") into API_SetChargerLimit_id
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "API_SetChargerLimit_chargerLimit") into API_SetChargerLimit_chargerLimit
+"CCSS_Pages/RunAndAssignmentTrackPage".SetChargerLimitFromAPI API_SetChargerLimit_id, API_SetChargerLimit_chargerLimit
+
+--Click on a Bus at Incoming Queue such that it would be classified as a Not Ready Bus on 'Run & Track Assignment' screen
+--Verify that the Garage is empty and no buses are assigned
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P1_TestData", "LCQ", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P1_TestData", "LCQ", "BusId2", "customerGarageId", "RunID2", "API_Bus_Details_busVins2", "tenantId"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "BusID") into BusId
+"CCSS_Pages/GarageOverview".CreateBusWithAnStatusAndAssignOnTrack "not ready", BusId,"RunAndTrackAssignmentPage\imgActiveCharger" ,"CCSS_P1_TestData", "LCQ", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+
+--Navigate to Garage Overview screen by selecting 'Charger Control' link from main menu
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+
+--Navigate to Logical Charge Queue section
+"CCSS_Pages/GarageOverview".NavigateToElement "Logical Charge Queue", "LogicalChargeQueueArea"
+
+--Verify the LCQ
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "BusID") into BusId
+"CCSS_Pages/GarageOverview".VerifyPriorityOfBusIs "highest", BusId
+
+
+--Verify the Alert
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".CreateChargerName "CCSS_P1_TestData", "LCQ", "BusID",BusId
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "Alert2") into Alert
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyAlertMessage Alert
+
+--Select and add another Bus from the Incoming Queue such that this Bus should have a higher priority than the previous Bus
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Run & Track Assignment", "Run & Track Assignment",1
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "BusID2") into BusId2
+"CCSS_Pages/GarageOverview".CreateBusWithAnStatusAndAssignOnTrack "not ready", BusId2,"RunAndTrackAssignmentPage\imgActiveCharger" ,"CCSS_P1_TestData", "LCQ", "BusId2", "customerGarageId", "RunID2", "API_Bus_Details_busVins2", "tenantId"
+
+--Verify that the Terminate Charging Alert is displayed for the previous Bus
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "ChargerStatusAfterTerminateChargeAlert") into Alert
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyAlertMessage Alert
+
+--Verify that the Initiate Charging Alert is displayed for the new Bus
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "InitiateChargingBtn") into Alert
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyAlertMessage Alert
+
+Log "#############  Finished execution of Test Case--> TOUC_3407 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3407

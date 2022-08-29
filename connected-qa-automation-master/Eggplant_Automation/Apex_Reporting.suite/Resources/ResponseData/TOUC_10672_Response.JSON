@@ -1,0 +1,843 @@
+{
+  "took" : 7,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 3,
+      "relation" : "eq"
+    },
+    "max_score" : 7.33788,
+    "hits" : [
+      {
+        "_index" : "aggregated_data_pcan",
+        "_type" : "_doc",
+        "_id" : "7JZTH13J2LS000303_2022-06-20",
+        "_score" : 7.33788,
+        "_ignored" : [
+          "mpge",
+          "miscResults.extrapolatedMaxRangeMiles",
+          "statResults.accelLimitDisableFlag.min",
+          "statResults.accelLimitDisableFlag.max"
+        ],
+        "_source" : {
+          "_class" : "busaggworker.resultrepo.snapshot.PCANResult",
+          "id" : "7JZTH13J2LS000303_2022-06-20",
+          "type" : "agg_pcan",
+          "busName" : "7JZTH13J2LS000303",
+          "busMetadata" : {
+            "busAlias" : "8027",
+            "fleetName" : "ETS",
+            "processingSvr" : "",
+            "modelConfig" : "E2-2d",
+            "timezone" : "America/Denver",
+            "Comments" : "",
+            "busName" : "8027",
+            "ipAddress" : "",
+            "License" : "",
+            "phoneNum" : "0.0",
+            "unicanSerialNum" : "0000000736",
+            "nrelRptFlag" : "0",
+            "partNum" : "47962",
+            "wklyRptFlag" : "0",
+            "busModel" : "E2",
+            "deviceIMEI" : "0.0",
+            "ftpPortal" : "",
+            "inServiceFlag" : "0",
+            "Firmware" : "0.0",
+            "batteryCapacity" : "440.0",
+            "vinNum" : "7JZTH13J2LS000303",
+            "simCard" : "89011702278356357784",
+            "APN" : ""
+          },
+          "reportDate" : "2022-06-20",
+          "reportStartDate" : 1655704800000,
+          "reportEndDate" : 1655791200000,
+          "snapshotTimestamp" : 1655807647238,
+          "distanceInMiles" : 0.051208333333333335,
+          "totalOperatingTimeInS" : 5000,
+          "totalMovingTimeInS" : 30,
+          "totalStoppedTimeInS" : 103,
+          "totalEnergyChargedInKWH" : 0.0,
+          "totalChargeTimeInS" : 5000,
+          "avgChargeTimeInS" : 5000,
+          "numberOfCharges" : 1,
+          "totalFastChargeTimeInS" : 60,
+          "avgFastChargeTimeInS" : 60,
+          "numberOfFastCharges" : 1,
+          "totalManualChargeTimeInS" : 0,
+          "avgManualChargeTimeInS" : 0,
+          "numberOfManualCharges" : 0,
+          "efficiencyKWHPerMile" : 0.0,
+          "mpge" : "Infinity",
+          "efficiencyKWHPerMileOdo" : 0.9991045727724904,
+          "mpgeOdo" : 37.67373408726369,
+          "odometerReading" : 22229.144719,
+          "distanceInMilesOdo" : 0.27029599999877973,
+          "totalEnergyConsumedInKWH" : 0.2700539696008939,
+          "efficiencyKWHPerMileV2" : 5.273633255021524,
+          "mpgeV2" : 7.137394312385944,
+          "energyConsumptionResult" : {
+            "grossEnergyConsumedKWH" : 0.31453357823531947,
+            "energyRegeneratedKWH" : 0.04447960863442558,
+            "netEnergyConsumedKWH" : 0.2700539696008939
+          },
+          "weatherData" : { },
+          "isValidSnapshot" : false,
+          "regenResult" : {
+            "regenEnergyInKWH" : -0.05801136334737142,
+            "regenEnergyOutKWH" : 0.13578282859590318,
+            "regenPercent" : 42.723637404856454
+          },
+          "hvacResult" : {
+            "timeInEachModeInS" : {
+              "fanMode" : 0,
+              "coolMode" : 562,
+              "heatingMode" : 0,
+              "batteryCoolMode" : 0,
+              "autoMode" : 0
+            },
+            "timeInEachModePercent" : {
+              "fanMode" : 0.0,
+              "coolMode" : 11.24,
+              "heatingMode" : 0.0,
+              "batteryCoolMode" : 0.0,
+              "autoMode" : 0.0
+            }
+          },
+          "gearShiftResult" : {
+            "timeInGearInS" : {
+              "0" : 11,
+              "1" : 1
+            },
+            "distanceInGearMi" : {
+              "1" : 1.7097941116244844E-4
+            },
+            "distanceInGearPercent" : {
+              "1" : 0.33388981838069676
+            },
+            "timeInGearPercent" : {
+              "0" : 91.66666666666666,
+              "1" : 8.333333333333332
+            },
+            "shiftsPerMile" : 19.52807160292921,
+            "totalNumberOfShifts" : 1,
+            "numberOfGearShiftsByMode" : {
+              "1-0" : 1
+            },
+            "shiftsPerMileWhileMoving" : 0.0,
+            "totalNumberOfShiftsWhileMoving" : 0,
+            "numberOfGearShiftsByModeWhileMoving" : { }
+          },
+          "auxiliaryResults" : {
+            "airCompressorOnPercent" : 11.34,
+            "batteryRadiatorFanOnPercent" : 0.0,
+            "HVACOnPercent" : 0.0,
+            "headlightOnPercent" : 2.04,
+            "btmsOnPercent" : 0.0,
+            "coolantPumpOnPercent" : 0.0,
+            "powerSteeringOnPercent" : 0.92,
+            "batteryCoolOnPercent" : 0.0,
+            "scoopHeaterOnPercent" : 100.0,
+            "interiorLightOnPercent" : 0.0,
+            "radiatorFanOnPercent" : 0.72,
+            "bladeHeaterOnPercent" : 0.0,
+            "defrosterOnPercent" : 0.0
+          },
+          "statResults" : {
+            "batteryCoolantTempInC" : {
+              "min" : 20.0,
+              "avg" : 21.100347042752713,
+              "max" : 25.0,
+              "count" : 13543.0,
+              "sum" : 285762.0
+            },
+            "cabinTempInC" : {
+              "min" : 20.80000114440918,
+              "avg" : 22.589382958202677,
+              "max" : 24.000001907348633,
+              "count" : 13543.0,
+              "sum" : 305928.01340293884
+            },
+            "electronicCoolantTempInC" : {
+              "min" : 20.0,
+              "avg" : 27.704275271357897,
+              "max" : 31.0,
+              "count" : 13543.0,
+              "sum" : 375199.0
+            },
+            "accelLimitDisableFlag" : {
+              "min" : "Infinity",
+              "max" : "-Infinity",
+              "count" : 0.0,
+              "sum" : 0.0
+            },
+            "returnAirTempInC" : {
+              "min" : 21.0,
+              "avg" : 21.33984346156686,
+              "max" : 22.0,
+              "count" : 13543.0,
+              "sum" : 289005.5
+            },
+            "speedInMph" : {
+              "min" : 0.0,
+              "avg" : 0.02793393455797438,
+              "max" : 13.899999618530273,
+              "count" : 13199.0,
+              "sum" : 368.70000223070383
+            },
+            "cabinTempSetpointInC" : {
+              "min" : 9.999999974752427E-7,
+              "avg" : 9.999999974752427E-7,
+              "max" : 9.999999974752427E-7,
+              "count" : 13543.0,
+              "sum" : 0.013542999965807212
+            },
+            "ambientTempInC" : {
+              "min" : 20.5,
+              "avg" : 20.662397540983605,
+              "max" : 20.78125,
+              "count" : 61.0,
+              "sum" : 1260.40625
+            },
+            "autoTractionControlFlag" : {
+              "min" : 0.0,
+              "avg" : 0.0,
+              "max" : 0.0,
+              "count" : 13543.0,
+              "sum" : 0.0
+            },
+            "antiLockBreakingFlag" : {
+              "min" : 0.0,
+              "avg" : 0.0,
+              "max" : 0.0,
+              "count" : 13543.0,
+              "sum" : 0.0
+            },
+            "altitudeInMeter" : {
+              "min" : 0.0,
+              "avg" : 0.0,
+              "max" : 0.0,
+              "count" : 13543.0,
+              "sum" : 0.0
+            },
+            "movingSpeedInMph" : {
+              "min" : 0.10000000149011612,
+              "avg" : 6.044262331650883,
+              "max" : 13.899999618530273,
+              "count" : 61.0,
+              "sum" : 368.70000223070383
+            }
+          },
+          "energyByComponents" : {
+            "totalEnergyDischargedKWH" : 3.16910310853108,
+            "totalEnergyChargedKWH" : 0.007291251423528352,
+            "netEnergyConsumptionResult" : {
+              "grossEnergyConsumedKWH" : 0.31453357823531947,
+              "energyRegeneratedKWH" : 0.04447960863442558,
+              "netEnergyConsumedKWH" : 0.2700539696008939
+            },
+            "energyConsumedByComponents" : {
+              "hvac" : 0.0,
+              "dc2" : 0.0,
+              "dc1" : 2.6989351252935094,
+              "defrosterBTMNew" : 0.0,
+              "powerSteering" : 0.006303934419093985,
+              "airCompressor" : 0.41912511552500265,
+              "defrosterBTM" : 0.0,
+              "powerTrain" : 0.0447389332934737
+            },
+            "energyChargedByTypes" : {
+              "overheadCharge" : 0.007291251423528352,
+              "depotCharge" : 0.0
+            }
+          },
+          "busActivity" : {
+            "chargingTimeInS" : 5000,
+            "stoppingTimeInS" : 103,
+            "movingTimeInS" : 30,
+            "operatingTimeInS" : 5000
+          },
+          "miscResults" : {
+            "maxAnnualGHGPreventedInPounds" : 104.66983333333333,
+            "batteryPacks" : 4.0,
+            "extrapolatedMaxRangeMiles" : "Infinity",
+            "dieselGallonsSaved" : 0.012802083333333334,
+            "treesPlanted" : 1.0,
+            "maxEnergyKWH" : 352.0,
+            "ghgPreventedInPounds" : 0.28676666666666667
+          },
+          "startStates" : { },
+          "endStates" : { }
+        }
+      },
+      {
+        "_index" : "aggregated_data_pcan",
+        "_type" : "_doc",
+        "_id" : "7JZTH13J2LS000303_2022-06-21",
+        "_score" : 7.3048096,
+        "_ignored" : [
+          "statResults.accelLimitDisableFlag.min",
+          "statResults.accelLimitDisableFlag.max"
+        ],
+        "_source" : {
+          "_class" : "busaggworker.resultrepo.snapshot.PCANResult",
+          "id" : "7JZTH13J2LS000303_2022-06-21",
+          "type" : "agg_pcan",
+          "busName" : "7JZTH13J2LS000303",
+          "busMetadata" : {
+            "busAlias" : "8027",
+            "fleetName" : "ETS",
+            "processingSvr" : "",
+            "modelConfig" : "E2-2d",
+            "timezone" : "America/Denver",
+            "Comments" : "",
+            "busName" : "8027",
+            "ipAddress" : "",
+            "License" : "",
+            "phoneNum" : "0.0",
+            "unicanSerialNum" : "0000000736",
+            "nrelRptFlag" : "0",
+            "partNum" : "47962",
+            "wklyRptFlag" : "0",
+            "busModel" : "E2",
+            "deviceIMEI" : "0.0",
+            "ftpPortal" : "",
+            "inServiceFlag" : "0",
+            "Firmware" : "0.0",
+            "batteryCapacity" : "440.0",
+            "vinNum" : "7JZTH13J2LS000303",
+            "simCard" : "89011702278356357784",
+            "APN" : ""
+          },
+          "reportDate" : "2022-06-21",
+          "reportStartDate" : 1655791200000,
+          "reportEndDate" : 1655877600000,
+          "snapshotTimestamp" : 1655894576491,
+          "distanceInMiles" : 0.6674166666666667,
+          "totalOperatingTimeInS" : 5000,
+          "totalMovingTimeInS" : 497,
+          "totalStoppedTimeInS" : 5000,
+          "totalEnergyChargedInKWH" : 0.21205303501169867,
+          "totalChargeTimeInS" : 5000,
+          "avgChargeTimeInS" : 5000,
+          "numberOfCharges" : 1,
+          "totalFastChargeTimeInS" : 60,
+          "avgFastChargeTimeInS" : 60,
+          "numberOfFastCharges" : 1,
+          "totalManualChargeTimeInS" : 60,
+          "avgManualChargeTimeInS" : 60,
+          "numberOfManualCharges" : 1,
+          "efficiencyKWHPerMile" : 0.31772211513801774,
+          "mpge" : 118.46830361068594,
+          "efficiencyKWHPerMileOdo" : 5.195664497582377,
+          "mpgeOdo" : 7.244501645076289,
+          "odometerReading" : 22230.20105,
+          "distanceInMilesOdo" : 1.0563309999997728,
+          "totalEnergyConsumedInKWH" : 5.488341474394509,
+          "efficiencyKWHPerMileV2" : 8.22326104291848,
+          "mpgeV2" : 4.577259532872783,
+          "energyConsumptionResult" : {
+            "grossEnergyConsumedKWH" : 5.65829003190671,
+            "energyRegeneratedKWH" : 0.16994855751220111,
+            "netEnergyConsumedKWH" : 5.488341474394509
+          },
+          "weatherData" : { },
+          "isValidSnapshot" : false,
+          "regenResult" : {
+            "regenEnergyInKWH" : -0.22559974721736378,
+            "regenEnergyOutKWH" : 1.0136489891881744,
+            "regenPercent" : 22.256200087373966
+          },
+          "hvacResult" : {
+            "timeInEachModeInS" : {
+              "fanMode" : 0,
+              "coolMode" : 1327,
+              "heatingMode" : 0,
+              "batteryCoolMode" : 0,
+              "autoMode" : 703
+            },
+            "timeInEachModePercent" : {
+              "fanMode" : 0.0,
+              "coolMode" : 26.54,
+              "heatingMode" : 0.0,
+              "batteryCoolMode" : 0.0,
+              "autoMode" : 14.06
+            }
+          },
+          "gearShiftResult" : {
+            "timeInGearInS" : {
+              "0" : 35,
+              "1" : 4
+            },
+            "distanceInGearMi" : {
+              "1" : 9.008926087911797E-4
+            },
+            "distanceInGearPercent" : {
+              "1" : 0.13498203652758345
+            },
+            "timeInGearPercent" : {
+              "0" : 89.74358974358975,
+              "1" : 10.256410256410255
+            },
+            "shiftsPerMile" : 10.488200774129105,
+            "totalNumberOfShifts" : 7,
+            "numberOfGearShiftsByMode" : {
+              "0-1" : 3,
+              "1-0" : 4
+            },
+            "shiftsPerMileWhileMoving" : 0.0,
+            "totalNumberOfShiftsWhileMoving" : 0,
+            "numberOfGearShiftsByModeWhileMoving" : { }
+          },
+          "auxiliaryResults" : {
+            "airCompressorOnPercent" : 26.84,
+            "batteryRadiatorFanOnPercent" : 0.0,
+            "HVACOnPercent" : 12.76,
+            "headlightOnPercent" : 100.0,
+            "btmsOnPercent" : 0.0,
+            "coolantPumpOnPercent" : 0.0,
+            "powerSteeringOnPercent" : 16.04,
+            "batteryCoolOnPercent" : 0.0,
+            "scoopHeaterOnPercent" : 100.0,
+            "interiorLightOnPercent" : 0.0,
+            "radiatorFanOnPercent" : 0.58,
+            "bladeHeaterOnPercent" : 0.0,
+            "defrosterOnPercent" : 0.0
+          },
+          "statResults" : {
+            "batteryCoolantTempInC" : {
+              "min" : 23.0,
+              "avg" : 24.262520829476024,
+              "max" : 27.0,
+              "count" : 43208.0,
+              "sum" : 1048335.0
+            },
+            "cabinTempInC" : {
+              "min" : 9.999999974752427E-7,
+              "avg" : 24.4298566803868,
+              "max" : 28.000001907348633,
+              "count" : 43208.0,
+              "sum" : 1055565.2474461528
+            },
+            "electronicCoolantTempInC" : {
+              "min" : 24.0,
+              "avg" : 32.97667098685429,
+              "max" : 37.0,
+              "count" : 43208.0,
+              "sum" : 1424856.0
+            },
+            "accelLimitDisableFlag" : {
+              "min" : "Infinity",
+              "max" : "-Infinity",
+              "count" : 0.0,
+              "sum" : 0.0
+            },
+            "returnAirTempInC" : {
+              "min" : 0.0,
+              "avg" : 22.936898259581557,
+              "max" : 26.0,
+              "count" : 43208.0,
+              "sum" : 991057.5
+            },
+            "speedInMph" : {
+              "min" : -2.200000047683716,
+              "avg" : 0.1049143414563311,
+              "max" : 14.199999809265137,
+              "count" : 40860.0,
+              "sum" : 4286.799991905689
+            },
+            "cabinTempSetpointInC" : {
+              "min" : 9.999999974752427E-7,
+              "avg" : 5.198556859088008,
+              "max" : 20.80000114440918,
+              "count" : 43208.0,
+              "sum" : 224619.24476747465
+            },
+            "ambientTempInC" : {
+              "min" : 21.59375,
+              "avg" : 23.207400653923543,
+              "max" : 25.375,
+              "count" : 994.0,
+              "sum" : 23068.15625
+            },
+            "autoTractionControlFlag" : {
+              "min" : 0.0,
+              "avg" : 1.388631734863914E-4,
+              "max" : 1.0,
+              "count" : 43208.0,
+              "sum" : 6.0
+            },
+            "antiLockBreakingFlag" : {
+              "min" : 0.0,
+              "avg" : 0.0,
+              "max" : 0.0,
+              "count" : 43208.0,
+              "sum" : 0.0
+            },
+            "altitudeInMeter" : {
+              "min" : 0.0,
+              "avg" : 0.0,
+              "max" : 0.0,
+              "count" : 43208.0,
+              "sum" : 0.0
+            },
+            "movingSpeedInMph" : {
+              "min" : 0.10000000149011612,
+              "avg" : 4.5735412395336255,
+              "max" : 14.199999809265137,
+              "count" : 994.0,
+              "sum" : 4546.099992096424
+            }
+          },
+          "energyByComponents" : {
+            "totalEnergyDischargedKWH" : 9.928265884960389,
+            "totalEnergyChargedKWH" : 0.18267864374780385,
+            "netEnergyConsumptionResult" : {
+              "grossEnergyConsumedKWH" : 5.65829003190671,
+              "energyRegeneratedKWH" : 0.16994855751220111,
+              "netEnergyConsumedKWH" : 5.488341474394509
+            },
+            "energyConsumedByComponents" : {
+              "hvac" : 1.1427811500852,
+              "dc2" : 0.0,
+              "dc1" : 7.957925913373747,
+              "defrosterBTMNew" : 0.0,
+              "powerSteering" : 0.2551954357546885,
+              "airCompressor" : 1.0821763400513724,
+              "defrosterBTM" : 0.0,
+              "powerTrain" : 0.17283838461873355
+            },
+            "energyChargedByTypes" : {
+              "overheadCharge" : 0.1371771733857569,
+              "depotCharge" : 0.045501470362046936
+            }
+          },
+          "busActivity" : {
+            "chargingTimeInS" : 5000,
+            "stoppingTimeInS" : 5000,
+            "movingTimeInS" : 497,
+            "operatingTimeInS" : 5000
+          },
+          "miscResults" : {
+            "maxAnnualGHGPreventedInPounds" : 1364.1996666666664,
+            "batteryPacks" : 4.0,
+            "extrapolatedMaxRangeMiles" : 1107.886367453811,
+            "dieselGallonsSaved" : 0.16685416666666666,
+            "treesPlanted" : 1.0,
+            "maxEnergyKWH" : 352.0,
+            "ghgPreventedInPounds" : 3.737533333333333
+          },
+          "startStates" : { },
+          "endStates" : {
+            "odometerReading" : 22230.20105,
+            "availSystemEnergyInKWH" : 567.464027,
+            "ambientTempInC" : 1759.0,
+            "soc" : 90.329689,
+            "batteryCoolantInletTempInC" : 26.800001,
+            "acState" : 0.0,
+            "batteryCoolantOutletTempInC" : 26.800001,
+            "dashSOC" : 99.435939
+          }
+        }
+      },
+      {
+        "_index" : "aggregated_data_pcan",
+        "_type" : "_doc",
+        "_id" : "7JZTH13J2LS000303_2022-06-22",
+        "_score" : 7.2311506,
+        "_ignored" : [
+          "statResults.accelLimitDisableFlag.min",
+          "statResults.accelLimitDisableFlag.max"
+        ],
+        "_source" : {
+          "_class" : "busaggworker.resultrepo.snapshot.PCANResult",
+          "id" : "7JZTH13J2LS000303_2022-06-22",
+          "type" : "agg_pcan",
+          "busName" : "7JZTH13J2LS000303",
+          "busMetadata" : {
+            "busAlias" : "8027",
+            "fleetName" : "ETS",
+            "processingSvr" : "",
+            "modelConfig" : "E2-2d",
+            "timezone" : "America/Denver",
+            "Comments" : "",
+            "busName" : "8027",
+            "ipAddress" : "",
+            "License" : "",
+            "phoneNum" : "0.0",
+            "unicanSerialNum" : "0000000736",
+            "nrelRptFlag" : "0",
+            "partNum" : "47962",
+            "wklyRptFlag" : "0",
+            "busModel" : "E2",
+            "deviceIMEI" : "0.0",
+            "ftpPortal" : "",
+            "inServiceFlag" : "0",
+            "Firmware" : "0.0",
+            "batteryCapacity" : "440.0",
+            "vinNum" : "7JZTH13J2LS000303",
+            "simCard" : "89011702278356357784",
+            "APN" : ""
+          },
+          "reportDate" : "2022-06-22",
+          "reportStartDate" : 1655877600000,
+          "reportEndDate" : 1655964000000,
+          "snapshotTimestamp" : 1656754088533,
+          "lastKnownLocation" : {
+            "lat" : 53.58034515,
+            "lon" : -113.45095825
+          },
+          "distanceInMiles" : 93.87252851527778,
+          "totalOperatingTimeInS" : 5000,
+          "totalMovingTimeInS" : 5000,
+          "totalStoppedTimeInS" : 5000,
+          "totalEnergyChargedInKWH" : 0.23266476756353974,
+          "totalChargeTimeInS" : 5000,
+          "avgChargeTimeInS" : 5000,
+          "numberOfCharges" : 1,
+          "totalFastChargeTimeInS" : 60,
+          "avgFastChargeTimeInS" : 60,
+          "numberOfFastCharges" : 1,
+          "totalManualChargeTimeInS" : 0,
+          "avgManualChargeTimeInS" : 0,
+          "numberOfManualCharges" : 0,
+          "efficiencyKWHPerMile" : 0.002478518169729214,
+          "mpge" : 15186.49347005283,
+          "efficiencyKWHPerMileOdo" : 1.2561514325693788,
+          "mpgeOdo" : 29.964540121575745,
+          "odometerReading" : 22375.570844,
+          "distanceInMilesOdo" : 145.369794000002,
+          "totalEnergyConsumedInKWH" : 182.606474985418,
+          "efficiencyKWHPerMileV2" : 1.945260001766105,
+          "mpgeV2" : 19.34959849368546,
+          "energyConsumptionResult" : {
+            "grossEnergyConsumedKWH" : 294.32092656546234,
+            "energyRegeneratedKWH" : 111.71445158004433,
+            "netEnergyConsumedKWH" : 182.606474985418
+          },
+          "weatherData" : { },
+          "isValidSnapshot" : false,
+          "regenResult" : {
+            "regenEnergyInKWH" : -122.69335225328389,
+            "regenEnergyOutKWH" : 279.9319949936411,
+            "regenPercent" : 43.82969951543801
+          },
+          "hvacResult" : {
+            "timeInEachModeInS" : {
+              "fanMode" : 0,
+              "coolMode" : 5000,
+              "heatingMode" : 1766,
+              "batteryCoolMode" : 0,
+              "autoMode" : 630
+            },
+            "timeInEachModePercent" : {
+              "fanMode" : 0.0,
+              "coolMode" : 100.0,
+              "heatingMode" : 35.32,
+              "batteryCoolMode" : 0.0,
+              "autoMode" : 12.6
+            }
+          },
+          "gearShiftResult" : {
+            "timeInGearInS" : {
+              "0" : 27,
+              "1" : 4,
+              "2" : 38
+            },
+            "distanceInGearMi" : {
+              "1" : 0.0043831573120086,
+              "2" : 0.14367631789868104
+            },
+            "distanceInGearPercent" : {
+              "1" : 0.00466926520605572,
+              "2" : 0.15305470106230035
+            },
+            "timeInGearPercent" : {
+              "0" : 39.130434782608695,
+              "1" : 5.797101449275362,
+              "2" : 55.072463768115945
+            },
+            "shiftsPerMile" : 0.09587469457089619,
+            "totalNumberOfShifts" : 9,
+            "numberOfGearShiftsByMode" : {
+              "0-2" : 1,
+              "1-0" : 1,
+              "1-2" : 3,
+              "2-1" : 4
+            },
+            "shiftsPerMileWhileMoving" : 0.0745692068884748,
+            "totalNumberOfShiftsWhileMoving" : 7,
+            "numberOfGearShiftsByModeWhileMoving" : {
+              "1-2" : 3,
+              "2-1" : 4
+            }
+          },
+          "auxiliaryResults" : {
+            "airCompressorOnPercent" : 100.0,
+            "batteryRadiatorFanOnPercent" : 0.0,
+            "HVACOnPercent" : 12.14,
+            "headlightOnPercent" : 100.0,
+            "btmsOnPercent" : 0.0,
+            "coolantPumpOnPercent" : 0.0,
+            "powerSteeringOnPercent" : 100.0,
+            "batteryCoolOnPercent" : 0.0,
+            "scoopHeaterOnPercent" : 100.0,
+            "interiorLightOnPercent" : 0.0,
+            "radiatorFanOnPercent" : 56.82,
+            "bladeHeaterOnPercent" : 0.0,
+            "defrosterOnPercent" : 45.7
+          },
+          "statResults" : {
+            "batteryCoolantTempInC" : {
+              "min" : 0.0,
+              "avg" : 22.86385423394636,
+              "max" : 26.0,
+              "count" : 88251.0,
+              "sum" : 2017758.0
+            },
+            "cabinTempInC" : {
+              "min" : 9.999999974752427E-7,
+              "avg" : 21.71236705302222,
+              "max" : 26.400001525878906,
+              "count" : 88251.0,
+              "sum" : 1916138.1047962639
+            },
+            "electronicCoolantTempInC" : {
+              "min" : 0.0,
+              "avg" : 39.213901258909246,
+              "max" : 49.0,
+              "count" : 88251.0,
+              "sum" : 3460666.0
+            },
+            "accelLimitDisableFlag" : {
+              "min" : "Infinity",
+              "max" : "-Infinity",
+              "count" : 0.0,
+              "sum" : 0.0
+            },
+            "returnAirTempInC" : {
+              "min" : 0.0,
+              "avg" : 20.104837338953665,
+              "max" : 25.0,
+              "count" : 88251.0,
+              "sum" : 1774272.0
+            },
+            "speedInMph" : {
+              "min" : -0.20000000298023224,
+              "avg" : 7.663715576113412,
+              "max" : 65.0999984741211,
+              "count" : 88192.0,
+              "sum" : 675878.404088594
+            },
+            "cabinTempSetpointInC" : {
+              "min" : 9.999999974752427E-7,
+              "avg" : 10.663621882864204,
+              "max" : 20.80000114440918,
+              "count" : 88251.0,
+              "sum" : 941075.2947846488
+            },
+            "ambientTempInC" : {
+              "min" : 14.15625,
+              "avg" : 20.111871875873202,
+              "max" : 27.15625,
+              "count" : 32209.0,
+              "sum" : 647783.28125
+            },
+            "autoTractionControlFlag" : {
+              "min" : 0.0,
+              "avg" : 7.931921451314999E-5,
+              "max" : 1.0,
+              "count" : 88251.0,
+              "sum" : 7.0
+            },
+            "antiLockBreakingFlag" : {
+              "min" : 0.0,
+              "avg" : 0.0,
+              "max" : 0.0,
+              "count" : 88251.0,
+              "sum" : 0.0
+            },
+            "altitudeInMeter" : {
+              "min" : 0.0,
+              "avg" : 388.00744447151493,
+              "max" : 703.9000244140625,
+              "count" : 88251.0,
+              "sum" : 3.4242044982055664E7
+            },
+            "movingSpeedInMph" : {
+              "min" : 0.10000000149011612,
+              "avg" : 20.984206404688823,
+              "max" : 65.0999984741211,
+              "count" : 32209.0,
+              "sum" : 675880.3040886223
+            }
+          },
+          "energyByComponents" : {
+            "totalEnergyDischargedKWH" : 294.32092656546234,
+            "totalEnergyChargedKWH" : 0.24648078186887848,
+            "netEnergyConsumptionResult" : {
+              "grossEnergyConsumedKWH" : 294.32092656546234,
+              "energyRegeneratedKWH" : 111.71445158004433,
+              "netEnergyConsumedKWH" : 182.606474985418
+            },
+            "energyConsumedByComponents" : {
+              "hvac" : 1.0704203374694197,
+              "dc2" : 0.0,
+              "dc1" : 17.09902465839756,
+              "defrosterBTMNew" : 151.27768199675464,
+              "powerSteering" : 3.4527054847050613,
+              "airCompressor" : 9.956116834972583,
+              "defrosterBTM" : 151.84397532466957,
+              "powerTrain" : 111.96910426271758
+            },
+            "energyChargedByTypes" : {
+              "overheadCharge" : 0.24648078186887848,
+              "depotCharge" : 0.0
+            }
+          },
+          "busActivity" : {
+            "chargingTimeInS" : 5000,
+            "stoppingTimeInS" : 5000,
+            "movingTimeInS" : 5000,
+            "operatingTimeInS" : 5000
+          },
+          "miscResults" : {
+            "maxAnnualGHGPreventedInPounds" : 191875.44828522776,
+            "batteryPacks" : 4.0,
+            "extrapolatedMaxRangeMiles" : 142020.34275926132,
+            "dieselGallonsSaved" : 23.468132128819445,
+            "treesPlanted" : 11.0,
+            "maxEnergyKWH" : 352.0,
+            "ghgPreventedInPounds" : 525.6861596855555
+          },
+          "startStates" : {
+            "odometerReading" : 22230.20105,
+            "availSystemEnergyInKWH" : 567.464027,
+            "ambientTempInC" : 1759.0,
+            "soc" : 90.329689,
+            "batteryCoolantInletTempInC" : 26.800001,
+            "acState" : 0.0,
+            "batteryCoolantOutletTempInC" : 26.800001,
+            "dashSOC" : 99.435939
+          },
+          "endStates" : {
+            "odometerReading" : 22375.570844,
+            "availSystemEnergyInKWH" : 587.120028,
+            "ambientTempInC" : 21.3125,
+            "soc" : 93.870314,
+            "batteryCoolantInletTempInC" : 23.200001,
+            "acState" : 0.0,
+            "batteryCoolantOutletTempInC" : 23.200001,
+            "dashSOC" : 100.000001
+          }
+        }
+      }
+    ]
+  }
+}

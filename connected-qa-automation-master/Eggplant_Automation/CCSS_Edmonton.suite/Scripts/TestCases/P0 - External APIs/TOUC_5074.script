@@ -1,0 +1,32 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 19/July/22
+@TC_ID: TOUC_5074
+@TC_Description: (EXTERNAL_API): Bus Fleet Metrics: Verify /fleetMetrics API
+***)
+
+BeginTestCase TOUC_5074
+
+Log "###########   Started execution of Test Case--> TOUC_5074   ##############"
+Log "#######################################################"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "TOUC_5074", "chargerId") into chargerId
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "TOUC_5074", "startTimestamp") into startTimestamp
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "TOUC_5074", "endTimestamp") into endTimestamp
+
+
+put  "CCSS_Pages/API".RunAPIForChargersTestScript( "TOUC_5074", chargerId, startTimestamp, endTimestamp) into responseBody
+log responseBody
+
+--Fetch response to validate
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\External API_TestData.xlsx", "TOUC_5074", "ResponseToValidate") into ResponseToValidate
+log responseToValidate
+
+
+"CCSS_Pages/API".CompareJsonResponses1 responseToValidate, responseBody
+
+
+Log "#############  Finished execution of Test Case--> TOUC_5074 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_5074

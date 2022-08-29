@@ -1,0 +1,59 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 05/Aug/22
+@TC_ID: TOUC_3432
+@TC_Description: CCSS-Charger Faults: Charger Faults component
+***)
+
+BeginTestCase TOUC_3432
+
+Log "###########   Started execution of Test Case--> TOUC_3432 ##############"
+Log "#######################################################"
+
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Simulator setup - Generate fault
+"CCSS_Pages/PrerequsiteTestData/ChargerSimulator".StartSimulator
+"CCSS_Pages/PrerequsiteTestData/ChargerSimulator".GenerateFault
+"CCSS_Pages/PrerequsiteTestData/ChargerSimulator".NavigateToApplicationTab
+-------
+
+--Navigate to Garage Overview screen by selecting 'Garage Overview' link from main menu
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+"CCSS_Pages/GarageOverview".NavigateToElement "Charge History", "ChargerFaultArea"
+--Click on ellipsis / Menu should be disabled
+
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "Charging", "Charging Station ID", "ChargerFaultArea", 0,0,10,20
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "","Faulted System", "ChargerFaultArea",  0,0,10,20
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "","Criticality", "ChargerFaultArea",  0,0,10,20
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P3_TestData.xlsx", "ChargerFault", "ChargingStationID") into ChargingStationID
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "KAT",ChargingStationID, "ChargerFaultArea",0,0,30,30
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P3_TestData.xlsx", "ChargerFault", "FaultedSystem") into FaultedSystem
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", FaultedSystem, "ChargerFaultArea",0,0,10,20
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P3_TestData.xlsx", "ChargerFault", "Criticality") into Criticality
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "",Criticality, "ChargerFaultArea",0,0,10,20
+
+--Click on Main Menu and navigate to 'Charger Control' screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control", 2
+
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "Charging", "Charging Station ID", "ChargerFaultArea", 0,0,10,20
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "","Faulted System", "ChargerFaultArea",  0,0,10,20
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "","Criticality", "ChargerFaultArea",  0,0,10,20
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P3_TestData.xlsx", "ChargerFault", "ChargingStationID") into ChargingStationID
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "KAT",ChargingStationID, "ChargerFaultArea",0,0,30,30
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P3_TestData.xlsx", "ChargerFault", "FaultedSystem") into FaultedSystem
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", FaultedSystem, "ChargerFaultArea",0,0,10,20
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P3_TestData.xlsx", "ChargerFault", "Criticality") into Criticality
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "",Criticality, "ChargerFaultArea",0,0,10,20
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3432############"
+Log "#######################################################"
+
+EndTestCase TOUC_3432

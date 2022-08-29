@@ -1,0 +1,36 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = "";
+	    showCheckedNumber = <*BY>;
+	    value = "";
+	}
+    );
+    authenticationType = None;
+    httpVerb = POST;
+    oauth1Token = "";
+    password = "";
+    requestBody = "{
+    \"busName\": \"4UZAEXG47NCMN5341\",
+    \"start\": \"2021-07-012T00:00:00-06:00\",
+    \"end\": \"2022-07-13T15:00:00-06:00\",
+    \"fields\": [
+        \"PCpt_en_PresentGear\",
+        \"PCes_uin_V_v\",
+        \"PCes_uin_CurrentIn_a\",
+        \"Longitude_deg\",
+        \"Latitude_deg\",
+        \"PCpt_int_Spd_mph\"
+    ]
+}";
+    requestBodyFormat = "JSON (application/json)";
+    requestHeaders = "<![CDATA[x-api-key:SESSYxMADr9V5EiQnHOh1524y5SekQoZ5H1YKnw0
+Content-Type:application/json
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "https://exp-api.proterra.com/exp-datalake-qa2/v1/external/tenants/66ef7196-295b-4abc-8a2c-76f495305ffc/bus/rawdata";
+    userName = "";
+}

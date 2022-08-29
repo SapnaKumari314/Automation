@@ -1,0 +1,63 @@
+﻿(***
+@Author: Shalini Vijayakumar
+@Date: 19/July/2022
+@TC_ID: TOUC_10638
+@TC_Description: Verify user able to see all data fields in Sequential view by sliding the scroll bar for vehicle
+***)
+
+BeginTestCase TOUC_10638
+Log "###########   Started execution of Test Case--> TOUC_10638  ##############"
+Log "#######################################################"
+--"1.Login as an superadmin in Apex Portal.
+
+"LoginPage".OpenApplication
+
+"LoginPage".Login "ProterraAdmin"
+
+Set DatasheetPath to Resourcepath("TestData\S3_TC01_TOUC-10638.xlsx")
+--2.Under Historical Data on Left menu choose Fault Dashboard
+"ApexPages/FaultDashboardSearchCriteria".NavigateTo "HISTORICAL DATA","FAULT DASHBOARD"
+--3.Select the charger in toggle and select the options as below
+--customer dropdown = multiple
+--Vehicle name = Single 
+--Fault status = active and select the from & to date 
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "CustomerName") into CustomerNames
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "AssetName") into VehicleName
+
+"ApexPages/FaultDashboardSearchCriteria".SelectCustomer CustomerNames
+
+get  "ApexPages/FaultDashboardSearchCriteria".AssetTypeSelection ("Vehicle")
+
+get "ApexPages/FaultDashboardSearchCriteria".SelectAssetID ("Vehicle",VehicleName)
+
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultPriority ("All")
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultStatus ("Active")
+---No date range selection for active faults---
+get "ApexPages/FaultDashboardSearchCriteria".ClickGetDataBtn
+
+--verify the data fields in sequential view
+"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Sequential"
+
+"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "All"
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "DatafieldColnames1") into DatafieldColnames1
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "DatafieldColnames2") into DatafieldColnames2
+
+--"ApexPages/FaultDashboardVehicle".ValidateDatafieldColumnNames_Vehicle DatafieldColnames
+
+--4Hover the scroll bar to right and verify the data fields and UI of the screen
+"ApexPages/FaultDashboardSearchCriteria".ValidateDatafieldColumnUI DatafieldColnames1,DatafieldColnames2
+
+"LoginPage".Logout
+
+Log "#############  Finished execution of Test Case--> TOUC_10638 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_10638
+
+
+
+
+
+
+

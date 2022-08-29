@@ -1,0 +1,46 @@
+{
+	"lastmodifieddate": 1659094030.9390001,
+	"lastfoundlocation": [
+		1097,
+		575,
+		51,
+		28
+	],
+	"originalcapturelocation": [
+		1097,
+		575,
+		51,
+		28
+	],
+	"createddate": 1659094030.9390001,
+	"lastfounddate": 1659101423.1210001,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[25,14]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "GarageOverview/imgEllipseMenu/imgEllipseMenu2.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"capturerect": [
+					1097,
+					575,
+					51,
+					28
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com"
+			}
+	],
+	"name": "GarageOverview/imgEllipseMenu/imgEllipseMenu2"
+}

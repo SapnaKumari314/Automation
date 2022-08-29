@@ -1,0 +1,1097 @@
+﻿
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		LogoffArea:[[.75,0],[1,.125]],
+		GarageDropdownArea:[[.75,0],[0.90,.125]],
+		SearchBEBArea:[[0,0.125],[.25,.375]],
+		BusDetailsArea:[[0,.125],[.40,.5]],
+		RecommendedRunArea:[[0.25,.125],[.65,.50]],
+		RecommendedTrackArea:[[0.5,.125],[1,.50]],
+		AlertsArea:[[0,.40],[0.25,1]],
+		NotificationsArea:[[0.15,.375],[0.5,1]],
+		TracksArea:[[0,.35],[1,1]],
+		TracksAreaGarageOverview:[[0,.275],[1,1]],
+		BusChargerStatusArea:[[0.25,.875],[1,1]],
+		ToastMessageArea:[[0.25,.06],[1,.25]],
+		TitleBarArea:[[0,0],[.75, .40]],
+		MenuArea:[[0,.05],[.15, .45]],
+		SelectRunArea:[[0,0.35],[1,1]],
+		IncomingQueueArea:[[0,0.125],[1,.24]],
+		OverrideCommentsBoxArea:[[.25,0.25],[.75,.75]],
+		OrverrideTitlebarArea:[[0,0.455],[1,.49]],
+		ToolsTipArea:[[0.25,0.15],[.55,.75]],
+		TrackPaginationArea:[[0.7,0.90],[1,.95]],
+	}
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+End ScreenPart
+
+function SearchRect AreaName
+	set screenPortions to {
+		ExportButtonArea:[844,672,1307,754],
+		//DailyProcessingArea:[1632,77,1913,173],
+		//ProcessingArea:[1593,79,1910,171],
+		DailyProcessingArea:[1640,93,1900,159],
+		SelectionFiledsArea:[259,153,1898,402],
+		ExportToCSVDownload:[1347,48,1908,408],
+		ExportDataPrompt:[645,404,1270,762],
+		FromDatePickerArea:[1259,383,1511,565],
+		ToDatePickerArea:[1581,380,1840,573],
+		SelectDatePickerArea:[1259,386,1505,571],
+		DownloadsPanelArea:[1476,90,1908,341],
+		SpecificTimeofDayPopUpArea:[1633,81,1899,189],
+	}
+	return screenPortions.(AreaName)
+	
+end SearchRect
+
+//Description: Handler to click on the dropdown field
+---Input: DropDownField(Customer,Asset ID) 
+---Output: returns the true or false
+---Created By/date: Himaja R (08-Jul-2022)
+
+to ClickCustomerAssetDropdown DropDownField
+	try
+		Global ConfigValues
+		
+		if imagefound (Text:DropDownField,waitfor:ConfigValues.MediumTimeOut,SearchRectangle:SearchRect("SelectionFiledsArea"))
+			put FoundImageLocation() into Loc
+			Put Loc+[-40,20] into Pos1
+			Put Loc+[300,290] into Pos2
+			if imagefound (Image:"txt_Search",waitfor:ConfigValues.MediumTimeOut,SearchRectangle:[Pos1,Pos2]) then
+				LogSuccess DropDownField&&" Dropdown is already clicked!!"
+			else
+				Click FoundImageLocation()+[0,25]
+				
+				"Utilities/GenericOperations".Success("Clicked on"&&DropDownField&&" Dropdown successfully!!")
+				
+			end if
+			return true
+		else
+			"Utilities/GenericOperations".Error "Unable to click on"&&DropDownField&&" Dropdown successfully!!"
+			return false
+		end if
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,ClickCustomerAssetDropdown)
+	End try
+end ClickCustomerAssetDropdown
+
+
+//Description: Handler to Select Customer using search
+---Input: CustomerName 
+---Output: returns the true or false
+---Created By/date: Himaja R (08-Jul-2022)
+
+to SelectCustomer CustomerName
+	try
+		Global ConfigValues
+		//put ["Edmonton Transit Service","Stockton Regional Transit District"] into CustomerName
+		wait 20
+		ClickCustomerAssetDropdown "Customer"
+		repeat with the unique items of CustomerName
+			if it is not empty then
+				if imagefound (Imagename:"txt_Search",waitfor:ConfigValues.LongTimeOut,SearchRectangle:SearchRect("SelectionFiledsArea"))
+					Click FoundImageLocation()+[80,0]
+					Typetext controlKey,a
+					Typetext deletekey
+					Typetext it
+					put FoundImageLocation() into Loc
+					Put Loc+[-40,20] into Pos1
+					Put Loc+[300,290] into Pos2
+					Log "Available Searched Customer List:"&ReadText([Pos1,Pos2])
+					if imagefound (Text:it,waitfor:ConfigValues.MediumTimeOut,SearchRectangle:[Pos1,Pos2])
+						Click FoundImageLocation()+[-28,0]
+						MoveTo [430,140]
+						"Utilities/GenericOperations".Success "Specified Customer"&&it&&"is found and selected"
+						set Flag to true
+					else
+						set Flag to false
+						"Utilities/GenericOperations".Error"Specified Customer"&&it&&"is Not found and Not selected"
+					end if
+				else
+					set Flag to false
+					"Utilities/GenericOperations".Error "Search field option not available and Img:txt_Search not found"
+				end if
+			end if 
+		end repeat
+		
+		Click [430,140]
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,SelectCustomer)
+	End try
+end SelectCustomer
+
+
+
+//Description: Handler to Select Asset Id using search
+---Input: CustomerName 
+---Output: returns the true or false
+---Created By/date: Himaja R (08-Jul-2022)
+
+to SelectAssetID AssetID
+	try
+		Global ConfigValues
+		//put ["16403","8001","8002",] into AssetID
+		ClickCustomerAssetDropdown "Asset ID"
+		repeat with each item of AssetID
+			if it is not empty then
+				if imagefound (Image:"txt_Search",waitfor:ConfigValues.MediumTimeOut,SearchRectangle:SearchRect("SelectionFiledsArea"))
+					Click FoundImageLocation()+[80,0]
+					Typetext controlKey,a
+					Typetext deletekey
+					Typetext it
+					put FoundImageLocation() into Loc
+					Put Loc+[-40,20] into Pos1
+					Put Loc+[300,290] into Pos2
+					Log "Available Searched Asset ID List:"&ReadText([Pos1,Pos2])
+					if imagefound (Text:it,waitfor:ConfigValues.MediumTimeOut,SearchRectangle:[Pos1,Pos2])
+						Click FoundImageLocation()+[-28,0]
+						Moveto [430,140]
+						"Utilities/GenericOperations".Success( "Specified Asset ID"&&it&&"is found and selected")
+					else
+						"Utilities/GenericOperations".Error( "Specified Asset ID"&&it&&"is Not found and Not selected")
+						
+					end if
+				else
+					"Utilities/GenericOperations".Error "Search field option not available and Img:txt_Search not found"
+					
+				end if
+			end if
+		end repeat
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,SelectAssetID)
+	End try
+end SelectAssetID
+
+
+
+
+//Description: Function to Click Export to CSV and Read Time stamp and return
+---Input: ExportAssetDataWith 
+---Output: returns the time stamp and file nname residing on top right
+---Created By/date: Himaja R (04-Jul-2022)
+
+to VerifyExportCSVProcessingPopUp ExportAssetDataWith,ToWait,TimeType,AssetType
+	try
+		Global ConfigValues
+		(*set Global ConfigValues to {MinTimeOut:"4",BasicTimeOut:"7",MediumTimeOut:"14",LongTimeOut:"30"}
+		
+		set Towait to 2.5
+		set TimeType to "DailyIntervals"
+		set ExportAssetDataWith to "Data fields and explanations"*)
+		Click {Text:"Export to CSV", SearchRectangle:SearchRect("ExportToCSVDownload")}
+		wait 5
+		
+		if ImageFound(imageName:"img_rb_Datafieldsandexplanations", waitFor:ConfigValues.BasicTimeOut,SearchRectangle:SearchRect("ExportDataPrompt"))
+			"Utilities/GenericOperations".Success "By default Both data columns and data column explanations radio button is selected"
+		else
+			"Utilities/GenericOperations".Error "By default Both data columns and data column explanations radio button is not selected"
+		end if
+		SelectAssetDataWithRadioBtn(ExportAssetDataWith)
+		set the SearchRectangle to empty
+		set the SearchRectangle to SearchRect("ExportButtonArea")
+		
+		Click {image:"bt_Export",waitfor:ConfigValues.BasicTimeOut}
+		set the SearchRectangle to empty
+		
+		put  "Handlers/TimeStamp".GetUTCTimeStamp("UTC") into TimeStamp
+		replace "0" with "o" in TimeStamp
+		
+		wait ToWait // to wait for clear processing file msg to be displayed
+		if TimeType is "DailyIntervals" then
+			put ReadText(SearchRect("DailyProcessingArea")) into ReadData
+		end if
+		if TimeType is "Aggregation" then
+			put ReadText(SearchRect("DailyProcessingArea")) into ReadData
+		end if
+		if TimeType is "Specific Time of Day" then
+			put ReadText(SearchRect("SpecificTimeofDayPopUpArea")) into ReadData
+		end if
+		Set PopUpToValidate to "Success: Your file "&AssetType&"_"&TimeType&"_"&TimeStamp&".CSV is now Processing..."
+		delete newline in ReadData
+		delete "^" in ReadData
+		Replace "O" with "o" in ReadData
+		log "Read Value:"&ReadData
+		if ReadData is PopUpToValidate 
+			LogSuccess "A pop up message comes that "&ReadData
+			
+		else
+			LogWarning "A pop up message is either not displayed or dynamic and couldnot capture/validate"&newline&"Displayed Msg is:"&ReadData
+			
+		end if
+		
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,VerifyExportCSVProcessingPopUp)
+	End try
+end VerifyExportCSVProcessingPopUp
+
+//Description: Function to select Export Asset data with radio buton
+---Input: ExportAssetDataWith
+---Output: 
+---Created By/date: Himaja R (04-Jul-2022)
+to SelectAssetDataWithRadioBtn ExportAssetDataWith
+	try
+		//set ExportAssetDataWith to "Only Data fields"
+		Global ConfigValues
+		
+		if imagefound (Text:ExportAssetDataWith,waitfor:ConfigValues.LongTimeOut,validWords:ExportAssetDataWith,SearchRectangle:SearchRect("ExportDataPrompt"))
+			Click FoundImageLocation()
+			"Utilities/GenericOperations".Success "Clicked on radio button"&&ExportAssetDataWith&&" successfully!!"
+		else
+			"Utilities/GenericOperations".Error "Unable to click on  radio button "&&ExportAssetDataWith&&" successfully!!"
+		end if
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,openApplication)
+	End try
+end SelectAssetDataWithRadioBtn
+
+//Description: Function to export to csv and convert current time to UTC timestamp
+---Input: ExportCSVAndTimeStampUTC
+---Output: 
+---Created By/date: Himaja R (05-Jul-2022)
+function ExportCSVAndReturnTimeStamp ExportAssetDataWith,TimeZone
+	try
+		//set TimeZone to "America/Newyork"
+		Global  ConfigValues
+		Click {Text:"Export to CSV", SearchRectangle:SearchRect("ExportToCSVDownload")}
+		//wait 5
+		
+		SelectAssetDataWithRadioBtn(ExportAssetDataWith)
+		set  the SearchRectangle to empty
+		set  the SearchRectangle to SearchRect("ExportButtonArea")
+		Click  {image:"bt_Export",waitfor:ConfigValues.BasicTimeOut}
+		set  the SearchRectangle to empty
+		
+		put  the long common time into DateAndTime
+		log  DateAndTime
+		put formattedTime("%Y-%m-%d_%H-%M-%S",DateAndTime) into timerVal
+		
+		//log timerVal
+		if Global TimeZone is "UTC" or TimeZone  is "UTC"
+			
+			subtract 5 hours 30 minutes from timerVal
+			//Add 9 seconds to timerVal
+			
+			Add 13 seconds to timerVal
+			insert timerVal into timerList
+			Add 1 seconds to timerVal
+			insert timerVal into timerList
+			Add 1 seconds to timerVal
+			insert timerVal into timerList
+			Add 1 seconds to timerVal
+			insert timerVal into timerList
+			log "UTC TimeStamp:"&timerVal
+		end if
+		
+		if Global TimeZone is "America/Newyork" or TimeZone  is  "America/Newyork"
+			
+			//put formattedTime("%Y-%m-%d_%H-%M-%S",  DateAndTime) into timerVal
+			subtract 9 hours 30 minutes from timerVal
+			//9 hours 30 minutes from timerVal
+			Add 10 seconds to timerVal
+			log "America/Newyork Time stamp:"&timerVal
+		End if 
+		return timerList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,ExportCSVAndReturnTimeStamp)
+	End try
+end ExportCSVAndReturnTimeStamp
+
+
+
+//Description: Function to Click on downloads button
+---Input: 
+---Output: 
+---Created By/date: Himaja R (05-Jul-2022)
+to ClickAndVerifyDownloadsBtn
+	try
+		Global  ConfigValues
+		
+		put "Utilities/CommonActions".ClickBtnByText("Downloads",ConfigValues.BasicTimeOut,SearchRect("ExportToCSVDownload")) into Flag
+		if ImageFound(imageName:"img_CancelDownloads", waitFor:ConfigValues.BasicTimeOut)
+			"Utilities/GenericOperations".Success "Downloads window opened Sucessfully!!!"
+		else
+			"Utilities/GenericOperations".Error "Downloads window is not opened Sucessfully!!!"
+		end if
+		
+		return Flag
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,ClickAndVerifyDownloadsBtn)
+	End try
+end ClickAndVerifyDownloadsBtn
+
+//Description: Function to Click on downloads button
+---Input: 
+---Output: 
+---Created By/date: Himaja R (05-Jul-2022)
+to CloseDownloadsWindow
+	try
+		Global  ConfigValues
+		put "Utilities/CommonActions".ClickBtnByImage("img_CancelDownloads",ConfigValues.BasicTimeOut,SearchRect("ExportToCSVDownload")) into Flag
+		wait 2
+		if Flag is "true" then
+			if not ImageFound(imageName:"img_CancelDownloads", waitFor:3)
+				"Utilities/GenericOperations".Success "Downloads window closed"
+				"Utilities/GenericOperations".CaptureScreenshotScreenName CloseWindow
+				set  Flag to "true"
+			else
+				set  Flag to "false"
+				"Utilities/GenericOperations".Error "Downloads Window is not closed"
+				"Utilities/GenericOperations".CaptureScreenshotScreenName CloseWindow_error
+			end if
+		end if
+		return Flag
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,CloseDownloadsWindow)
+	End try
+end CloseDownloadsWindow
+
+
+//Description: Function to Select Asset Type
+---Input:  Asset type
+---Output: Returns Flag-True/False
+---Created By/date: Himaja R (06-Jul-2022)
+to SelectAssetType AssetType
+	try
+		Global  ConfigValues
+		
+		if ImageFound(imageName:"bt_"&AssetType&"Toggle_Selected",waitFor:ConfigValues.MediumTimeOut,SearchRectangle:SearchRect("SelectionFiledsArea"))
+			"Utilities/GenericOperations".Success "Asset type"&&AssetType&&"is selected"
+			
+			put "true" into Flag
+		else
+			put "Utilities/CommonActions".ClickBtnByText(AssetType,ConfigValues.BasicTimeOut,SearchRect("SelectionFiledsArea")) into Flag
+			Moveto [430,140]
+			
+			if ImageFound(imageName:"bt_"&AssetType&"Toggle_Selected",waitFor:ConfigValues.MediumTimeOut,searchrectangle:SearchRect("SelectionFiledsArea"))
+				"Utilities/GenericOperations".Success "Asset type"&&AssetType&&"is selected"
+				"Utilities/GenericOperations".CaptureScreenshotScreenName AssetType
+			else
+				"Utilities/GenericOperations".CaptureScreenshotScreenName AssetType
+				Throw "Asset type"&&AssetType&&"is not selected"
+			end if
+		end if
+		return Flag
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,SelectAssetType)
+	End try
+end SelectAssetType
+
+//Description: Function to Select TimeType
+---Input: time type to be selected
+---Output: returns flag value
+---Created By/date: Himaja R (06-Jul-2022)
+to SelectAndVerifyTimeType TimeType
+	try
+		Global  ConfigValues
+		//set TimeType  to "Daily Intervals"
+		if ImageFound(Text:"Time Type",waitFor:ConfigValues.BasicTimeOut,SearchRectangle:SearchRect("SelectionFiledsArea"))
+			Click FoundImageLocation()+[0,25]
+			"Utilities/GenericOperations".Success "Clicked on Time type dropdown"
+			put FoundImageLocation() into Loc
+			Put Loc+[-40,40] into Pos1
+			Put Loc+[165,150] into Pos2
+			Log "Available time type dropdown list":ReadText([Pos1,Pos2])
+			if ImageFound(Text:TimeType,waitFor:ConfigValues.BasicTimeOut,SearchRectangle:[Pos1,Pos2])
+				Click FoundImageLocation()
+				"Utilities/GenericOperations".Success "Clicked on specified time type -- "&&TimeType&&" successfully!!"
+				put VerifyTimeTypeSelected(TimeType) into Flag
+				set Flag to true
+			else
+				set Flag to false
+				"Utilities/GenericOperations".Error "Unable to click on specified time type -- "&&TimeType&&" successfully!!"
+			end if
+		else
+			set Flag to false
+			"Utilities/GenericOperations".Error "Unable to click on Time type dropdown"
+		end if
+		return Flag
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,SelectAndVerifyTimeType)
+	End try
+end SelectAndVerifyTimeType
+
+
+//Description: Function to Select TimeType
+---Input:  time type to be verified
+---Output: 
+---Created By/date: Himaja R (06-Jul-2022)
+to VerifyTimeTypeSelected TimeType
+	try
+		
+		Global  ConfigValues
+		put ImageLocation(Text:"Time Type",waitFor:ConfigValues.BasicTimeOut,SearchRectangle:SearchRect("SelectionFiledsArea")) into Loc
+		Put Loc+[-40,10] into Pos1
+		Put Loc+[195,50] into Pos2
+		log "Selected time type:"&ReadText([Pos1,Pos2])
+		if ImageFound(Text:TimeType,waitFor:ConfigValues.BasicTimeOut,SearchRectangle:[Pos1,Pos2])
+			"Utilities/GenericOperations".Success "Specified time type -- "&&TimeType&&"selected successfully!!"
+			set Flag to true
+		else
+			set Flag to false
+			"Utilities/GenericOperations".Error  "Specified time type -- "&&TimeType&&"is not selected successfully!!"
+		end if
+		return Flag
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,VerifyTimeTypeSelected)
+	End try
+	
+end VerifyTimeTypeSelected
+
+//Description: Function to Select date-day
+---Input: 
+---Output: 
+---Created By: Himaja R (06-Jul-2022)
+///put EveryImageLocation(Text:"2",SearchRectangle:[1265,423,1514,514]) into valdate
+to DatePickerDay Day,FromOrToDate
+	try
+		Global  ConfigValues
+		//set Day to 2
+		//set FromOrToDate to "from Date"
+		if FromOrToDate is "From Date" then
+			set SearchRect to SearchRect("FromDatePickerArea")
+		else if FromOrToDate is "Select Date" then
+			set SearchRect to SearchRect("SelectDatePickerArea")
+		else 
+			set SearchRect to SearchRect("ToDatePickerArea")
+		end if
+		if length(Day) is 1 then
+			
+			put EveryImageLocation(Text:Day,SearchRectangle:SearchRect) into val
+			repeat with each item of Val
+				put item 1 of  it +17  into pos1
+				//put item 2 of it - 10 into pos2
+				put item 2 of it - 12 into pos2
+				//put (item 1 of  it - 4) into pos3
+				put (item 1 of  it - 8) into pos3
+				put (item 2 of  it +10) into pos4
+				put ReadText(pos1,pos2,pos3,pos4) into readVal
+				log readVal
+				if readVal is Day
+					Click it
+					set flag to true
+					exit repeat
+				end if
+				set flag to false
+			end repeat
+			
+		else
+			//set day to "11"
+			put [25,26,27,28,29,30,31] into dte
+			repeat with each item of dte
+				if Day is equal it
+					put EveryImageLocation(Text:Day,SearchRectangle:SearchRect) into val 
+					if the number of items in val is 2 then
+						click item 2 of val
+						set flag to true
+						exit repeat
+						
+					else
+						click item 1 of val
+						set flag to true
+						exit repeat
+					end if
+				end if
+				
+			end repeat
+			
+			put [10,11,12,13,14,15,16,17,18,19,20,21,22,23,24] into dte
+			if Day is in dte then
+				wait 2
+				click {Text:Day,SearchRectangle:SearchRect}
+				set flag to true
+			end if
+		end if
+		if flag is false then
+			"Utilities/GenericOperations".Error "Couldn't select the required date - " &Day
+		else
+			"Utilities/GenericOperations".Success "Selected the date - "&Day&" succesfully from date picker"
+		end if
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,DatePickerDay)
+	End try
+	
+end DatePickerDay
+
+
+//Description: Function to Select month from date picker
+---Input: 
+---Output: 
+---Created By: Himaja R (07-Jul-2022)
+to DatePickerMonth Month,FromOrToDate
+	try
+		Global  ConfigValues
+		
+		if FromOrToDate is "From Date" then
+			set SearchRect to SearchRect("FromDatePickerArea")
+		else if FromOrToDate is "Select Date" then
+			set SearchRect to SearchRect("SelectDatePickerArea")
+		else 
+			set SearchRect to SearchRect("ToDatePickerArea")
+		end if
+		log readtext(SearchRect)
+		if ImageFound(text:Month, waitFor:ConfigValues.BasicTimeOut,SearchRectangle:SearchRect)
+			Click FoundImageLocation()
+			"Utilities/GenericOperations".Success "Selected the Month - "&Month&" succesfully from date picker"
+		else			
+			"Utilities/GenericOperations".Error "Couldn't select the specified Month - " &Month
+		end if
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,DatePickerMonth)
+	End try
+end DatePickerMonth
+
+
+
+//Description: Function to Select Year from date picker
+---Input: 
+---Output: 
+---Created By: Himaja R (07-Jul-2022)
+to DatePickerYear Year,FromOrToDate
+	try
+		Global  ConfigValues
+		
+		if FromOrToDate is "From Date" then
+			set SearchRect to SearchRect("FromDatePickerArea")
+		else if FromOrToDate is "Select Date" then
+			set SearchRect to SearchRect("SelectDatePickerArea")
+		else 
+			set SearchRect to SearchRect("ToDatePickerArea")
+		end if
+		log readtext(SearchRect )
+		if ImageFound(text:Year, waitFor:ConfigValues.BasicTimeOut,SearchRectangle:SearchRect)
+			Click FoundImageLocation()
+			"Utilities/GenericOperations".Success "Selected the Year - "&Year&" succesfully from date picker"
+		else
+			"Utilities/GenericOperations".Error "Couldn't select the specified Year - " &Year
+		end if
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,DatePickerYear)
+	End try
+end DatePickerYear
+
+
+//Description: Function to Select Date from "From Date"/"To Date"
+---Input: 
+---Output: 
+---Created By: Himaja R (07-Jul-2022)
+to SelectDateFromDatePickerWindow Day,Month,Year,FromOrToDate
+	try
+	(*set Global ConfigValues to {MinTimeOut:"4",BasicTimeOut:"7",MediumTimeOut:"14",LongTimeOut:"30"}
+	set Day to "15"
+	set Month to "Jun"
+	set Year to "2022"
+	set FromOrToDate to "From Date"*)
+		Global ConfigValues
+		if ImageFound(Text:FromOrToDate,waitFor:ConfigValues.BasicTimeOut,SearchRectangle:SearchRect("SelectionFiledsArea"))
+			Click FoundImageLocation()+[0,25]
+			"Utilities/GenericOperations".Success "Clicked on "&FromOrToDate
+			DoubleClick FoundImageLocation()+[30,75]
+			Moveto [430,140]
+			get DatePickerYear(Year,FromOrToDate)
+			Moveto [430,140]
+			get DatePickerMonth(Month,FromOrToDate)
+			Moveto [430,140]
+			get DatePickerDay(Day,FromOrToDate)
+			set Flag to "true"
+		else
+			set Flag to "false"
+			"Utilities/GenericOperations".Error "Couldnot Clicked on "&FromOrToDate&"text not found"
+		end if
+		return Flag
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,SelectDateFromDatePickerWindow)
+	End try
+	
+End SelectDateFromDatePickerWindow
+
+//Description: Function to Select All fields
+---Input: 
+---Output: 
+---Created By: Himaja R (08-Jul-2022)
+to SelectAllDataFields 
+	try
+		Global ConfigValues
+		
+		put "Utilities/CommonActions".ClickBtnByText("Select All",ConfigValues.BasicTimeOut,SearchRect("SelectionFiledsArea")) into Flag
+		return Flag
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,SelectAllDataFields)
+	End try
+end SelectAllDataFields
+
+//Description: Function to Validate if reporting page is opned
+---Input: 
+---Output: 
+---Created By: Himaja R (11-Jul-2022)
+to VerifyReportingPageOpened
+	try
+		Global ConfigValues
+		set ReportingPageList to ["Select All","Clear Selection","Export To CSV","Time Type","Downloads"]
+		Repeat with each item of ReportingPageList
+			if ImageFound(Text:it,waitFor:ConfigValues.LongTimeOut,SearchRectangle:SearchRect("SelectionFiledsArea"))
+				put true into Flag
+			else
+				put false into Flag
+			end if
+		end repeat 
+		if Flag is true
+			"Utilities/GenericOperations".Success "Reporting page opened successfully!!!"
+		else
+			Throw "Reporting page is not opened"
+		end if
+		return Flag
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,VerifyReportingPageOpened)
+	End try
+end VerifyReportingPageOpened
+
+//Description: Function to select any asset type and time type
+---Input: 
+---Output: 
+---Created By: Himaja R (14-Jul-2022)
+to SelectAnyAssetTypeAndTimeType AssetType
+	try
+		
+		put "Handlers/ReportHandlers".SelectAssetType(AssetType)
+		
+		if AssetType is "Vehicle"
+			set TimeType to ["Daily Intervals","5 Minute Intervals","Specific Time of Day","Aggregation"]
+			Put any item of TimeType into TimeType
+			put "Handlers/ReportHandlers".SelectAndVerifyTimeType(TimeType) into  ReturnVal 
+		else
+			set TimeType to ["Charge Sessions","Specific Time of Day","Aggregation"]
+			Put any item of TimeType into TimeType
+			put "Handlers/ReportHandlers".SelectAndVerifyTimeType(TimeType) into  ReturnVal 
+		end if
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,SelectAnyAssetTypeAndTimeType)
+	End try
+end SelectAnyAssetTypeAndTimeType
+
+//Description: Function to verify export to CSV Window
+---Input: 
+---Output: 
+---Created By: Himaja R (14-Jul-2022)
+to VerifyExportToCSVWindow
+	try
+		Global ConfigValues
+		Click {Text:"Export to CSV", SearchRectangle:SearchRect("ExportToCSVDownload")}
+		
+		if ImageFound(imageName:"img_rb_Datafieldsandexplanations", waitFor:ConfigValues.BasicTimeOut,SearchRectangle:SearchRect("ExportDataPrompt"))
+			"Utilities/GenericOperations".Success "By default Both data columns and data column explanations radio button is selected"
+		else
+			"Utilities/GenericOperations".Error "By default Both data columns and data column explanations radio button is not selected"
+		end if
+		
+		set Data to ["Data fields and explanations","Only data fields"]
+		Repeat with each item of data
+			if imagefound (Text:it,waitfor:ConfigValues.MediumTimeOut,SearchRectangle:SearchRect("ExportDataPrompt"))
+				
+				"Utilities/GenericOperations".Success it&&"radio button is found successfully!!"
+			else
+				"Utilities/GenericOperations".Error  it&&"radio button is NOT found successfully!!"
+			end if
+		end repeat
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,VerifyExportToCSVWindow)
+	End try
+end VerifyExportToCSVWindow
+
+//Description: Function to close export to CSV Window
+---Input: 
+---Output: 
+---Created By: Himaja R (14-Jul-2022)
+To CancelExportToCSVPrompt
+	try
+		Click {image:"bt_Cancel",waitfor:ConfigValues.BasicTimeOut,SearchRectangle: SearchRect("ExportButtonArea")}
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,CancelExportToCSVPrompt)
+	End try
+End CancelExportToCSVPrompt
+
+
+//Description: Handler to  Explanations for the data fileds
+---Input: 
+---Output: 
+---Created By/date: Himaja R (27-Jul-2022)
+
+to readAndVerifyDataFieldColumns CSVFileName,TestDataExcelFileName,ExcelSheetName
+
+	try
+		Global  ConfigValues
+		//Set CSVFileName to "TOUC_10672" 
+		//set TestDataExcelFileName to  "Vehicle.xlsx"
+		//set ExcelSheetName to "DailyIntervalExplanations"
+		put "Handlers/FileOperations".ReadFromCSVFile(CSVFileName) into ReadCSVData
+		put line 1 of ReadCSVData into ColumnHeader
+		
+		repeat with each item of ColumnHeader
+			insert it.value into ColumnNamesList
+		end repeat
+		
+		put  "Utilities/ExcelOperations".readColumDataFrom(Resourcepath(TestDataExcelFileName),ExcelSheetName, "DataField") into TestDataColumn
+		(*log ReadExplanationsList
+		log TestDataExplanation
+		log ColumnNamesList
+		log TestDataColumn*)
+		put compareLists(ColumnNamesList,TestDataColumn) into ReturnVal
+		if ReturnVal is true
+			Logsuccess " Downloaded CSV contains -->  column names as per Reporting Matrix"
+			LogSucCess "Exported data is sorted as per user filters chosen in drag and drop zone"
+			set flag to true
+		else
+			logError " Downloaded CSV DOESNOT contains - column names as per Reporting Matrix"
+			logError "Exported data is NOT sorted as per user filters chosen in drag and drop zone"
+			set flag to false
+		end if
+		return true
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,readAndVerifyDataFieldColumns)
+	End try
+	
+end readAndVerifyDataFieldColumns
+
+
+//Description: Handler to  Explanations for the data fileds
+---Input: 
+---Output: 
+---Created By/date: Himaja R (18-Jul-2022)
+
+to readAndVerifyDataFieldExplanations CSVFileName,TestDataExcelFileName,ExcelSheetName
+
+	try
+		Global  ConfigValues
+		//Set CSVFileName to "TOUC_10672" 
+		//set TestDataExcelFileName to  "Vehicle.xlsx"
+		//set ExcelSheetName to "DailyIntervalExplanations"
+		put "Handlers/FileOperations".ReadFromCSVFile(CSVFileName) into ReadCSVData
+		put line 1 of ReadCSVData into Explanations
+		put line 2 of ReadCSVData into ColumnHeader
+		repeat with each item of Explanations
+			insert it.value into ReadExplanationsList
+		end repeat
+		repeat with each item of ColumnHeader
+			insert it.value into ColumnNamesList
+		end repeat
+		put  "Utilities/ExcelOperations".readColumDataFrom(Resourcepath(TestDataExcelFileName),ExcelSheetName, "Explanation") into TestDataExplanation
+		put  "Utilities/ExcelOperations".readColumDataFrom(Resourcepath(TestDataExcelFileName),ExcelSheetName, "DataField") into TestDataColumn
+		(*log ReadExplanationsList
+		log TestDataExplanation
+		log ColumnNamesList
+		log TestDataColumn*)
+		put compareLists(ColumnNamesList,TestDataColumn) into ReturnVal
+		put compareLists(ReadExplanationsList,TestDataExplanation) into ReturnVal1
+		if ReturnVal is true and ReturnVal1 is true
+			Logsuccess " Downloaded CSV contains - columns explanations first and then column names as per Reporting Matrix"
+			LogSucCess "Exported data is sorted as per user filters chosen in drag and drop zone"
+			logsuccess "Explanations match sucessfully as per Reporting Matrix"
+			set flag to true
+		else
+			logError " Downloaded CSV DOESNOT contains - columns explanations first and then column names as per Reporting Matrix"
+			logError "Exported data is NOT sorted as per user filters chosen in drag and drop zone"
+			logError "Explanations doesnot match as per Reporting Matrix"
+			set flag to false
+		end if
+		return true
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,readAndVerifyDataFieldExplanations)
+	End try
+	
+end readAndVerifyDataFieldExplanations
+
+//Description: Handler to compare list
+---Input: 
+---Output: 
+---Created By/date: Himaja R (19-Jul-2022)
+to compareLists List1,List2
+	try
+		repeat with each item of List1
+			put item repeatindex() of  List2 into value
+			log "Exported CSV value --> "&it
+			log "Test data/Open Search value --> "&value
+			set flag to  true
+			if it is equal to item repeatindex() of  list2
+				logsuccess "Values match"
+				
+			else 
+				set flag to false
+				logError "Values doesnot match"
+			end if
+		end repeat
+		if flag is true
+			Logsuccess "List Values Match"
+			return true
+		else
+			Logerror "List Values doesn't match"
+		end if
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,compareLists)
+	End try
+end compareLists
+
+//Description: Handler to get the response from open search
+---Input: 
+---Output: 
+---Created By/date: Himaja R (21-Jul-2022)
+to getTheResponseFromOpenSearchAndSave Query,FileName
+	try
+		OpenSearchDashboard.NavigateTo "Dev Tools"
+		
+		OpenSearchDashboard.ClearExistingQueries
+		put OpenSearchDashboard.EnterQueryRunAndGetResponse(Query) into Response
+		put  "Handlers/FileOperations".createJSONFileAndWrite(FileName,Response)
+		put "Handlers/FileOperations".getJSONValueFromJSONFile (FileName) into Response
+		Return Response
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getTheResponseFromOpenSearchAndSave)
+	End try
+end getTheResponseFromOpenSearchAndSave
+
+//Handler to convert 
+---Input: 
+---Output: 
+---Created By/date: Himaja R (25-Jul-2022)
+to getRoundTheDecimalValuesFromCSV CSVData
+	try
+		
+		repeat with each item of CSVData
+			if it is a number then
+				insert it rounded to 4 places  into RoundedDataList
+			else
+				insert it into RoundedDataList
+			end if
+		end repeat
+		log RoundedDataList
+		return RoundedDataList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getRoundTheDecimalValuesFromCSV)
+	End try
+end getRoundTheDecimalValuesFromCSV
+
+//Handler to convert 
+---Input: 
+---Output: 
+---Created By/date: Himaja R (25-Jul-2022)
+to HandleSpecialValuesInExportedCSV ListName
+	try
+		replace every occurrence of "No Index" in ListName by empty
+		replace every occurrence of "Null" in ListName by empty
+		replace every occurrence of "Infinity" in ListName by "-"
+		replace every occurrence of "-Infinity" in ListName by "-"
+		replace every occurrence of "NaN" in ListName by "-"
+		Repeat with each item of ListName
+			if it is "0.0"
+				replace it in ListName by "0"
+			end if 
+		end repeat
+		return ListName
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,HandleSpecialValuesInExportedCSV)
+	End try
+end HandleSpecialValuesInExportedCSV
+
+
+
+
+//Description: Function to read from and to date from excel sheet and return all the dates between them
+---Input: 
+---Output: Returns all the dates between the given dates
+---Created By/date: Himaja R (27-Jul-2022)
+to getAllTheDatesBtwFromAndToDate ExcelFileName,ExcelSheetName
+	try
+		Global  ConfigValues
+		put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath(ExcelFileName), ExcelSheetName, "FromDateDay") into FromDateDay
+		put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath(ExcelFileName), ExcelSheetName, "FromDateMon") into FromDateMon
+		put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath(ExcelFileName), ExcelSheetName, "FromDateYear") into FromDateYear
+		
+		
+		put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath(ExcelFileName), ExcelSheetName, "ToDateDay") into ToDateDay
+		put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath(ExcelFileName), ExcelSheetName, "ToDateMon") into ToDateMon
+		put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath(ExcelFileName), ExcelSheetName, "ToDateYear") into ToDateYear
+		
+		put FromDateDay&&FromDateMon&&FromDateYear into FromDateVal
+		put ToDateDay&&ToDateMon&&ToDateYear into ToDateVal
+		
+		put  (FromDateVal .. ToDateVal) into list
+		
+		repeat with each item of list
+			insert formattedTime("%Y-%m-%d",it) into DatesList
+		end repeat
+		log DatesList
+		return DatesList
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,getAllTheDatesBtwFromAndToDate)
+	End try
+end getAllTheDatesBtwFromAndToDate
+
+
+//Description: Function to Validate the format of the file downloaded and download the file
+---Input: 
+---Output: 
+---Created By/date: Himaja R (28-Jul-2022)
+to validateFileDownloaded AssetType,TimeType,TimeStampList
+	try
+		
+		Global  ConfigValues
+		log TimeStampList
+		//set TimeStampList to ["2022-07-28_15-42-48","2022-07-28_15-42-49","2022-07-28_15-42-50"]
+		Repeat with each item  of TimeStampList
+			put it into TimeStamp
+			replace "O" with "0" in it
+			delete  "_" in it
+			delete "-" in it
+			put characters 1 to 6 of it into Chars
+			delete characters 1 to 6 of it
+			Put Chars&newline&it into val
+			//----------------------------------------------------------------------------------------------------------------------------------
+			(*replace every  occurrence of <<_>> in   it by " "
+			replace every  occurrence of <<->> in   it by " "
+			split it by " "*)
+			//----------------------------------------------------------------------------------------------------------------------------------
+			//log val
+			Set DownloadedFileName to AssetType&"_"&TimeType&"_"&val&".csv"
+			log DownloadedFileName
+			replace "O" with "0" in TimeType
+			if ImageFound(Text:"Today", waitFor:ConfigValues.BasicTimeOut,Validwords:"Today",searchRectangle:SearchRect(DownloadsPanelArea))
+				put FoundImageLocation() into Loc
+				Put Loc+[-10,10] into Pos1
+				Put Loc+[370,100] into Pos2
+				put ReadText(Pos1,Pos2) into val1
+				replace "O" with "0" in val1
+				delete " " in val1
+				delete  "_" in val1
+				delete "-" in val1
+				delete "—" in val1
+				log val1
+				insert AssetType into list 
+				insert  TimeType into list 
+				insert Chars into list 
+				insert it into list
+				
+				set flag to true
+				
+				repeat with each item of list
+					
+					if val1 contains it
+						logsuccess "Found it:"&it
+					else
+						logwarning "Couldnot find : "& it
+						Set flag to false
+					end if
+					
+				end repeat
+				put empty list into list
+				
+			else
+				LogError "Downloads screen is not shown"
+				
+			end if
+			
+			if flag is true  then
+				put repeatindex() into index
+				put  TimeStamp  into TimeStampval
+				set flag1 to true
+			end if
+			
+		End repeat
+		
+		if flag1 is true  then
+			LogSuccess " Downloaded file is available in the downloads pannel in the specified format"
+			log "TimeStamp:"&TimeStampval
+			Click {Text:"Download", waitFor:ConfigValues.BasicTimeOut,Validwords:"Download",searchRectangle:[Pos1,Pos2]}
+			"Utilities/GenericOperations".Success  "Clicked on Download successfully!!"
+		else
+			"Utilities/GenericOperations".Error " Downloaded file is not available in the specified format"
+		end if
+		return TimeStampval
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,validateFileDownloaded)
+	End try	
+end validateFileDownloaded
+
+
+//Description: Handler to Select Time 
+---Input: 
+---Output: 
+---Created By/date: Himaja R (03-Aug-2022)
+to DatePickerTime TimeValues,FromOrToDate
+	try
+		Global  ConfigValues
+		Split TimeValues by ","
+		put item 1 of TimeValues into Hours
+		put item 2 of TimeValues into Min
+		put item 3 of TimeValues into AMorPM
+		
+		if FromOrToDate is "From Date" then
+			set SearchRect to SearchRect("FromDatePickerArea")
+		else if FromOrToDate is "Select Date" then
+			set SearchRect to SearchRect("SelectDatePickerArea")
+		else 
+			set SearchRect to SearchRect("ToDatePickerArea")
+		end if
+		if ImageFound(Text:FromOrToDate,waitFor:ConfigValues.BasicTimeOut,SearchRectangle:SearchRect("SelectionFiledsArea"))
+			Click FoundImageLocation()+[0,25]
+			put FoundImageLocation() into Loc
+			Put Loc+[-30,25] into Pos1
+			Put Loc+[270,400] into Pos2
+			Click {Image:"bt_TimeClock", waitFor:ConfigValues.BasicTimeOut,SearchRectangle:[Pos1,Pos2]}
+			Click {Image:"bt_Hrs", waitFor:ConfigValues.BasicTimeOut,SearchRectangle:[Pos1,Pos2]}
+			if ImageFound(text:Hours, waitFor:ConfigValues.BasicTimeOut,SearchRectangle:SearchRect)
+				click FoundImageLocation()
+			else
+				"Utilities/GenericOperations".Error "Couldn't find "&Hours&" hours"
+			end if 
+			Click {Image:"bt_Mins", waitFor:ConfigValues.BasicTimeOut,SearchRectangle:[Pos1,Pos2]}
+			if ImageFound(text:Min, waitFor:ConfigValues.BasicTimeOut,SearchRectangle:SearchRect)
+				click FoundImageLocation()
+			else
+				"Utilities/GenericOperations".Error "Couldn't find "&Min&" Minutes"
+			end if 
+			get ToggleTimeAMPM(AMorPM,SearchRect)
+		else
+			"Utilities/GenericOperations".Error "Couldn't find "&FromOrToDate&" field"
+		end if 
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,DatePickerTime)
+	End try
+end DatePickerTime
+
+//Description: Handler to Select AM or PM
+---Input: 
+---Output: 
+---Created By/date: Himaja R (03-Aug-2022)
+to ToggleTimeAMPM AMorPM,SearchRect
+	try
+		if AMorPM is "AM"
+			if ImageFound(text:"AM", waitFor:ConfigValues.BasicTimeOut,SearchRectangle:SearchRect)
+				LogSuccess AMorPM&&"is set"
+			else
+				Click{text:"PM", waitFor:ConfigValues.BasicTimeOut,SearchRectangle:SearchRect}
+			end if
+		else if AMorPM is "PM"
+			if ImageFound(text:"PM", waitFor:ConfigValues.BasicTimeOut,SearchRectangle:SearchRect)
+				LogSuccess AMorPM&&"is set"
+			else
+				Click{text:"AM", waitFor:ConfigValues.BasicTimeOut,SearchRectangle:SearchRect}
+			end if
+		end if
+		if ImageFound(text:AMorPM, waitFor:ConfigValues.BasicTimeOut,SearchRectangle:SearchRect)
+			"Utilities/GenericOperations".Success AMorPM&&"is  set"
+		else
+			"Utilities/GenericOperations".Error "Couldn't find "&AMorPM&" and couldnot set"
+		end if
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,DatePickerTime)
+	End try
+end ToggleTimeAMPM

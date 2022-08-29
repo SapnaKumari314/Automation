@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		1726,
+		982,
+		155,
+		41
+	],
+	"lastmodifieddate": 1659011621.575,
+	"createddate": 1659009202.2740002,
+	"name": "RunAndTrackAssignmentPage/imgDisabledEmergencyStopAll",
+	"lastfounddate": 1659021512.7690001,
+	"ocrcapturestring": "1 mergency Stop All",
+	"lastfoundlocation": [
+		1729,
+		986,
+		147,
+		34
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[77,20]",
+					"Tolerance": "_33",
+					"Discrepancy": "_0",
+					"SearchType": "Smoothed for Text"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/imgDisabledEmergencyStopAll.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com",
+				"capturerect": [
+					1726,
+					982,
+					155,
+					41
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "Emergency Stop All"
+			}
+	]
+}

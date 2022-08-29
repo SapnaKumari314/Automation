@@ -1,0 +1,797 @@
+﻿
+(***
+@Author: Vivek Mamgain
+@Date: 02/Mar/22
+@Description: This script is the POM scripts for Run and Assignment page.
+***)
+
+-----------------------------------------Run and Assignment Page
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		LogoffArea:[[.75,0],[1,.125]],
+		GarageDropdownArea:[[.75,0],[0.90,.155]],
+		GlobalTabFieldsArea:[[0,0.125],[.5,.75]],
+		GarageTabFieldsArea:[[0,0.125],[.5,.975]],
+		ApplyAndCancelButtonArea:[[0,0.875],[.25,.975]],
+		TitleBarArea:[[0,0],[.75, .40]],
+		IncomingQueueArea:[[0,0.125],[1,.24]],
+		TracksArea:[[0,.35],[1,1]],
+		PaginationArea:[[.75,.875],[1,.971]],
+	}
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+End ScreenPart
+-----------------------------------------------------
+
+--@Author: Vivek Mamgain
+to handle VerifyFieldsOnGlobalConfig
+	Log "****Verify the fields are appearing correctly on Global Page"
+	set the SearchRectangle to ScreenPart("GlobalTabFieldsArea")
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("Maximum Charger Power Rate (kW)") then
+		LogSuccess "Maximum Charger Power Rate (kW) is present on the screen"
+	else
+		LogError "Maximum Charger Power Rate (kW) is not present on the screen"
+	end if
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("Minimum Charger Power Rate (kW)") then
+		LogSuccess "Minimum Charger Power Rate (kW) is present on the screen"
+	else
+		LogError "Minimum Charger Power Rate (kW) is not present on the screen"
+	end if
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("ROB Shift PM") then
+		LogSuccess "ROB Shift PM is present on the screen"
+	else
+		LogError "ROB Shift PM is not present on the screen"
+	end if
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("ROB Shift AM") then
+		LogSuccess "ROB Shift AM is present on the screen"
+	else
+		LogError "ROB Shift AM is not present on the screen"
+	end if
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("ROB Shift Mid-Day") then
+		LogSuccess "ROB Shift Mid-Day is present on the screen"
+	else
+		LogError "ROB Shift Mid-Day is not present on the screen"
+	end if
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("ROB Server URL") then
+		LogSuccess "ROB Server URL is present on the screen"
+	else
+		LogError "ROB Server URL is not present on the screen"
+	end if
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("ROB API Maximum Response Time") then
+		LogSuccess "ROB API Maximum Response Time is present on the screen"
+	else
+		LogError "ROB API Maximum Response Time is not present on the screen"
+	end if
+	
+	set the SearchRectangle to empty
+	
+	
+	
+end VerifyFieldsOnGlobalConfig
+
+--@Author: Vivek Mamgain
+to handle VerifyFieldsOnGarageConfig
+	Log "****Verify the fields are appearing correctly on Garage Page"
+	set the SearchRectangle to ScreenPart("GarageTabFieldsArea")
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("Garage Name") then
+		LogSuccess "Garage Name is present on the screen"
+	else
+		LogError "Garage Name is not present on the screen"
+	end if
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("Proterra Garage ID") then
+		LogSuccess "Proterra Garage ID is present on the screen"
+	else
+		LogError "Proterra Garage ID is not present on the screen"
+	end if
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("Global Vehicle Battery Capacity (kWh)") then
+		LogSuccess "Global Vehicle Battery Capacity (kWh) is present on the screen"
+	else
+		LogError "Global Vehicle Battery Capacity (kWh) is not present on the screen"
+	end if
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("Estimated Max. Run Distance (km)") then
+		LogSuccess "Estimated Max. Run Distance (km) is present on the screen"
+	else
+		LogError "Estimated Max. Run Distance (km) is not present on the screen"
+	end if
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("Energy Threshold Ratio") then
+		LogSuccess "Energy Threshold Ratio is present on the screen"
+	else
+		LogError "Energy Threshold Ratio is not present on the screen"
+	end if
+	
+	"Utilities/CommonActions".scrollMouseWheelDown "Energy Threshold Ratio", 2
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("Energy Consumption Rate (kWh/km)") then
+		LogSuccess "Energy Consumption Rate (kWh/km) is present on the screen"
+	else
+		LogError "Energy Consumption Rate (kWh/km) is not present on the screen"
+	end if
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("Timezone For Calculations") then
+		LogSuccess "Timezone For Calculations is present on the screen"
+	else
+		LogError "Timezone For Calculations is not present on the screen"
+	end if
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("Required Energy Safety Margin") then
+		LogSuccess "Required Energy Safety Margin is present on the screen"
+	else
+		LogError "Required Energy Safety Margin is not present on the screen"
+	end if
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("Required Energy Reserved Ratio") then
+		LogSuccess "Required Energy Reserved Ratio is present on the screen"
+	else
+		LogError "Required Energy Reserved Ratio is not present on the screen"
+	end if
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("Book Out Delay Threshold (min)") then
+		LogSuccess "Book Out Delay Threshold (min) is present on the screen"
+	else
+		LogError "Book Out Delay Threshold (min) is not present on the screen"
+	end if
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("ROB Garage ID") then
+		LogSuccess "ROB Garage ID is present on the screen"
+	else
+		LogError "ROB Garage ID is not present on the screen"
+	end if
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("OCPP Send Commands To Charger") then
+		LogSuccess "OCPP Send Commands To Charger is present on the screen"
+	else
+		LogError "OCPP Send Commands To Charger is not present on the screen"
+	end if
+	
+	set the SearchRectangle to empty
+	
+end VerifyFieldsOnGarageConfig
+
+to handle VerifyApplyCancelButtonOnScreen
+	Log "****Verifying the Apply and Cancel buttons are present on the screen"
+	set the SearchRectangle to ScreenPart("ApplyAndCancelButtonArea")
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("Apply") then
+		LogSuccess "Apply button is present on the screen"
+	else
+		LogError "Apply button is not present on the screen"
+	end if
+	
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("Cancel") then
+		LogSuccess "Cancel button is present on the screen"
+	else
+		LogError "Cancel button is not present on the screen"
+	end if
+	set the SearchRectangle to empty
+end VerifyApplyCancelButtonOnScreen
+
+to handle ClickOnGarageTab
+	Log "****Click on the Garage Tab"
+	wait 2
+	if "Utilities/CommonActions".ClickBtnByText ("Garage") then
+		LogSuccess "Garage button is Clicked on the screen"
+	else
+		LogError "Garage button is not clicked on the screen"
+	end if
+	
+end ClickOnGarageTab
+
+to handle SwitchTheGarage garageName
+	Log "****Switching the Garage from default to other"
+	set the SearchRectangle to ScreenPart("GarageDropdownArea")
+	
+	if "Utilities/CommonActions".ClickBtnByImage ("Generic/imgGarageIcon")
+		LogSuccess "Garage Icon clicked successfully"
+		
+		--if garageName=""
+		
+		--if "Utilities/CommonActions".ClickBelowOfBtnByImage("Generic/imgSecondGarage")
+		--	LogSuccess "Garage switched successfully "
+		--else
+		--	LogError "Garage is not switched successfully"
+		--	end if
+		--else	
+		if "Utilities/CommonActions".ClickBtnByText(garageName)
+			LogSuccess "Garage switched successfully "&garageName
+		else
+			LogError  "Garage is not switched successfully"
+		end if
+		--end if
+	else
+		LogError "Unable to click Garage Icon "
+	end if
+	
+	set the SearchRectangle to empty
+end SwitchTheGarage
+
+to handle UpdateField fieldName, data
+	Log "****Updating the Editable field with some data"
+	set the SearchRectangle to ScreenPart("GarageTabFieldsArea")
+	wait 5
+	if "Utilities/CommonActions".EnterValueWrtAField (fieldName, data)
+		LogSuccess "Value updated successfully in the field ---> "&&fieldName 
+	else
+		LogError "Value updated successfully in the field ---> "&&fieldName 
+	end if
+	set the SearchRectangle to empty
+end UpdateField
+
+to handle ClickApplyButton
+	Log "****Clicking Apply button"
+	set the SearchRectangle to ScreenPart("ApplyAndCancelButtonArea")
+	if "Utilities/CommonActions".ClickBtnByText ("Apply")
+		LogSuccess "Successfully clicked Apply button"
+	else
+		LogError "Unable to click Apply button"
+	end if
+	Wait 10
+	--"Utilities/GenericOperations".ApiSynchronization
+	set the SearchRectangle to empty
+end ClickApplyButton
+
+to handle ClickCancelButton
+	Log "****Clicking Cancel button"
+	set the SearchRectangle to ScreenPart("ApplyAndCancelButtonArea")
+	if "Utilities/CommonActions".ClickBtnByText ("Cancel")
+		LogSuccess "Successfully clicked Cancel button"
+		wait 4
+	else
+		LogError "Unable to click Cancel button"
+	end if
+	set the SearchRectangle to empty
+end ClickCancelButton
+
+to handle VerifyPageTitle
+	Log "****Verifying the Page title"
+	set the SearchRectangle to ScreenPart("TitleBarArea")
+	if "Utilities/CommonActions".IsTextPresentOnScreen ("CCSS Configuration")
+		LogSuccess "User is on the page --> CCSS Configuration"
+	else
+		LogError "User is not on the page --> CCSS Configuration"
+	end if
+	set the SearchRectangle to empty
+end VerifyPageTitle
+
+
+(**Handler No : 02**)
+--------------------------------
+(***
+@author : Mohammed Gouse
+@date : 22/March/22
+@description : To Verify all Non Editable Fields of "Global" Tab
+***)
+to handle VerifyAllEditableAndNonEditableGlobalFields 
+	put "Maximum Charger Power Rate (kW)" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	put "Minimum Charger Power Rate (kW)" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	put "ROB Shift PM" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	put "ROB Shift AM" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	put "ROB Shift Mid-Day" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	put "ROB Server URL" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	put "ROB API Maximum Response Time" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+end VerifyAllEditableAndNonEditableGlobalFields 
+
+to handle VerifyFieldIsEditable fieldName, screenPart
+	set the SearchRectangle to ScreenPart(screenPart)
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	set the SearchRectangle to empty
+end VerifyFieldIsEditable 
+
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(**Handler No : 03**)
+--------------------------------
+(***
+@author : Mohammed Gouse
+@date : 22/March/22
+@description : To Verify all Non Editable Fields of "Garage" Tab
+***)
+to handle VerifyAllEditableAndNonEditableGarageFields 
+	
+	put "Garage Name" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	put "Proterra Garage ID" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	put "Global Vehicle Battery Capacity (kWh)" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	put "Estimated Max. Run Distance (km)" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	put "Energy Threshold Ratio" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	put "Energy Consumption Rate (kWh/km)" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	put "Timezone For Calculations" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	put "Required Energy Safety Margin" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	put "Required Energy Reserved Ratio" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	ScrollWheelDown 1
+	
+	put "Book Out Delay Threshold (min)" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	ScrollWheelDown 1
+	
+	put "ROB Garage ID" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+	ScrollWheelDown 1
+	
+	put "OCPP Send Commands To Charger" into fieldName
+	"Utilities/CommonActions".IsFieldEditable fieldName
+	if ImageFound(text:fieldName) then
+		LogSuccess fieldName && "- Field Found Successfully"
+	else
+		LogError fieldName && "- Field was Not Found"               
+	end if
+	
+end VerifyAllEditableAndNonEditableGarageFields 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(**Handler No : 04**)
+--------------------------------
+(***
+@author : Mohammed Gouse
+@date : 22/March/22
+@description : To Verify all Non Editable Fields of "Garage" Tab
+***)
+to handle VerifyButtonIsEnabledOrDisabled buttonName
+	set the SearchRectangle to ScreenPart("ApplyAndCancelButtonArea")
+	"Utilities/CommonActions".ClickBtnByText buttonName
+	if ImageFound(text:buttonName) then
+		LogSuccess buttonName && "- Button Found Successfully"
+	else
+		LogError buttonName && "- Button was Not Found"                     
+	end if
+	set the SearchRectangle to empty
+end VerifyButtonIsEnabledOrDisabled
+
+
+to handle VerifyFieldValueIsReset fieldName, resetValue
+	if "Utilities/CommonActions".GetValueWrtAField(fieldName) = resetValue
+		LogSuccess "Field value is reset successfully --->"&&fieldName
+	else
+		LogError "Field value is not reset successfully --->"&&fieldName
+	end if
+end VerifyFieldValueIsReset 
+
+(**Handler No : 06**)
+--------------------------------
+(***
+@author : Mohammed Gouse
+@date : 23/March/22
+@description : To verify only Details of Bus Available in IQ Including Bus No. and Time
+***)
+to handle VerifyIQueueBusDetails busID
+	Log "****Verify only Details of Bus Available in IQ Including Bus No. and Time, Bus ID--> "&&busID
+	set the SearchRectangle to ScreenPart("IncomingQueueArea")
+	if ImageFound(text:busID, WaitFor:20) then
+		put FoundImageLocation() into FoundBusLocation
+		put ReadText(FoundBusLocation) into IQueueBusNo
+		Log IQueueBusNo	
+		
+		put ImageRectangle(text:busID, waitFor:20) into ImageRectangleOfBusId
+		put ReadText(ImageRectangleOfBusId.TopLeft+[-20,-45],ImageRectangleOfBusId.BottomRight+[20,-20]) into IQueueBusBookInTime
+		Log "The HH:MM Time Format of" && IQueueBusNo && "is" && IQueueBusBookInTime
+		
+		LogSuccess busID && "- Bus Found In IQueue and Verified their details Successfully"
+	else
+		LogError busID && "- Bus was not Found In IQueue and not Verified their details"                 
+	end if
+	set the SearchRectangle to empty
+end VerifyIQueueBusDetails
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(**Handler No : 07**)
+--------------------------------
+(***
+@author : Mohammed Gouse
+@date : 23/March/22
+@description : To Verify more than one Bus Available in IQ
+***)
+to handle VerifyMoreThanOneBusInIQueue busID
+	Log "****Verify more than one Bus Available in IQ, Bus ID--> "&&busID
+	set the SearchRectangle to ScreenPart("OverallIncomingQueueArea")
+	if ImageFound(text:busID, WaitFor:20) then
+		put FoundImageLocation() into FoundBusLocation
+		put ReadText(FoundBusLocation) into IQueueBusNo
+		Log IQueueBusNo	
+		
+		if ImageFound(text:busID, WaitFor:20) then
+			put FoundImageLocation() into SecondBusLocation
+			put ReadText(SecondBusLocation) into SecondBusNo
+			put ImageRectangle(text:busID, waitFor:20) into ImageRectangleOfBusIdNo1
+			put ReadText(ImageRectangleOfBusIdNo1.TopRight+[20,-45],ImageRectangleOfBusIdNo1.BottomRight+[180,25]) into ValueOfBusNo2
+			LogSuccess "Second Bus Found Successfully contains Details with" && ValueOfBusNo2
+			
+			if ImageFound(text:SecondBusNo, WaitFor:20) then
+				put FoundImageLocation() into ThirdBusLocation
+				put ReadText(ThirdBusLocation) into ThirdBusNo
+				put ImageRectangle(text:SecondBusNo, waitFor:20) into ImageRectangleOfBusId2
+				put ReadText(ImageRectangleOfBusId2.TopRight+[20,-45],ImageRectangleOfBusId2.BottomRight+[180,25]) into ValueOfBusNo3
+				LogSuccess "Third Bus Found Successfully contains Details with" && ValueOfBusNo3
+			else
+				LogError "Third Bus was Not Available in IQueue"
+			end if
+		else
+			LogError "Second Bus was Not Available in IQueue"
+		end if
+		
+		LogSuccess "First Bus (" & busID & ") Found In IQueue and Verified their details Successfully"
+	else
+		LogError "(" & busID & ") Bus was not Found In IQueue and not Verified their details"                 
+	end if
+	set the SearchRectangle to empty
+end VerifyMoreThanOneBusInIQueue
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(**Handler No : 08**)
+--------------------------------
+(***
+@author : Mohammed Gouse
+@date : 23/March/22
+@description : To Verify order of Bus Available in IQ
+***)
+to handle VerifyOrderOfBusInIQueue busID
+	Log "****Verify Order of Buses Available in IQ, Bus ID--> "&&busID
+	set the SearchRectangle to ScreenPart("IncomingQueueArea")
+	if ImageFound(text:busID, WaitFor:20) then
+		put FoundImageLocation() into FoundBusLocation
+		put ReadText(FoundBusLocation) into IQueueBusNo1
+		Log IQueueBusNo1
+		
+		put ImageRectangle(text:busID, waitFor:20) into ImageRectangleOfBusId
+		put ReadText(ImageRectangleOfBusId.TopLeft+[-20,-45],ImageRectangleOfBusId.BottomRight+[20,-20]) into BookInTimeOfIQueueBus1
+		Log "The HH:MM Time Format of" && IQueueBusNo1 && "is" && BookInTimeOfIQueueBus1
+		
+		if ImageFound(text:IQueueBusNo1, WaitFor:20) then
+			put FoundImageLocation() into SecondBusLocation
+			put ReadText(SecondBusLocation) into IQueueBusNo2
+			Log IQueueBusNo2
+			
+			put ImageRectangle(text:IQueueBusNo1, waitFor:20) into ImageRectangleOfIQueueBusNo1
+			put ReadText(ImageRectangleOfIQueueBusNo1.TopLeft+[-20,-45],ImageRectangleOfIQueueBusNo1.BottomRight+[20,-20]) into BookInTimeOfIQueueBus2
+			Log"The HH:MM Time Format of" && IQueueBusNo2 && "is" && BookInTimeOfIQueueBus2
+			
+			if ImageFound(text:IQueueBusNo2, WaitFor:20) then
+				put FoundImageLocation() into SecondBusLocation
+				put ReadText(SecondBusLocation) into IQueueBusNo3
+				Log IQueueBusNo3
+				
+				put ImageRectangle(text:IQueueBusNo2, waitFor:20) into ImageRectangleOfIQueueBusNo2
+				put ReadText(ImageRectangleOfIQueueBusNo2.TopLeft+[-20,-45],ImageRectangleOfIQueueBusNo2.BottomRight+[20,-20]) into BookInTimeOfIQueueBus3
+				Log "The HH:MM Time Format of" && IQueueBusNo3 && "is" && BookInTimeOfIQueueBus3
+			else
+				LogError "Third Bus was Not Available in IQueue"
+			end if
+		else
+			LogError "Second Bus was Not Available in IQueue"
+		end if
+		if (BookInTimeOfIQueueBus1 is greater than [BookInTimeOfIQueueBus2, BookInTimeOfIQueueBus3]) and (BookInTimeOfIQueueBus2 is greater than BookInTimeOfIQueueBus3) then
+			Log "Order of Bus (" & busID & ") is" && "1"
+			Log "Order of Bus (" & IQueueBusNo2 & ") is" && "2"
+			Log "Order of Bus (" & IQueueBusNo3 & ") is" && "3"
+		else if (BookInTimeOfIQueueBus2 is greater than [BookInTimeOfIQueueBus3, BookInTimeOfIQueueBus1]) and (BookInTimeOfIQueueBus3 is greater than BookInTimeOfIQueueBus1)
+			Log "Order of Bus (" & IQueueBusNo2 & ") is" && "1"
+			Log "Order of Bus (" & IQueueBusNo3 & ") is" && "2"
+			Log "Order of Bus (" & busID & ") is" && "3"
+		else if (BookInTimeOfIQueueBus3 is greater than [BookInTimeOfIQueueBus1, BookInTimeOfIQueueBus2]) and (BookInTimeOfIQueueBus1 is greater than BookInTimeOfIQueueBus2)
+			Log "Order of Bus (" & IQueueBusNo3 & ") is" && "1"
+			Log "Order of Bus (" & busID & ") is" && "2"
+			Log "Order of Bus (" & IQueueBusNo2 & ") is" && "3"
+		else
+			Log "Order No maintained since No Buses in IQueue"
+		end if
+		LogSuccess "First Bus (" & busID & ") Found In IQueue and Verified the Order of Buses Successfully"
+	else
+		LogError "(" & busID & ") Bus was not Found In IQueue and not Verified the Order of Buses "                 
+	end if
+	set the SearchRectangle to empty
+end VerifyOrderOfBusInIQueue
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+(**Handler No : 05**)
+--------------------------------
+(***
+@author : Mohammed Gouse
+@date : 23/March/22
+@description : To only select Available Bus from IQ
+***)
+to handle SelectBusFromIQueueIfAvailable busID
+	Log "****Select only Available Bus from IQ, Bus ID--> "&&busID
+	set the SearchRectangle to ScreenPart("IncomingQueueArea")
+	--"Utilities/CommonActions".ClickBtnByText busID
+	if "Utilities/CommonActions".ClickBtnByText( busID) then
+		LogSuccess busID && "- Bus Found In IQueue Successfully"
+	else
+		LogError busID && "- Bus was Not Found In IQueue"
+	end if
+	set the SearchRectangle to empty
+end SelectBusFromIQueueIfAvailable
+
+(**Handler No : 18**)
+--------------------------------
+(***
+@author : Mohammed Gouse
+@date : 25/March/22
+@description : To Calculate Required Energy 
+***)
+
+
+Page : CCSS Configuration
+
+to handle CalculateRequiredEnergy 
+	"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "CCSS Configuration", "CCSS Configuration", 1
+	wait 2
+	"CCSS_Pages/CCSSConfiguration".ClickOnGarageTab
+	set the SearchRectangle to ScreenPart("GarageTabFieldsArea")	
+	wait 2
+	put  "Utilities/CommonActions".GetValueWrtAField  ("Energy Consumption Rate (kWh/km)") into consumptionRate
+	wait 2
+	put  "Utilities/CommonActions".GetValueWrtAField ("Required Energy Safety Margin") into safetyMargin
+	wait 2
+	put  "Utilities/CommonActions".GetValueWrtAField  ("Required Energy Reserved Ratio") into RequiredEnergyReservedRatio
+	wait 2
+	put  "Utilities/CommonActions".GetValueWrtAField  ("Global Vehicle Battery Capacity (kWh)") into AvailableBatteryCapacity
+	wait 2
+	set the SearchRectangle to empty
+	
+	"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Run & Track Assignment", "Run & Track Assignment", 1
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+	
+	wait 8
+	
+	set the SearchRectangle to ScreenPart("RecommendedRunArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Distance") into totalDistance
+	put split (totalDistance , " ") into listo
+	put first item of listo into  totalDistance
+	
+	put ((totalDistance * consumptionRate * (1 + safetyMargin)) + (RequiredEnergyReservedRatio * AvailableBatteryCapacity)) into calculatedRequiredEnergy
+	log calculatedRequiredEnergy
+	return calculatedRequiredEnergy
+	
+	set the SearchRectangle to ScreenPart("BusDetailsArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Required Energy") into actualRequiredtEnergy
+	put split (actualRequiredtEnergy , " ") into listo
+	put first item of listo into  actualRequiredtEnergy
+	
+	if "Utilities/CommonActions".compareValues (calculatedRequiredEnergy,actualRequiredtEnergy)
+		LogSuccess "Required Energy is calculated correctly"
+	else
+		LogError "Required Energy was Not calculated correctly"
+	end if
+	
+	set the SearchRectangle to empty
+end CalculateRequiredEnergy
+
+to handle CalculateRequiredEnergyForNonRecommendedRun 
+	"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "CCSS Configuration", "CCSS Configuration", 1
+	wait 2
+	"CCSS_Pages/CCSSConfiguration".ClickOnGarageTab
+	set the SearchRectangle to ScreenPart("GarageTabFieldsArea")	
+	wait 2
+	put "Utilities/CommonActions".GetValueWrtAField ("Energy Consumption Rate (kWh/km)") into consumptionRate
+	wait 2
+	put "Utilities/CommonActions".GetValueWrtAField ("Required Energy Safety Margin") into safetyMargin
+	wait 2
+	put "Utilities/CommonActions".GetValueWrtAField ("Required Energy Reserved Ratio") into RequiredEnergyReservedRatio
+	wait 2
+	put "Utilities/CommonActions".GetValueWrtAField ("Global Vehicle Battery Capacity (kWh)") into AvailableBatteryCapacity
+	wait 2
+	set the SearchRectangle to empty
+	
+	"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Run & Track Assignment", "Run & Track Assignment", 1
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+	
+	wait 2
+	
+	"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+	"Utilities/CommonActions".pageDown
+	"Utilities/CommonActions".pageDown
+	
+	set the SearchRectangle to ScreenPart("PaginationArea")
+	"Utilities/CommonActions".ClickBtnByImage "Generic\imgPage4"
+	set the SearchRectangle to empty
+	
+	
+	set the SearchRectangle to ScreenPart("TracksArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Distance",26) into totalDistance
+	put split (totalDistance , " ") into listo
+	put first item of listo into  totalDistance
+	log totalDistance
+	put ((totalDistance * consumptionRate * (1 + safetyMargin)) + (RequiredEnergyReservedRatio * AvailableBatteryCapacity)) into calculatedRequiredEnergy
+	log calculatedRequiredEnergy
+	--return calculatedRequiredEnergy
+	set the SearchRectangle to empty
+	set the SearchRectangle to ScreenPart("TracksArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Required Energy",26) into actualRequiredtEnergy
+	put split (actualRequiredtEnergy , " ") into listo
+	put first item of listo into  actualRequiredtEnergy
+	log actualRequiredtEnergy
+	
+	if "Utilities/CommonActions".compareValues (calculatedRequiredEnergy,actualRequiredtEnergy)
+		LogSuccess "Required Energy is calculated correctly"
+	else
+		LogError "Required Energy was Not calculated correctly"
+	end if
+	
+	set the SearchRectangle to empty
+end CalculateRequiredEnergyForNonRecommendedRun
+
+to handle VerifyEnergyConsumptionInRunAndTrackAssignment EnergyConsumptionRate
+	set the SearchRectangle to ScreenPart("BusDetailsArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Consumption") into actualenergyConsumption
+	put split (actualenergyConsumption , " ") into listo
+	put first item of listo into actualenergyConsumption
+	
+	if "Utilities/CommonActions".compareValues (EnergyConsumptionRate,actualenergyConsumption)
+		LogSuccess "Energy Consumption Rate value is the same as the config screen value"
+	else
+		LogError "Energy Consumption Rate value is Not same as the config screen value"
+	end if
+	set the SearchRectangle to empty
+end VerifyEnergyConsumptionInRunAndTrackAssignment
+
+to handle CalculateAndVerifyRange EnergyConsumptionRateValue
+	set the SearchRectangle to ScreenPart("BusDetailsArea")
+	put "Utilities/CommonActions".GetTextBelowByText ("Current Energy") into actualCurrentEnergy
+	put split (actualCurrentEnergy , " ") into listo
+	put first item of listo into  actualCurrentEnergy
+	
+	put (actualCurrentEnergy divided by EnergyConsumptionRateValue) into expectedRange 
+	Log expectedRange
+	
+	put "Utilities/CommonActions".GetTextBelowByText ("Range") into actualRange
+	put split (actualRange , " ") into listo
+	put first item of listo into  actualRange
+	
+	if "Utilities/CommonActions".compareValues (expectedRange,actualRange)
+		LogSuccess "Range is calculated correctly with the updated Energy Consumption Rate value"
+	else
+		LogError "Range was Not calculated correctly with the updated Energy Consumption Rate value"
+	end if
+	set the SearchRectangle to empty
+end CalculateAndVerifyRange
+
+to handle CheckFieldIsEditable fieldName, x1,y1,x2,y2, screenPart
+	set the SearchRectangle to ScreenPart(screenPart)
+	"Utilities/CommonActions".IsBelowFieldEditableAsPerCoordinates fieldName, x1,y1,x2,y2
+	set the SearchRectangle to empty
+end CheckFieldIsEditable
+
+

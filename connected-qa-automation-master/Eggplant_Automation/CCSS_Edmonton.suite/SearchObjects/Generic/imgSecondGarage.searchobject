@@ -1,0 +1,40 @@
+{
+	"lastmodifieddate": 1647944447.688,
+	"ocrcapturestring": "/s /\\\t22 M 3l",
+	"originalcapturelocation": [
+		1672,
+		103,
+		96,
+		74
+	],
+	"createddate": 1647944371.0510001,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[48,37]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "Generic/imgSecondGarage.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"capturerect": [
+					1672,
+					103,
+					96,
+					74
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com"
+			}
+	],
+	"name": "Generic/imgSecondGarage"
+}

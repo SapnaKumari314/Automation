@@ -1,0 +1,39 @@
+﻿(***
+@Author: Vivek Mamgain 
+@Date: 21/March/22
+@TC_ID: TOUC_3308
+@TC_Description: CCSS-RRT-BEB Search: Search bus which is neither in IQ nor the garage
+***)
+
+BeginTestCase TOUC_3308
+
+Log "###########   Started execution of Test Case--> TOUC_3308   ##############"
+Log "#######################################################"
+
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "P1_BEBSarch", "BusId") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusNotInIncomingQueue BusId
+
+"CCSS_Pages/PrerequsiteTestData/BEBSearch".RemoveBusFromAPI "CCSS_P1_TestData", "P1_BEBSarch", "BusId", "RunID", "API_Bus_Details_busVins", "TOUC_3308"
+
+-----Find a Bus is dislayed in Garage 
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "P1_BEBSarch", "BusNotInQandGarage") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+--API Call
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetails BusId
+
+--"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+--"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedRunDetailsAreBlank
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedTrackDetailsAreBlank
+
+Log "#############  Finished execution of Test Case--> TOUC_3308 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3308
+
+

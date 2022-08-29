@@ -1,0 +1,53 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 16/Aug/22
+@TC_ID: TOUC_3813
+@TC_Description: CCSS-RRT-Run Override: Run Override screen to select Recommended Run
+***)
+
+BeginTestCase TOUC_3813
+
+Log "###########   Started execution of Test Case--> TOUC_3813   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+--Remove bus from the track
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P0_TestData", "RunAndTackAssignment", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+------------------------
+
+--Select a Bus from the Incoming Queue
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "BusID") into BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+--Uncheck the Needs Maintenance (if selected)
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+
+--Click Recommended Run and Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+
+--Click the Override Button from Run Details
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+
+
+--Verify that all the Recommended Runs are marked with the Recommended label next to the Run ID
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyRecommededRunsAreMarkedWithRecommendedLabel
+
+--Select a Recommended Run and confirm
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectRecommendedRun
+
+
+--Verify that the Track details are populated with a recommended track for the selected Run
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyRecommendedTrackDetailsAreCalculated
+
+--Click Assign Run & Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3813 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3813
+

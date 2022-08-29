@@ -1,0 +1,52 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 19/Apr/22
+@TC_ID: TOUC_3372
+@TC_Description: CCSS-CC-Charger Actions: Reset Charger with Right Click Charger Actions
+***)
+
+BeginTestCase TOUC_3372
+
+Log "###########   Started execution of Test Case--> TOUC_3372  ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Click the Menu and select Charger Control
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+
+--Right Click on the Charger with Status In-Active
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "ImgInactiveCharger") into imgCharger
+"CCSS_Pages/RunAndAssignmentTrackPage".RightClickCharger imgCharger
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "InactiveChargerOptions") into options
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyElementIsDisabled "Reset"
+
+--Right Click on the Charger with Status Active
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "ImgActiveCharger") into imgCharger
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "ActiveChargerOptions") into options
+
+"CCSS_Pages/RunAndAssignmentTrackPage".RightClickCharger imgCharger
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickOption "Reset"
+
+--Right Click on the Charger with Status Maintenance
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "ImgMaintenanceCharger") into imgCharger
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "MaintenanceChargerOptions") into options
+
+"CCSS_Pages/RunAndAssignmentTrackPage".RightClickCharger imgCharger
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickOption "Reset"
+
+--Right Click on the Charger with Status Charging
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "ImgChargingCharger") into imgCharger
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "ChargerActions", "ChargingChargerOptions") into options
+
+"CCSS_Pages/RunAndAssignmentTrackPage".RightClickCharger imgCharger
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickOption "Reset"
+
+Log "#############  Finished execution of Test Case--> TOUC_3372 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3372
+

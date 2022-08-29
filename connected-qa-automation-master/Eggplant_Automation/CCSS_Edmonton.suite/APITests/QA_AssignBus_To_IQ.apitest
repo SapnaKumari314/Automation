@@ -1,0 +1,23 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = "";
+	    showCheckedNumber = <*BY>;
+	    value = "";
+	}
+    );
+    authenticationType = None;
+    httpVerb = DELETE;
+    oauth1Token = "";
+    password = "";
+    requestBody = "";
+    requestBodyFormat = "Form Url Encoded";
+    requestHeaders = "<![CDATA[Authorization:[[AuthorizationToken]]
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "http://[[AddBusInIQ_API_URL]]/api/v1/tenants/[[tenantId]]/garages/[[garageId]]/pullOutBusFromGarage/[[VIN_Number]]";
+    userName = "";
+}

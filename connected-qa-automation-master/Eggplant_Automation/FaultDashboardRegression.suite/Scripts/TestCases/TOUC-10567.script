@@ -1,0 +1,73 @@
+﻿(***
+@Author: Shalini Vijayakumar
+@Date: 16/August/2022
+@TC_ID: TOUC_10567
+@TC_Description: Verify user is able to select the multiple data filed columns and view the same in data filed columns for vehicle
+@Prerequisite: Any active vehicle fault
+***)
+
+BeginTestCase TOUC_10567
+Log "###########   Started execution of Test Case--> TOUC_10567  ##############"
+Log "#######################################################"
+--"1.Login as an superadmin in Apex Portal.
+Set DatasheetPath to Resourcepath("TestData\TOUC-10567.xlsx")
+"LoginPage".OpenApplication
+
+"LoginPage".Login "ProterraAdmin"
+
+--2.Under Historical Data on Left menu choose Fault Dashboard
+"ApexPages/FaultDashboardSearchCriteria".NavigateTo "HISTORICAL DATA","FAULT DASHBOARD"
+
+
+--3.Select the vehicle in toggle and select the options as below
+--customer dropdown = Single
+--Vehicle name = Single 
+--Fault status = active and select the from & to date-->3.Selected options should be displayed and date should be shown as per selection 
+get  "ApexPages/FaultDashboardSearchCriteria".AssetTypeSelection ("Vehicle")
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "CustomerName") into CustomerName
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDateTime") into FromDateTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDateTime") into ToDateTime
+"ApexPages/FaultDashboardSearchCriteria".SelectCustomer CustomerName
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "AssetName") into AssetID
+get "ApexPages/FaultDashboardSearchCriteria".SelectAssetID ("Vehicle",AssetID)
+set Status to "Active"
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "Priority") into Priority
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultPriority (Priority)
+
+"ApexPages/FaultDashboardSearchCriteria".SelectFaultStatus Status
+
+get "ApexPages/FaultDashboardSearchCriteria".ClickGetDataBtn
+
+"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Sequential"
+--4. Select the Source Address Customer Name data fields in customize fields and verify the data fields in sequential view-->the selected data fields should be displayed in data filed column 
+
+"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "Source Address"
+"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "Customer name"
+
+
+--fetch UI data for selected datafield
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "VIN") into VIN
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "SPN") into SPN
+"ApexPages/FaultDashboardSearchCriteria".SelectFilterDropdown "SPN",SPN,"VEHICLE"
+
+put "ApexPages/FaultDashboardVehicle".FetchUIDashboardDataForSpecificField (VIN,"SPN,FMI,SOURCEADDRESS,CUSTOMERNAME,TIMEOFFAULT") into UIFaultDashboardData
+"LoginPage".Logout
+
+-------------------------------------Backend Validation (Open Search Dashboard and database)---------------------------------------------------------
+--launch and login open search dashboard
+"OpenSearchDashboard".OpenApplication_OpenSearch 
+"OpenSearchDashboard".OpenSearchLogin ""
+--navigate to dev tools open in opensearch dashboard
+"OpenSearchDashboard".NavigateTo "Dev Tools"
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "HeaderID") into VehicleHeaderID
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "BustPlatform") into BustPlatform
+
+"ApexPages/DataValidation".Vehicle_ComapareUIandOpenSearchBackEndValuesForSpecificDatafields UIFaultDashboardData,VehicleHeaderID,FromDateTime,ToDateTime,BustPlatform,VIN
+
+
+"OpenSearchDashboard".LogoutOpensearchDashboard
+Log "#############  Finished execution of Test Case--> TOUC_10567 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_10567

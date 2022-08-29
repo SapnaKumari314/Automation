@@ -1,0 +1,15 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 10/Aug/22
+@TC_ID: Master Script for Change History
+@TC_Description: 
+***)
+
+
+"CCSS_Pages/PrerequsiteTestData/ChargerSimulator".StartSimulator
+"CCSS_Pages/PrerequsiteTestData/ChargerSimulator".GenerateFault
+run "/TestCases/P1 - CCSS - LCQ/TOUC_3440"
+run "/TestCases/P1 - CCSS - LCQ/TOUC_3441"
+run "/TestCases/P1 - CCSS - LCQ/TOUC_3442"
+"CCSS_Pages/PrerequsiteTestData/ChargerSimulator".EndSimulator
+run "/TestCases/P1 - CCSS - LCQ/TOUC_3439"

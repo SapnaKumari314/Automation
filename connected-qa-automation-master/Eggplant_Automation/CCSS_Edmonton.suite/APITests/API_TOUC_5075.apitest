@@ -1,0 +1,35 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = date;
+	    showCheckedNumber = <*BY>;
+	    value = "[[startTimestamp]]";
+	},
+	{
+	    checkedNumber = <*BY>;
+	    param = buses;
+	    showCheckedNumber = <*BY>;
+	    value = "[[busName]]";
+	},
+	{
+	    checkedNumber = <*BY>;
+	    param = signalNames;
+	    showCheckedNumber = <*BY>;
+	    value = "[[signalNames]]";
+	}
+    );
+    authenticationType = None;
+    httpVerb = GET;
+    oauth1Token = "";
+    password = "";
+    requestBody = "";
+    requestBodyFormat = "Form Url Encoded";
+    requestHeaders = "<![CDATA[x-api-key:[[xapikey]]
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "[[BaseURI]]/external/busReadings?date=[[startTimestamp]]&buses=[[busName]]&signalNames=[[signalNames]]";
+    userName = "";
+}

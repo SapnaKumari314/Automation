@@ -1,0 +1,35 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = startDate;
+	    showCheckedNumber = <*BY>;
+	    value = "[[startTimestamp]]";
+	},
+	{
+	    checkedNumber = <*BY>;
+	    param = endDate;
+	    showCheckedNumber = <*BY>;
+	    value = "[[endTimestamp]]";
+	},
+	{
+	    checkedNumber = <*BY>;
+	    param = type;
+	    showCheckedNumber = <*BY>;
+	    value = "[[type]]";
+	}
+    );
+    authenticationType = None;
+    httpVerb = GET;
+    oauth1Token = "";
+    password = "";
+    requestBody = "";
+    requestBodyFormat = "Form Url Encoded";
+    requestHeaders = "<![CDATA[x-api-key:[[xapikey]]
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "[[BaseURI]]/external/tenants/b9ed83eb-5a8d-489c-9639-076d408be8a4/garages/[[garageid]]/audit/events?startDate=[[startTimestamp]]&endDate=[[endTimestamp]]&type=[[type]]";
+    userName = "";
+}

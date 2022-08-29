@@ -1,0 +1,4 @@
+﻿2022-06-27 16:10:39.277 +0530	START		Running ApexPages/FaultDashboard.script
+2022-06-27 16:10:39.912 +0530	set		SEARCHRECTANGLE = [[1728,216],[1920,486]]	2	on_apexpages_faultdashboard	ApexPages/FaultDashboard.script
+2022-06-27 16:10:45.985 +0530	EndTestCase		(Duration:"6.706", Errors:"1", Exceptions:"0", StartTime:"2022-06-27 16:10:39 +0530", Successes:"0", TestCase:"ApexPages/FaultDashboard.script", Warnings:"0")
+2022-06-27 16:10:45.990 +0530	ABORTED		Execution Time 0:00:06 ApexPages/FaultDashboard.script

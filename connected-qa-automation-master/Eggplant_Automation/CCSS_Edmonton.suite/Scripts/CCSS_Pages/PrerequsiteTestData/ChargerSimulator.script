@@ -1,0 +1,184 @@
+﻿
+----------------------------------------Charger Simulator - pages
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		TitleArea:[[0,0],[.29,.10]],
+		EnvironmentsArea:[[0.1,.125],[.50,.6]],
+		SetupArea:[[0.15,.40],[.78,.78]],
+		ChargersTabArea:[[0.15,.24],[.75,.90]],
+		StopButtonArea:[[0.70,.65],[.75,.75]],
+	}
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+End ScreenPart
+-----------------------------------------------------
+set the SearchRectangle to ScreenPart("SetupArea")
+
+
+------------------------Environment constants------
+to handle SetVariables
+	put "QA2_ChargerSimulator" into SheetName
+	return SheetName
+end SetVariables
+
+-------------------------------------------------------------
+
+to handle StartSimulator
+	if VerifySimulatorTabOpen()=true
+		Log "Simulator tab is already open!!"	
+		if IsChargerRunning()=true
+			LogSuccess "Simulator is already running!!"	
+		end if 
+	else
+		set the SearchRectangle to ScreenPart("SetupArea")
+		Log "Open the browser and navigate to Charger url"
+		"Utilities/GenericOperations".LaunchSimulator "chrome", "http://localhost:9001"
+		set the SearchRectangle to empty
+	end if
+	
+	put SetVariables() into SheetName
+	"Utilities/CommonActions".pageUp
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\Prerequisite_TestData_SimulatorData.xlsx", SheetName, "Simulator_Environment") into Simulator_Environment
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\Prerequisite_TestData_SimulatorData.xlsx", SheetName, "Simulator_NoOfChargers") into Simulator_NoOfChargers
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\Prerequisite_TestData_SimulatorData.xlsx", SheetName, "Simulator_ChargerName") into Simulator_ChargerName
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\Prerequisite_TestData_SimulatorData.xlsx", SheetName, "Simulator_ChargerType") into Simulator_ChargerType
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\Prerequisite_TestData_SimulatorData.xlsx", SheetName, "Simulator_BusName") into Simulator_BusName
+	put "Utilities/ExcelOperations".readTestDataFrom ("TestData\Prerequisite_TestData_SimulatorData.xlsx", SheetName, "Simulator_BusType") into Simulator_BusType
+	
+	-----Select Environment
+	set the SearchRectangle to ScreenPart("EnvironmentsArea")
+	"Utilities/CommonActions".ClickBtnByTextWithProperties "Environment:", "#ffffff",0,20
+	"Utilities/CommonActions".ClickElementByCoordinates Simulator_Environment, 0, 0 
+	
+	--Setup
+	"Utilities/CommonActions".EnterTextBoxByTextBelow "# Of Chargers", Simulator_NoOfChargers, 0
+	"Utilities/CommonActions".ClickElementByCoordinates "Simulate", 0, 0 
+	
+	set the SearchRectangle to empty
+	
+	set the SearchRectangle to ScreenPart("SetupArea")
+	
+	"Utilities/CommonActions".ClickElementByCoordinates "Charger", 0, 57 
+	TypeText controlKey, a
+	"Utilities/CommonActions".EnterTextBoxByTextBelow "Charger", Simulator_ChargerName, 40
+	
+	
+	"Utilities/CommonActions".ClickBtnByTextWithProperties "Charger Type", "#ffffff",0,57
+	"Utilities/CommonActions".ClickElementByCoordinates Simulator_ChargerType, 0, 0 
+	
+	--"Utilities/CommonActions".ClickElementByCoordinates "ABB", 0, 0 
+	"Utilities/CommonActions".ClickElementByCoordinates "Bus", 0, 57 
+	TypeText controlKey, a
+	"Utilities/CommonActions".EnterTextBoxByTextBelow "Bus", Simulator_BusName, 57
+	
+	"Utilities/CommonActions".ClickBtnByTextWithProperties "Bus Type", "#ffffff",0,57
+	"Utilities/CommonActions".ClickElementByCoordinates Simulator_BusType, 0, 0 
+	
+	"Utilities/CommonActions".ClickElementByCoordinates "Start", 0, 0
+	
+	set the SearchRectangle to empty
+	
+end StartSimulator
+
+to handle EndSimulator
+	if imagefound(text:"Energy Management Simulator")
+		"Utilities/CommonActions".ClickBtnByText "Energy Management Simulator"
+	end if
+	
+	"Utilities/CommonActions".pageUp
+	set the SearchRectangle to ScreenPart("SetupArea")
+	if ImageFound (text:"Stop")
+		"Utilities/CommonActions".ClickBtnByTextWithProperties "Stop", "#ffffff",0,0
+	end if
+	set the SearchRectangle to empty
+	set the SearchRectangle to ScreenPart("EnvironmentsArea")
+	if ImageFound (text:"End Simulation")
+		"Utilities/CommonActions".ClickBtnByText "End Simulation"
+		if ImageFound(text:"# Of Chargers")
+			LogSuccess "Simulation Ended Successfully "
+		else
+			LogError "Simulation not Ended Successfully "
+		end if
+	end if
+	set the SearchRectangle to empty
+end EndSimulator
+
+to handle GenerateFault
+	"Utilities/CommonActions".pageDown
+	set the SearchRectangle to ScreenPart("ChargersTabArea")
+	"Utilities/CommonActions".ClickBtnByTextWithProperties "Chargers", "#ffffff",0,0
+	"Utilities/CommonActions".pageDown
+	
+	if ImageFound (text:"Generate Fault")
+		"Utilities/CommonActions".ClickBtnByTextWithProperties "Generate Fault", "#ffffff",0,0
+	end if
+	
+	if ImageFound(text:"Status - Faulted")
+		LogSuccess "Fault is Generated in the Charger"
+	else
+		LogError "Fault is not Generated in the Charger"
+	end if
+	
+	set the SearchRectangle to empty
+end GenerateFault
+
+to handle VerifySimulatorTabOpen
+	set the SearchRectangle to ScreenPart("TitleArea")
+	put false into flag
+	if imagefound(text:"Energy Management Simulator")
+		"Utilities/CommonActions".ClickBtnByText "Energy Management Simulator"
+		put true into flag
+	else 
+		put false into flag
+	end if
+	set the SearchRectangle to empty
+	return flag
+end VerifySimulatorTabOpen
+
+to handle IsChargerRunning
+	set the SearchRectangle to ScreenPart("StopButtonArea")
+	put false into flag
+	if ImageFound(text:"Stop")
+		put true into flag
+	else 
+		put false into flag
+	end if
+	set the SearchRectangle to empty
+	return flag
+end IsChargerRunning
+
+--StartSimulator
+--GenerateFault
+--EndSimulator
+
+to handle NavigateToApplicationTab
+	set the SearchRectangle to ScreenPart("TitleArea")
+	put false into flag
+	if imagefound(text:"Energy Management Simulator")
+		"Utilities/CommonActions".ClickBtnByText "Energy Management Simulator"
+		wait 2
+		TypeText controlKey, tabKey
+	end if
+	set the SearchRectangle to empty
+	return flag
+end NavigateToApplicationTab
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

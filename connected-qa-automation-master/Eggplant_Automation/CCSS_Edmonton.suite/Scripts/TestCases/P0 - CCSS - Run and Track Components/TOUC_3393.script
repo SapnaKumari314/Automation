@@ -1,0 +1,81 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 04/Apr/22
+@TC_ID: TOUC_3393
+@TC_Description: CCSS-Tooltip: Tooltip components
+***)
+
+BeginTestCase TOUC_3393
+
+Log "###########   Started execution of Test Case--> TOUC_3393   ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Remove bus from Garage
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P0_TestData", "RunAndTrackComponents", "BusID", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "bus_image_run_and_track_screen") into BusImg
+--Hover over a Charger Icon for which a Bus is not parked
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyChargerDetailsByHoverOnChargerIconWhereBusIsNotParked "RunAndTrackAssignmentPage\imgActiveCharger"
+
+--Hover over a Bus Icon for a Bus which is not parked at a charger location
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgBlackTrack"
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetailsByHoverOnBusIconWhichIsNotParkedAtChargerLocation BusImg
+
+--Hover over a Bus or Charger Icon for a Bus which is parked at a charger location
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgActiveCharger"
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusAndChargerDetailsByHoverOnBusOrChargerIconWhichIsParkedAtChargerLocation "RunAndTrackAssignmentPage\imgChargerNotAvailable"
+
+--Click Menu and click Charger Control screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+--Hover over a Charger Icon for which a Bus is not parked
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyChargerDetailsByHoverOnChargerIconWhereBusIsNotParked  "RunAndTrackAssignmentPage\imgActiveCharger"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "Bus_Image_ChargeCtrl") into BusImg
+--Hover over a Bus Icon for a Bus which is not parked at a charger location
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetailsByHoverOnBusIconWhichIsNotParkedAtChargerLocation  BusImg
+--Hover over a Bus or Charger Icon for a Bus which is parked at a charger location
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusAndChargerDetailsByHoverOnBusOrChargerIconWhichIsParkedAtChargerLocation "RunAndTrackAssignmentPage\imgChargerNotAvailable"
+
+--Click Menu and click Garage Overview screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+--Hover over a Charger Icon for which a Bus is not parked
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyChargerDetailsByHoverOnChargerIconWhereBusIsNotParked  "RunAndTrackAssignmentPage\imgActiveCharger"
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "Bus_Image") into BusImg
+--Hover over a Bus Icon for a Bus which is not parked at a charger location
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetailsByHoverOnBusIconWhichIsNotParkedAtChargerLocation  BusImg
+--Hover over a Bus or Charger Icon for a Bus which is parked at a charger location
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusAndChargerDetailsByHoverOnBusOrChargerIconWhichIsParkedAtChargerLocation "RunAndTrackAssignmentPage\imgChargerNotAvailable"
+
+Log "#############  Finished execution of Test Case--> TOUC_3393 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3393
+
+
+
+
+
+
+
+
+
+
+
+

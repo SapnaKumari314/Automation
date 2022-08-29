@@ -1,0 +1,29 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = tenantId;
+	    showCheckedNumber = <*BY>;
+	    value = "[[tenantId]]";
+	},
+	{
+	    checkedNumber = <*BY>;
+	    param = requestId;
+	    showCheckedNumber = <*BY>;
+	    value = "LOAD_TRACK_LIST_REQUEST_ID265781b4-9221-4d1c-88bf-918885d71d67";
+	}
+    );
+    authenticationType = None;
+    httpVerb = GET;
+    oauth1Token = "";
+    password = "";
+    requestBody = "";
+    requestBodyFormat = "Form Url Encoded";
+    requestHeaders = "<![CDATA[Authorization:[[authToken]]
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "[[BaseURI]]/tenants/[[tenantId]]/trackSetups/a4ac820a-9d67-4bd8-af67-9d9b30d0aaea?tenantId=[[tenantId]]&requestId=LOAD_TRACK_LIST_REQUEST_ID265781b4-9221-4d1c-88bf-918885d71d67";
+    userName = "";
+}

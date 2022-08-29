@@ -1,0 +1,38 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 29/March/22
+@TC_ID: TOUC_2821
+@TC_Description: CCSS-ECMS-Cumulative Bookout Delay: Cumulative Bookout Delay when Buses do not have any infinite delay
+***)
+
+(***Preconditions
+Assign run and track for two buses (Use Kathleen Andrews garage since it has two buses)
+
+1st Bus - Any run and Track
+2nd Bus - Bookout Time of this run should be before the Bookout Time of the 1st Bus's run
+2nd Bus should be parked behind the 1st Bus in the same track
+for example
+Bus1 - Track Position 6-1 - Bookout Date Time - 29 March 6:00 PM
+Bus2 - Track Position 6-2 - Bookout Date Time - 29 March 5:00 PM
+***)
+
+BeginTestCase TOUC_2821
+
+Log "###########   Started execution of Test Case--> TOUC_2821  ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login "COEAdmin"
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Energy Management", "Energy Management", 1
+
+"CCSS_Pages/EnergyManagement".CheckFieldIsEditable "Cumulative Book Out Delay", 0,0,0,80
+"CCSS_Pages/EnergyManagement".VerifyBookoutDelayTime "Cumulative Book Out Delay", 0,0,0,80
+
+Log "#############  Finished execution of Test Case--> TOUC_2821 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_2821
+
+
+

@@ -1,0 +1,22 @@
+﻿(***
+@Author: Mohammed Gouse
+@Date: 22/March/22
+@TC_ID: TOUC_3823
+@TC_Description: CCSS-Config: Config Screen Global Read Only fields
+***)
+
+BeginTestCase TOUC_3823
+
+Log "###########   Started execution of Test Case--> TOUC_3823   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "CCSS Configuration", "CCSS Configuration", 1
+"CCSS_Pages/CCSSConfiguration".VerifyAllEditableAndNonEditableGlobalFields
+
+Log "#############  Finished execution of Test Case--> TOUC_3823 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3823

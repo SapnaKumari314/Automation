@@ -1,0 +1,43 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 04/Apr/22
+@TC_ID: TOUC_3330
+@TC_Description: CCSS-RRT-Run Details: Override Runs screen is closed when another bus is searched
+***)
+
+BeginTestCase TOUC_3330
+
+Log "###########   Started execution of Test Case--> TOUC_3330   ##############"
+Log "#######################################################"
+
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedRunDetails 
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInAssignedRun
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyButtonsAreDisabled
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyButtonsAreNotAppearing
+
+Log "#############  Finished execution of Test Case--> TOUC_3330 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3330
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,46 @@
+{
+	"lastmodifieddate": 1647160096.007,
+	"lastfoundlocation": [
+		988,
+		469,
+		21,
+		8
+	],
+	"originalcapturelocation": [
+		984,
+		467,
+		27,
+		14
+	],
+	"createddate": 1647160051.4330001,
+	"lastfounddate": 1650456327.1259999,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[13,7]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/bus_8027_ChargeContrlTrack.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"capturerect": [
+					984,
+					467,
+					27,
+					14
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com"
+			}
+	],
+	"name": "bus_8027_ChargeContrlTrack"
+}

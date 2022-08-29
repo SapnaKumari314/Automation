@@ -1,0 +1,835 @@
+﻿(***
+@Author: Shalini V
+@Date: 27/June/2022
+@Description: Its a Global Library to use across the test cases.
+***)
+
+
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		ApexPagesArea :[[0,0.12],[.15,0.95]],
+		CustomerSelection:[[.125,.125],[.5,.5]],
+		AssetSelection:[[0.45,.105],[.90,.30]],
+		FaultDashboard:[[0.12,.35],[1,0.95]],
+		GetData:[[.9,0.2],[1,.35]],
+		FaultPriority:[[.125,.1],[.5,.45]],
+		FaultStatus:[[.3,.15],[0.5,.40]],
+		VIN:[[.15,1],[0.5,10]],
+		IndividualPopup:[[.6,0],[1,0.75]],
+	}
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+End ScreenPart
+
+function SearchRect AreaName
+	set screenPortions to {
+		
+		GetDataButton:[1758,173,1904,349],
+		FilterPart:[278,376,1859,462],
+		FaultPriority:[252,222,595,460],
+	}
+	return screenPortions.(AreaName)
+	
+end SearchRect
+//******************************
+//Description: Function to set navigation area and return
+//Input: Specify required portion
+//output: returns the searchrectangle area
+//Created By: Himaja R
+//******************************
+function NavigationScreenPart Portion
+	log "Start of NavigationScreenPart"
+	try
+		// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+		set screenPortions to {
+			ApexPagesArea: [[0,0.12],[.15,0.95]],
+
+		}
+		set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+		// Error handling is needed in the event that an unrecognized parameter is passed to the function
+		if multiplier is empty then
+			throw "Parameter error", Portion && "is not a recognized screen portion."
+		end if
+		return [the remoteScreenSize,the remotescreenSize] * multiplier
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,NavigationScreenPart)
+	End try
+	log "End of NavigationScreenPart"
+End NavigationScreenPart
+
+
+//*****************************************************
+//Description: Function to set navigation area and return
+---Input: MainPageTab - Main tab name,SubPageTab - sub tab name
+---Output: returns the searchrectangle area
+---Created By: Himaja R
+//*****************************************************
+//NavigateTo "Historical data","Fault Dashboard"
+NavigateTo "Management","Chargers"
+to NavigateTo MainPageTab,SubPageTab
+	Log "start of navigation to subtab"
+	try
+		Global ConfigValues,Iteration
+		set the SearchRectangle to NavigationScreenPart("ApexPagesArea")
+		if ImageFound(text:MainPageTab,ignoringcase:on, waitFor:ConfigValues.MediumTimeOut)
+			Click FoundImageLocation()
+			
+			"Utilities/GenericOperations".Success MainPageTab&&" tab found and clicked"
+			WaitFor 60, text:SubPageTab
+			
+			if ImageFound(text:SubPageTab, waitFor:ConfigValues.LongTimeOut, ignoringcase:on,)
+				Click FoundImageLocation()
+				"Utilities/GenericOperations".Success SubPageTab&&"tab found and clicked"
+			else
+				--LogError SubPageTab&&"tab not found"
+				"Utilities/GenericOperations".Error SubPageTab&&"tab not found"
+				
+				
+			end if
+		else
+			LogError MainPageTab&&"tab not found"
+		end if
+		If uppercase(SubPageTab) is "FAULT DASHBOARD"
+			set the SearchRectangle to ScreenPart("CustomerSelection")
+			WaitFor 60, text:"Sequential"
+			if "Utilities/CommonActions".IsTextPresentOnScreen ("Sequential") is false then
+				"GenericOperations".Error "Sequential tab not found"
+			end if
+			If "Utilities/CommonActions".IsTextPresentOnScreen("Group by Fault") is false then
+				"GenericOperations".Error "Group by Fault tab not found"
+			End If
+		eLSE IF uppercase(SubPageTab) is "CHARGERS"
+			set the SearchRectangle to ScreenPart("CustomerSelection")
+			WaitFor 60, text:"Add New Charger",validWords:"Add New Charger"
+		End IF
+		
+		set the SearchRectangle to empty
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,NavigateTo)
+	End try
+	Log "End of navigation to subtab"
+	return true
+end NavigateTo
+
+(*AssetTypeSelection "charger"*)
+//To select the asset type - Vehicle or Charger
+//*****************************************************
+--Description: Handler to select the asset type charger or vehicle
+---Input : AssetType
+---output: None
+---Created by:Shalini V
+//*****************************************************
+--AssetTypeSelection "Charger"
+to handle AssetTypeSelection AssetType
+	try
+		Log "start of function Asset Type"
+		set the SearchRectangle to ScreenPart("AssetSelection")
+		Global ConfigValues
+		If uppercase(AssetType) is "VEHICLE" then
+			If ImageFound(image:"VehicleChargerToggle", waitFor:15) then
+				
+				Click (ImageLocation(text:"Vehicle or Charger", WaitFor:ConfigValues.MediumTimeOut) + [1,40])
+				
+			else If ImageFound(image:"VehicleSelected", waitFor:10) then 
+				
+				"Utilities/GenericOperations".Success "Element Clicked successfully:----> "&&AssetType 
+				--Log "Element Clicked successfully:----> "&&AssetType 
+				--"Utilities/GenericOperations".CaptureScreenshot
+			Else
+				Throw "Asset type"&&AssetType&&"is not selected"
+				--LogError  "Vehicle Asset Type is not selected"
+				"Utilities/GenericOperations".CaptureScreenshotScreenName "Asset type not selected"
+			End if
+			
+			
+		Else If uppercase(AssetType) is "CHARGER" Then 
+			If ImageFound(image:"VehicleChargerToggle", waitFor:ConfigValues.MediumTimeOut) then
+				
+				Log "Charger Asset Type is selected "
+				
+			Else
+				Click (ImageLocation(text:"Vehicle or Charger", WaitFor:ConfigValues.LongTimeOut) + [80,40])
+				"Utilities/GenericOperations".CaptureScreenshot
+			End if
+			If ImageFound(image:"VehicleChargerToggle", waitFor:ConfigValues.LongTimeOut )then
+				
+				"Utilities/GenericOperations".Success "Element Clicked successfully:----> "&&AssetType 
+				
+				--Log "Element Clicked successfully:----> "&&AssetType
+				"Utilities/GenericOperations".CaptureScreenshotScreenName AssetType
+			Else
+				
+				Throw "Asset type"&&AssetType&&"is not selected"
+				--LogError  "Vehicle Asset Type is not selected"
+				"Utilities/GenericOperations".CaptureScreenshotScreenName AssetType
+			End if
+		End if
+		set the searchrectangle to empty
+		Log "End of function Asset Type"
+		
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,AssetTypeSelection)
+	End try
+end AssetTypeSelection
+
+
+
+(*SelectAssetNameCheckBox "vehicle","8019"
+SelectAssetNameCheckBox "charger","V2G_MD_QA1"*)
+--SelectAssetID "Vehicle","Vishnu_Test_Bus_Catalyst"
+//*****************************************************
+--Description: Handler to select the asset name checkbox
+---Input : AssetType,AssetName
+---output: None
+---Created by:Shalini V
+//*****************************************************
+to handle SelectAssetID AssetType,AssetName
+	try
+		Global ConfigValues
+		set the SearchRectangle to ScreenPart("AssetSelection")
+		
+		Log "Start of the function Select Asset ID"
+		
+		IF uppercase(AssetType) is "VEHICLE" then
+			repeat with each item of AssetName
+				
+				"Utilities/CommonActions".ClickBelowTextByYPosition "Vehicle Name", "30"
+				"Utilities/CommonActions".ClickRightByImage  "SearchImage","60"
+				Typetext controlKey,a
+				Typetext deletekey
+				typetext it 
+				wait ConfigValues.BasicTimeOut
+				put imagelocation(image:"SearchImage") into Assetidloc
+				Put Assetidloc+[-7,20] into AssetPos1
+				Put Assetidloc+[250,80] into AssetPos2
+				log readtext(AssetPos1,AssetPos2)
+				put trim(readtext(AssetPos1,AssetPos2)) into ActualValue
+				put trim(it) into expectedValue
+				Delete " " in ActualValue
+				Delete " " in expectedValue
+				Delete "_" in ActualValue
+				Delete "-"in ActualValue
+				Delete "_" in expectedValue
+				Delete "-"in expectedValue
+				--If uppercase(trim(readtext(AssetPos1,AssetPos2)) is uppercase(it)) then
+				If uppercase(ActualValue) is uppercase(expectedValue) then
+					"Utilities/GenericOperations".Success( "Specified Asset ID"&&it&&"is found and selected")
+				Else
+					"Utilities/GenericOperations".Error( "Specified Asset ID"&&it&&"is Not found and Not selected")
+					Exit all
+					
+				End If
+				
+				"Utilities/CommonActions".SelectCheckBox "SelectedCheckBox","CheckBoxSelect.png"
+				Click (ImageLocation(text:"Vehicle Name", WaitFor:ConfigValues.MediumTimeOutMediumTimeOut)  )
+				
+				"Utilities/GenericOperations".Success "Asset id is selected"
+				
+			end repeat
+		else 
+			repeat with each item of AssetName
+				"Utilities/CommonActions".ClickBelowTextByYPosition "Charger Name", "30"
+				"Utilities/CommonActions".ClickRightByImage  "SearchImage","60"
+				Typetext controlKey,a
+				Typetext deletekey
+				typetext it 
+				
+				wait 30
+				put imagelocation(image:"SearchImage") into Assetidloc
+				Put Assetidloc+[-7,20] into AssetPos1
+				Put Assetidloc+[250,80] into AssetPos2
+				log readtext(AssetPos1,AssetPos2)
+				put trim(readtext(AssetPos1,AssetPos2)) into ActualValue
+				put trim(it) into expectedValue
+				Delete " " in ActualValue
+				Delete " " in expectedValue
+				Delete "_" in ActualValue
+				Delete "-"in ActualValue
+				Delete "_" in expectedValue
+				Delete "-"in expectedValue
+				If uppercase(ActualValue) is uppercase(expectedValue) then
+					"Utilities/GenericOperations".Success( "Specified Asset ID"&&it&&"is found and selected")
+				Else
+					"Utilities/GenericOperations".Error( "Specified Asset ID"&&it&&"is Not found and Not selected")
+					Exit all
+					
+				End If
+				
+				
+				"Utilities/CommonActions".SelectCheckBox "SelectedCheckBox","CheckBoxSelect.png"
+				Click (ImageLocation(text:"Charger Name", WaitFor:ConfigValues.MediumTimeOut)  )
+				"Utilities/GenericOperations".Success "Asset id is selected"
+			end repeat
+			
+		END IF
+		
+		
+		
+		Log "Selected the Asset  Name "&&AssetType&&"--"&&AssetName
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,SelectAssetID)
+	End try
+	set the SearchRectangle to empty
+end SelectAssetID
+
+//SelectFaultStatus "All"
+
+
+//*****************************************************
+--Description: Handler to select the Fault Status
+---Input : FaultStatus
+---output: None
+---Created by:Shalini V
+//*****************************************************
+SelectFaultStatus "All"
+to handle SelectFaultStatus FaultStatus
+	try 
+		Log "Selection of Fault status "&&FaultStatus
+		Global Iteration,ConfigValues
+		set the SearchRectangle to ScreenPart("FaultStatus")
+		"Utilities/CommonActions".ClickBelowTextByYPosition "Fault Status", "30"
+		Click (ImageLocation(text:FaultStatus, WaitFor:ConfigValues.MediumTimeOut,Casesensitive:"yes"))
+		
+		wait 3
+		"Utilities/GenericOperations".CaptureScreenshot
+		put ImageLocation(text:"Fault Status",waitfor:ConfigValues.MediumTimeOut) into Loc
+		put Loc+[-40,20] into Pos1
+		Put Loc+[60,50] into Pos2
+		put readtext([Pos1,Pos2]) into StatusSelected
+		if "Utilities/CommonActions".compareValues (FaultStatus, StatusSelected)
+			--LogSuccess "Selected the Fault status "&&FaultStatus
+			"Utilities/GenericOperations".Success( "Selected the Fault status "&&FaultStatus)
+			
+			else
+			--LogError  "Fault status is not selected"			
+			"Utilities/GenericOperations".Error "Fault status is not selected"
+		end if
+		Catch exception
+		get "Utilities/GenericOperations".LogException(exception,SelectFaultStatus)
+	End try
+	set the SearchRectangle to empty
+End SelectFaultStatus 
+
+
+//*****************************************************
+--Description: Handler to select the Fault priority 
+---Input : FaultPriority- red, green, yellow or all
+---output: None
+---Created by:Shalini V
+//*****************************************************
+SelectFaultPriority "All"
+to handle SelectFaultPriority FaultPriority
+	try
+		Log "Selection of Fault status "&&FaultPriority
+		Global Iteration,ConfigValues
+		--set the SearchRectangle to SearchRect("CustomizeArea")
+		set the SearchRectangle to ScreenPart("FaultPriority")
+		"Utilities/CommonActions".ClickBelowTextByYPosition "Fault Priority", "30"
+		set the SearchRectangle to SearchRect("FaultPriority")
+		
+		Click (ImageLocation(text:FaultPriority, WaitFor:ConfigValues.MediumTimeOut,Casesensitive:"yes"))
+		
+		wait 3
+		"Utilities/GenericOperations".CaptureScreenshot
+		put readtext((ImageLocation(text:"Fault Priority",waitfor:ConfigValues.MediumTimeOut)+[0,30])) into PrioritySelected
+		if "Utilities/CommonActions".compareValues (FaultPriority, PrioritySelected)
+			--LogSuccess "Selected the Fault priority "&&FaultPriority
+			"Utilities/GenericOperations".Success( "Selected the Fault priority "&&FaultPriority)
+		else
+			--LogError  "Fault priority is not selected"	
+			"Utilities/GenericOperations".Error "Fault priority is not selected"
+		end if
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,SelectFaultPriority)
+	end try
+	set the SearchRectangle to empty
+	log "End of function SelectFaultPriority"
+End SelectFaultPriority
+-------------------------------------------------------------------------------------------------
+--Description: to select the Layout in the fault dashboard
+---Input : layout to select
+---output: 
+---Created by:Shalini V
+---Created On 07 July 2022
+-------------------------------------------------------------------------------------------------
+to handle Select_FaultDashboardLayout ValueToSelect
+	log "Start of function Select_FaultDashboardLayout"
+	
+	Global ConfigValues,Iteration
+	set the SearchRectangle to ScreenPart("CustomerSelection")
+	If uppercase(ValueToSelect) is "SEQUENTIAL"
+		click {text:"Sequential",waitfor:ConfigValues.LongTimeOut}
+		set the SearchRectangle to ScreenPart("FaultDashboard")
+		WaitFor ConfigValues.LongTimeOut, text:"Priority"
+		
+	else
+		click {text:"Group by Fault",waitfor:ConfigValues.LongTimeOut}
+		WaitFor ConfigValues.LongTimeOut, text:"Priority"
+	end if
+	"Utilities/GenericOperations".CaptureScreenshotScreenName "Layout selected"
+	log "End of function Select_FaultDashboardLayout"
+	set the SearchRectangle to empty
+end Select_FaultDashboardLayout
+//*****************************************************
+--Description: Handler to select the customer
+---Input : CustomerName
+---output: None
+---Created by:Shalini V
+--Created on: 11 July 2022
+//*****************************************************
+--SelectCustomer "Vijay FD Board"
+to handle SelectCustomer CustomerName
+	try
+		Log "Select the customer Name "&&CustomerName
+		Global ConfigValues
+		set the SearchRectangle to ScreenPart("CustomerSelection")
+		"Utilities/CommonActions".ClickBelowTextByYPosition "Customer", "30"
+		
+		If ImageFound(image:"Customer_AllSelected",waitfor:ConfigValues.LongTimeOut)then
+			log "All is selected by default for customer"
+			Click (ImageLocation(image:"Customer_AllSelected")  )
+			wait  10
+		End If
+		Repeat with each item of CustomerName
+			"Utilities/CommonActions".ClickRightByImage  "SearchImage","60"
+			Typetext controlKey,a
+			Typetext deletekey
+			typetext it 
+			wait 5
+			put imagelocation(image:"SearchImage") into customerloc
+			Put customerloc+[-50,20] into Pos1
+			Put customerloc+[400,80] into Pos2
+			log readtext(Pos1,Pos2)
+			put trim(readtext(Pos1,Pos2)) into actualValue
+			Put trim(it) into ExpectedValue
+			delete " " from actualValue
+			delete " " from ExpectedValue
+			Delete "_" in actualValue
+			Delete "-"in actualValue
+			Delete "_" in ExpectedValue
+			Delete "-"in ExpectedValue
+			--If uppercase(trim(readtext(Pos1,Pos2)) is uppercase(it)) then
+			If uppercase(actualValue) is uppercase(ExpectedValue) then 
+				--logsuccess "Customer name is selected"
+				"Utilities/GenericOperations".Success( "Customer name "&&it&&"is found and selected")
+			Else
+				--logerror "Customer name is not found"
+				"Utilities/GenericOperations".Error("Customer name "&&it&&"is not found and not selected")
+				Exit all
+				
+			End If
+			"Utilities/CommonActions".SelectCheckBox "SelectedCheckBox","CheckBoxSelect.png"
+		End Repeat
+		
+		Click (ImageLocation(text:"Customer", WaitFor:ConfigValues.MediumTimeOut)  )
+		--WaitFor ConfigValues.MediumTimeOut
+		wait  ConfigValues.MinTimeOut
+		
+		
+		set the searchrectangle to empty
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,SelectCustomer)
+	End try
+	Log "end of function SelectCustomer"
+End SelectCustomer
+//*****************************************************
+--Description: Handler to select date range
+---Input : FromDate,ToDate
+---output: None
+---Created by:Shalini V
+--Created on: 11 July 2022
+//*****************************************************
+--SelectDateRange "06/13/2022 7:08 AM","06/13/2022 8:30 AM"
+to handle SelectDateRange FromDate, ToDate
+	try
+		Log "Start of function SelectDateRange"
+		Global ConfigValues
+		
+		set the SearchRectangle to ScreenPart("AssetSelection")
+		"Utilities/CommonActions".ClickBelowTextByYPosition "Fault Creation Date Range", "30"
+		
+		Typetext controlKey,a
+		Typetext deletekey
+		Typetext FromDate
+		Typetext tab
+		typetext ToDate
+		
+		Click (ImageLocation(text:"Fault Creation Date Range")  )
+		wait 5
+		log readtext(imagelocation(text:"Fault Creation Date Range")+[10,30])
+
+		put imagelocation(text:"Fault Creation Date Range") into DateRangeLoc
+		Put DateRangeLoc+[-100,15] into Pos1
+		Put DateRangeLoc+[500,80] into Pos2
+		put readtext(Pos1,Pos2) into DateRangeSelected
+		Delete "%" from DateRangeSelected
+		delete newline from DateRangeSelected
+		log DateRangeSelected
+		delete " " in  DateRangeSelected
+		
+		put  FromDate&&ToDate into ref
+		delete " " in ref
+		If DateRangeSelected is ref then
+			"Utilities/GenericOperations".Success("Date is selected")
+		Else
+			"Utilities/GenericOperations".Error("Date rage is not selected properly")
+		End If
+	Catch exception
+		
+		
+		get "Utilities/GenericOperations".LogException(exception,SelectDateRange)
+	End try
+	Log "end of function SelectDateRange"	
+	set the SearchRectangle to empty
+end SelectDateRange
+
+--ClickGetDataBtn
+//Description: Function to Click on get data button
+---Input: 
+---Output: 
+---Created By/date: Shalini V (11-Jul-2022)
+to ClickGetDataBtn
+	try
+		Global  ConfigValues
+		set searchrectangle to empty
+		put "Utilities/CommonActions".ClickBtnByText("Get Data",ConfigValues.BasicTimeOut,SearchRect("GetDataButton")) into Flag
+		set searchrectangle to empty
+		wait ConfigValues.BasicTimeOut
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,ClickGetDataBtn)
+	End try
+	return Flag 
+end ClickGetDataBtn
+
+//*****************************************************
+--Description: Handler to select the filter for the given datafield header
+---Input : AssetType,AssetName
+---output: None
+---Created by:Shalini V
+//*****************************************************
+--SelectFilterDropdown "Priority","Green"
+(*
+set Global ConfigValues to {MinTimeOut:"4",BasicTimeOut:"15",MediumTimeOut:"20",LongTimeOut:"35"}
+SelectFilterDropdown "SPN","516106","Charger"
+*)
+
+to handle SelectFilterDropdown DatafieldColumnName,FilterValue,AssetType
+	log "Start of function SelectFilterDropdown"
+	global ConfigValues
+	
+	try
+		--set the SearchRectangle to ScreenPart("FaultDashboard")
+		getSearchAreaofDashboard AssetType
+		if imagefound (text:DatafieldColumnName,waitfor:ConfigValues.MediumTimeOut)
+			Click FoundImageLocation()+[30,0]
+			click {text:"Clear filters"}
+			wait ConfigValues.MinTimeOut
+			if imagefound (Image:"SearchImage",waitfor:ConfigValues.LongTimeOut)	
+				Click FoundImageLocation()+[80,0]
+				Typetext controlKey,a
+				Typetext deletekey
+				Typetext FilterValue
+				wait ConfigValues.MinTimeOut
+				put FoundImageLocation() into Loc
+				put Loc+[-48,20] into Pos1
+				Put Loc+[110,70] into Pos2
+				put ReadText([Pos1,Pos2]) into AvailableData
+				IF imagefound (Text:FilterValue,waitfor:ConfigValues.BasicTimeOut,SearchRectangle:[Pos1,Pos2] ) is false
+					
+					replace "0" with "O" in FilterValue
+					delete newline from AvailableData
+				end if
+				
+				(*If DatafieldColumnName is "VIN"
+	replace "0" with "O" in FilterValue
+	delete newline from AvailableData
+end if*)
+				Log "Available Searched Data List:"&AvailableData
+				
+				if imagefound (Text:FilterValue,waitfor:ConfigValues.LongTimeOut,SearchRectangle:[Pos1,Pos2])
+					Click FoundImageLocation()+[-28,0]
+					Moveto [430,140]
+					Click {text:"ok",searchrectangle:ScreenPart("FaultDashboard")}
+					
+					"Utilities/GenericOperations".Success("Filter value"&&FilterValue&&"is selected"&&" for datafield column"&&DatafieldColumnName)
+					put DatafieldColumnName&& ":"&&FilterValue into Filterdata
+					WaitFor 10, text:FilterValue,searchrectangle:SearchRect("FilterPart")
+					--If ImageFound(text:Filterdata, waitFor:ConfigValues.MediumTimeOut,searchrectangle:SearchRect("FilterPart")) 
+					If ImageFound(text:FilterValue, waitFor:ConfigValues.MediumTimeOut,searchrectangle:SearchRect("FilterPart")) 
+						"Utilities/GenericOperations".Success "Filter is applied for "&&Filterdata 
+					else
+						"Utilities/GenericOperations".Error "Filter is not applied for "&&Filterdata 
+					end if
+					
+				else if imagefound (Text:FilterValue,waitfor:ConfigValues.LongTimeOut,SearchRectangle:[Pos1,Pos2],textdifference:2) then
+					
+					Click FoundImageLocation()+[-28,0]
+					Moveto [430,140]
+					Click {text:"ok",searchrectangle:ScreenPart("FaultDashboard")}
+					
+					"Utilities/GenericOperations".Success("Filter value"&&FilterValue&&"is selected"&&" for datafield column"&&DatafieldColumnName)
+					put DatafieldColumnName&& ":"&&FilterValue into Filterdata
+					If ImageFound(text:FilterValue, waitFor:ConfigValues.MediumTimeOut,searchrectangle:SearchRect("FilterPart"),textdifference:1) 
+						--If ImageFound(text:Filterdata, waitFor:ConfigValues.MediumTimeOut,searchrectangle:SearchRect("FilterPart"),textdifference:1) 
+						"Utilities/GenericOperations".Success "Filter is applieted for "&&Filterdata 
+					else
+						--"Utilities/GenericOperations".Error "Filter is not applieted for "&&Filterdata 
+						If DatafieldColumnName is "VIN"
+							LogWarning "Filtered Data not match with Search input"
+						else
+							"Utilities/GenericOperations".Error "Filter is not applieted for "&&Filterdata 
+						end if
+						
+					end if
+					
+				else
+					"Utilities/GenericOperations".Error("Filter value"&&FilterValue&&"is  not selected"&&" for datafield column"&&DatafieldColumnName)
+				end if
+				
+			else
+				"Utilities/GenericOperations".Error("Search field option not available and"&&"Img:txt_Search is not found")
+			end if
+			
+			
+		end if
+	catch exception
+		get "Utilities/GenericOperations".LogException(exception,SelectFilterDropdown)
+	end try
+	
+	Log "End of function SelectFilterDropdown"
+end SelectFilterDropdown
+
+//*****************************************************
+--Description: Handler to verify the number of datafield row values with total rows in the fault dashboard. Get the number of imagelocations of vin and match with number of rows
+---Input : DatafieldColumname,DatafieldValue
+---output: None
+---Created by:Shalini V
+--Created on: 15 July 2022
+//*****************************************************
+--verifyDataEntryForGivenFaultSearch "VIN","5GZEV337X7J141405"
+to handle verifyDataEntryForGivenFaultSearch DatafieldColumname,DatafieldValue,AssetType
+	log "Start of function verifyDataEntryForGivenFaultSearch"
+	If uppercase(AssetType) is "VEHICLE"
+		put "ApexPages/FaultDashboardVehicle".FetchFaultDashboardHorizontalData_Vehicle ("VehicleNameDashboard") into NumofRows
+	ELSE
+		lOGERROR "UPDATE HANDLER FOR CHARGER"
+	end if
+	
+	set the SearchRectangle to ScreenPart("FaultDashboard")
+	put number of items in everyimagelocation(text:DatafieldValue,validwords:DatafieldValue) into NoOfdatafieldvalue
+	If NoOfdatafieldvalue is 0
+		replace "0" with "O" in DatafieldValue
+		put number of items in everyimagelocation(text:DatafieldValue,validwords:DatafieldValue) into NoOfdatafieldvalue
+	end if
+	
+	If NoOfdatafieldvalue is NumofRows then
+		logsuccess "Number of rows is equal to number of ocurrence of VIN"
+	else
+		LogError "Number of rows is not equal to number of ocurrence of VIN"
+	End If
+	Log "End of function verifyDataEntryForGivenFaultSearch"
+end verifyDataEntryForGivenFaultSearch
+(*
+set DatafieldColnames1 to "Vehicle Name,VIN,SPN,FMI,Priority,Status,Fault name,Fault description,Time of fault,Fault duration (hh:mm:ss),Source Address"
+
+set DatafieldColnames2 to "Source Address,Customer name,Manufacturer,Model"
+ValidateDatafieldColumnUI DatafieldColnames1,DatafieldColnames2*)
+to handle ValidateDatafieldColumnUI DatafieldColnames1,DatafieldColnames2
+	set the SearchRectangle to ScreenPart("FaultDashboard")
+	put "Utilities/CommonActions".scrollCursorRightHorizontally_WithReferenceText ("Model","FD_HorizontalScrollRight") into RightScroll
+	If RightScroll is 1 then
+		"Utilities/GenericOperations".Success "Scrollbar is scrolled horizontally to right"
+	else
+		"Utilities/GenericOperations".Error "Scrollbar is not scrolled horizontally to right"
+	End If
+	--Hover the scroll bar to left and verify the data fields and UI of the screen
+	put "Utilities/CommonActions".scrollCursorLeftHorizontally_WithReferenceText ("VIN","FD_LeftScrollbar") into LeftScroll
+	If LeftScroll is 1 then
+		"Utilities/GenericOperations".Success "Scrollbar is scrolled horizontally to left"
+	else
+		"Utilities/GenericOperations".Error "Scrollbar is not scrolled horizontally to left"
+	End If
+	set the SearchRectangle to ScreenPart("FaultDashboard")
+	put  imagelocation(text:"Vehicle Name") into loc
+	put loc +[-50,-20]  into pos1
+	put loc +[1770,20] into pos2
+	put  readtext(pos1,pos2) into val
+	replace newline with "," in val
+	If val is DatafieldColnames1
+		"Utilities/GenericOperations".Success "Header column are present in given order"&&DatafieldColnames1
+	else 
+		"Utilities/GenericOperations".Error "Header column are not present in given order"&&DatafieldColnames1
+	End if
+	
+	"Utilities/CommonActions".scrollCursorRightHorizontally_WithReferenceText "Model", "FD_HorizontalScrollRight"
+	
+	put  imagelocation(text:"Source Address") into loc1
+	
+	put loc1 +[-50,-20]  into pos1
+	put loc1 +[1770,20] into pos2
+	put  readtext(pos1,pos2) into val
+	replace newline with "," in val
+	If val is DatafieldColnames2
+		"Utilities/GenericOperations".Success "Header column are present in given order"&&DatafieldColnames2
+	else 
+		"Utilities/GenericOperations".Error "Header column are not present in given order"&&DatafieldColnames2
+	End if
+	"ApexPages/FaultDashboardCharger".ResetScrollPosition "FD_LeftScrollbar","FaultDashboard"
+end ValidateDatafieldColumnUI
+
+(*
+
+To Handle ClearExistingFilterInFD
+	log "Start of function ClearExistingFilterInFD"
+	set the searchrectangle to ScreenPart("FaultDashboard")
+	repeat until imagefound(image:"ClearFilter") is false
+		--	repeat for EveryImageLocation("ClearFilter")
+		Click {image:"ClearFilter"}
+		
+	end repeat
+	Log "End of Function ClearExistingFilterInFD"
+	
+End ClearExistingFilterInFD
+*)
+
+
+
+
+------------------------------------------------------------------------------------------------
+--Description: Handler to the searchrectangle to dashboard part based on the vehicle name or Charger name text
+---Input : MainPageTab,SubPageTab
+---output: None
+---Created by:Shalini V
+------------------------------------------------------------------------------------------------
+to handle getSearchAreaofDashboard AssetType
+	try 
+		global ConfigValues
+		set the searchrectangle to ScreenPart("FaultDashboard")
+		If Uppercase(AssetType) is "VEHICLE"
+			If imagefound(text:"Vehicle Name",waitfor:ConfigValues.MediumTimeOut ) is true then
+				put FoundImageLocation() into DashboardSearchPortion
+				put DashboardSearchPortion+[-50,-28] into Pos1
+				Put DashboardSearchPortion+[1800,500] into Pos2
+				--log readtext(Pos1,Pos2)
+				set the searchrectangle to [Pos1,Pos2]
+			ELSE
+				lOGERROR "The text vehicle name is not found in the dashboard"
+			End If
+		eLSE if Uppercase(AssetType) is "CHARGER"
+			
+			If imagefound(text:"Charger Name",waitfor:ConfigValues.MediumTimeOut) is true then
+				put FoundImageLocation() into DashboardSearchPortion
+				put DashboardSearchPortion+[-50,-28] into Pos1
+				Put DashboardSearchPortion+[1800,500] into Pos2
+				--log readtext(Pos1,Pos2)
+				set the searchrectangle to [Pos1,Pos2]
+			else
+				lOGERROR "The text charger name is not found in the dashboard"
+			End If
+		eND IF
+	catch exception
+		get "Utilities/GenericOperations".LogException(exception,getSearchAreaofDashboard)
+	end try
+	
+end getSearchAreaofDashboard
+
+
+to GetUTCTimeStamp_HM TimeZone
+
+	put  the long common time into DateAndTime
+	//log  DateAndTime
+	put formattedTime("%Y-%m-%d %H:%M",DateAndTime) into timerVal
+	
+	if Global TimeZone is "UTC" or TimeZone  is "UTC"
+		
+		subtract 5 hours 30 minutes from timerVal
+		--Add 14 seconds to timerVal
+		
+		log "UTC TimeStamp:"&timerVal
+	end if
+	log timerVal
+	return timerVal
+end GetUTCTimeStamp_HM
+
+
+------------------------------------------------------------------------------------------------
+--Description: To scroll down inthe fault popup vertical scroll bar
+---Input : MainPageTab,SubPageTab
+---output: None
+---Created by:Shalini V
+---Created on: 8 Aug 2022
+------------------------------------------------------------------------------------------------
+
+to scrollCursorDownVertically_FaultPopup  imgVerticalScroll,VerticalScrollEnd
+	if imagefound(imgVerticalScroll)=false
+		exit handler
+		put false into flagImageFound
+	end if
+	set verticalScrollLocation to ImageLocation(image:imgVerticalScroll)
+	log verticalScrollLocation
+	put item 1 of  verticalScrollLocation into x
+	put item 2 of  verticalScrollLocation into y
+	Log x
+	Log y
+	put true into flagImageFound
+	
+	repeat until imagefound(image:VerticalScrollEnd,waitFor:0)
+		set verticalScrollLocation to ImageLocation(image:imgVerticalScroll)
+		put item 1 of  verticalScrollLocation into xBeforeScroll
+		add 50 to y 
+		if y>1900
+			set y to 1900
+		end if
+		
+		MoveTo imgVerticalScroll
+		MouseButtonDown 1 //Holds down the left mouse button
+		--MoveTo the remoteScreenSize*(3/4) 
+		MoveTo [x,y]
+		MouseButtonUp 1 //Releases the left mouse button
+		
+		MoveTo [500,500]
+		set verticalScrollLocation to ImageLocation(image:imgVerticalScroll)
+		put item 1 of  verticalScrollLocation into xAfterScroll
+		
+		if xBeforeScroll = xAfterScroll
+			put false into flagImageFound
+			Exit repeat
+		end if
+	end repeat
+	return flagImageFound
+end scrollCursorDownVertically_FaultPopup
+
+ClearFilterSpecificDatafieldDropdown "Vendor Error Code", "Charger"
+
+to handle ClearFilterSpecificDatafieldDropdown DatafieldColumnName,AssetType
+	log "Start of function ClearFilterSpecificDatafieldDropdown"
+	global ConfigValues
+	
+	try
+		--set the SearchRectangle to ScreenPart("FaultDashboard")
+		getSearchAreaofDashboard AssetType
+		if imagefound (text:DatafieldColumnName,waitfor:ConfigValues.MediumTimeOut)
+			Click FoundImageLocation()+[50,0]
+			click {text:"Clear filters"}
+			wait ConfigValues.MinTimeOut
+			Click {text:"ok",searchrectangle:ScreenPart("FaultDashboard")}
+			wait 3
+		Else
+			"Utilities/GenericOperations".Error "Given datafield column is not available on the dashboard"
+		End if
+		
+	catch exception
+		get "Utilities/GenericOperations".LogException(exception,ClearFilterSpecificDatafieldDropdown)
+	end try
+	
+	Log "End of function ClearFilterSpecificDatafieldDropdown"
+end ClearFilterSpecificDatafieldDropdown

@@ -1,0 +1,46 @@
+{
+	"lastmodifieddate": 1647094976.4060001,
+	"lastfoundlocation": [
+		1036,
+		696,
+		22,
+		7
+	],
+	"originalcapturelocation": [
+		991,
+		545,
+		27,
+		13
+	],
+	"createddate": 1647000976.286,
+	"lastfounddate": 1659101071.674,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[13,6]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/bus_8035.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"capturerect": [
+					991,
+					545,
+					27,
+					13
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com"
+			}
+	],
+	"name": "img_8035"
+}

@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		268,
+		8,
+		48,
+		17
+	],
+	"lastmodifieddate": 1658504154.494,
+	"createddate": 1658504154.494,
+	"name": "img_Notepad",
+	"lastfounddate": 1659110671.4419999,
+	"ocrcapturestring": "Notepad",
+	"lastfoundlocation": [
+		272,
+		12,
+		48,
+		17
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[24,8]",
+					"Tolerance": "_73",
+					"Discrepancy": "_0",
+					"SearchType": "Smoothed for Text"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "img_Notepad.png",
+				"connectionname": "PROSUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					268,
+					8,
+					48,
+					17
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "Notepad"
+			}
+	]
+}

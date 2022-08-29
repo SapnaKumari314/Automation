@@ -1,0 +1,70 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 31/March/22
+@TC_ID: TOUC_3376
+@TC_Description: CCSS-RRT-Assign Run and Track: Assign default Run and Track for Non Maintenance Bus
+***)
+
+BeginTestCase TOUC_3376
+
+Log "###########   Started execution of Test Case--> TOUC_3376   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+--Select any Bus from the IQ or search for a Bus which is not in the garage
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusIsNotInTracksFromAPI BusId, "CCSS_P1_TestData", "ChargerActions", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "BusID") into BusId
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "API_Bus_Details_id") into API_Bus_Details_id
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "API_Bus_Details_busVins") into API_Bus_Details_busVins
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".UncheckNeedsMaintenanceCheckBx
+
+--API Call
+--"CCSS_Pages/RunAndAssignmentTrackPage".VerifyBusDetails BusId, API_Bus_Details_id, API_Bus_Details_busVins
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+
+--API - Verify Run and Trackdetails
+--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "BusID") into BusId
+--"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedRunDetails BusId
+
+
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "no"
+--Verify Toast msg
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "ToastMsg") into ToastMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyToastMessage ToastMsg
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "NotificationMsg") into NotificationMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyNotificationMessage NotificationMsg, NotificationMsg
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "NotificationMsg") into NotificationMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyNotificationMessage NotificationMsg, NotificationMsg
+
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTackAssignment", "Bus_Image") into BusImage
+"CCSS_Pages/RunAndAssignmentTrackPage".findBusInTracksOfGarageOverviewPageByImage BusImage, "Garage Overview"
+
+Log "#############  Finished execution of Test Case--> TOUC_3376 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3376
+
+
+
+
+
+
+
+
+
+
+
+

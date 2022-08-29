@@ -1,0 +1,47 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 15/July/22
+@TC_ID: TOUC_3431
+@TC_Description: CCSS-LCQ: Logical Charge Queue Export options disabled
+***)
+
+BeginTestCase TOUC_3431
+
+Log "###########   Started execution of Test Case--> TOUC_3431  ##############"
+Log "#######################################################"
+
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+-----------------------------Start - Pre-requisites
+--Verify that the Garage is empty and no buses are assigned
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P1_TestData", "LCQ", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "tenantId"
+"CCSS_Pages/RunAndAssignmentTrackPage".RemoveBusFromAPI "CCSS_P1_TestData", "LCQ", "BusId2", "customerGarageId", "RunID2", "API_Bus_Details_busVins2", "tenantId"
+
+--Navigate to Garage Overview screen by selecting 'Garage Overview' link from main menu
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+
+
+--Navigate to Logical Charge Queue section
+"CCSS_Pages/GarageOverview".NavigateToElement "Logical Charge Queue", "LogicalChargeQueueArea"
+--Click on ellipsis / Menu should be disabled
+"CCSS_Pages/GarageOverview".VerifyMenuIsDisabled "LogicalChargeQueueArea"
+
+
+--Click on Main Menu and navigate to 'Charger Control' screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control", 2
+
+--Click on ellipses of the LCQ component
+--Navigate to Logical Charge Queue section
+"CCSS_Pages/ChargerControl".NavigateToElement "Logical Charge Queue", "LogicalChargeQueueArea"
+--Click on ellipsis / Menu should be disabled
+"CCSS_Pages/ChargerControl".VerifyMenuIsDisabled "LogicalChargeQueueArea"
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3431 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3431

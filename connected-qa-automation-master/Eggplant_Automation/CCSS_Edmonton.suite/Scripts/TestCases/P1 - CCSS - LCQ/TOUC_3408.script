@@ -1,0 +1,78 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 11/July/22
+@TC_ID: TOUC_3408
+@TC_Description: CCSS-RRT-LCQ Algorithm: Alert sorting as per the LCQ when a bus enters the garage for charging with higher priority and existing bus charger action was not acknowledged
+***)
+
+BeginTestCase TOUC_3408
+
+Log "###########   Started execution of Test Case--> TOUC_3408   ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Prerequisite test data setup
+--1. Update API - Battery Capacity and Threshold ratio
+--2. Update Active Charger limit
+--3. Garage should have 1 bus in a charger position - Not Ready (UI)
+--4. Next Bus Priority
+
+--1. Update API - Battery Capacity and Threshold ratio
+"CCSS_Pages/PrerequsiteTestData/LCQ".UpdateBatteryCapacityAndThresholdRatio "TOUC_3408"
+
+--2. Update Active Charger limit
+"CCSS_Pages/PrerequsiteTestData/LCQ".UpdateActiveChargerLimit "TOUC_3408"
+
+--3. Garage should have 1 bus in a charger position - Not Ready (UI)
+--Empty the Garage first
+"CCSS_Pages/PrerequsiteTestData/LCQ".RemoveBusFromAPI "CCSS_P1_TestData", "LCQ", "BusId", "RunID", "API_Bus_Details_busVins", "TOUC_3408"
+"CCSS_Pages/PrerequsiteTestData/LCQ".RemoveBusFromAPI "CCSS_P1_TestData", "LCQ", "BusId2","RunID2", "API_Bus_Details_busVins2", "TOUC_3408"
+
+--Adding bus as "Not Ready" on track
+--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "BusID") into BusId
+"CCSS_Pages/PrerequsiteTestData/LCQ".CreateBusWithAnStatusAndAssignOnTrack "not ready", "RunAndTrackAssignmentPage\imgActiveCharger" ,"CCSS_P1_TestData", "LCQ", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "TOUC_3408", "ToastMsg", "low_for_high"
+
+--Navigate to Garage Overview screen by selecting 'Charger Control' link from main menu
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+
+--Navigate to Logical Charge Queue section
+"CCSS_Pages/GarageOverview".NavigateToElement "Logical Charge Queue", "LogicalChargeQueueArea"
+
+--Verify the LCQ
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "BusID") into BusId
+"CCSS_Pages/GarageOverview".VerifyPriorityOfBusIs "highest", BusId
+
+--Verify the Alert
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".CreateChargerName "CCSS_P1_TestData", "LCQ", "BusID",BusId
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "Alert3") into Alert
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyAlertMessage Alert
+
+--Select and add another Bus from the Incoming Queue such that this Bus should have a higher priority than the previous Bus
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Run & Track Assignment", "Run & Track Assignment",1
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "BusID2") into BusId2
+"CCSS_Pages/PrerequsiteTestData/LCQ".CreateBusWithAnStatusAndAssignOnTrack "not ready", "RunAndTrackAssignmentPage\imgActiveCharger" ,"CCSS_P1_TestData", "LCQ", "BusId2", "customerGarageId", "RunID", "API_Bus_Details_busVins", "TOUC_3408", "ToastMsg2", "high"
+
+--Verify that the Initiate Charging Alert is removed for the previous Bus
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "Alert3") into Alert
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyAlertMessageNotPresent Alert
+
+--Verify that the Initiate Charging Alert is displayed for the new Bus
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".CreateChargerName "CCSS_P1_TestData", "LCQ", "BusID",BusId
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P1_TestData.xlsx", "LCQ", "InitiateAlertBus2") into Alert
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyAlertMessage Alert
+
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3408 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3408

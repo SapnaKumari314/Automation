@@ -1,0 +1,47 @@
+{
+	"originalcapturelocation": [
+		489,
+		338,
+		147,
+		63
+	],
+	"lastmodifieddate": 1646752176.4650002,
+	"createddate": 1646735926.3340001,
+	"name": "NeedsMaintenance",
+	"lastfounddate": 1659636085.767,
+	"ocrcapturestring": "Needs Maintenance",
+	"lastfoundlocation": [
+		503,
+		374,
+		16,
+		16
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[73,31]",
+					"Tolerance": "_64",
+					"Discrepancy": "_0",
+					"SearchType": "Smoothed for Text"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/imgNeedsMaintenance.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"capturerect": [
+					489,
+					338,
+					147,
+					63
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com"
+			}
+	]
+}

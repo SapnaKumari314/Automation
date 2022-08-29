@@ -1,0 +1,160 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 24/Feb/22
+@Description: This script is the POM scripts for Login page.
+***)
+------------------------------
+-----------Login Page
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		LogoffArea:[[.75,0],[1,.125]],
+		LoginArea:[[.25,.375],[.75,.75]],
+		APILoadingIconArea:[[.25,.375],[.75,.75]],
+		ErrorMsgArea:[[.25,0.25],[.75,.75]],
+	}
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+End ScreenPart
+-----------------------------------------------------
+
+to handle SetGlobalEnvironmentVariables
+	--global BaseURI
+	put "Utilities/ExcelOperations".readTestDataFrom ("Configurations\Config.xlsx", "QA_Env_API", "API_BaseURI") into BaseURI
+	return BaseURI
+end SetGlobalEnvironmentVariables
+
+---------This handler is used to Open the application on a certain browser
+to OpenApplication
+	"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "ApplicationURL"
+	Set appUrl to the result
+	"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "BrowserName"
+	Set browserName to the result
+	"Utilities/GenericOperations".LaunchApplication browserName, appUrl
+	
+end openApplication
+
+---------This handler is used to Login to the application
+to handle Login userRole
+	SetGlobalEnvironmentVariables
+	set the SearchRectangle to ScreenPart("LogoffArea")
+	Wait 5
+	if ImageFound(text:"Logout", waitFor: 2) Then
+		Try
+			click text:"Logout"
+		Catch theException	
+			Log "Application logged out"
+			
+		End try
+	end if
+	set the SearchRectangle to empty
+	if userRole=""
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "UserID"
+		Set UserID to the result
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "Password"
+		Set Password to the result
+	else if userRole="COEAdmin"
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "COEAdminUserID"
+		Set UserID to the result
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "COEAdminPassword"
+		Set Password to the result
+	else if userRole="NonCoeUser"
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "NonCOEAdminUser"
+		Set UserID to the result
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "NonCOEPassword"
+		Set Password to the result
+	else if userRole="COEAccountAdmin"
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "COEAccountAdminUserID"
+		Set UserID to the result
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "COEAccountAdminPassword"
+		Set Password to the result
+	else if userRole="COEReadOnly"
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "COEReadOnlyUserID"
+		Set UserID to the result
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "COEReadOnlyPassword"
+		Set Password to the result
+	else if userRole="COE_CSO"
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "COE_CSOUserID"
+		Set UserID to the result
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "COE_CSOPassword"
+		Set Password to the result
+	else if userRole="COE_CSO_Supervisor"
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "COE_CSO_SupervisorUserID"
+		Set UserID to the result
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "COE_CSO_SupervisorPassword"
+		Set Password to the result
+	else if userRole="COE_APEX_RO"
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "COE_APEX_ROUserID"
+		Set UserID to the result
+		"Utilities/ExcelOperations".readTestDataFrom "Configurations\Config.xlsx", "QA_Env", "COE_APEX_ROPassword"
+		Set Password to the result
+	end if
+	
+	set the SearchRectangle to ScreenPart("LoginArea")
+	if  ImageFound(text:"User name", waitFor: 5) Then
+		click ImageLocation(text:"User name", WaitFor:20)
+		typetext controlKey, a
+		typetext UserID
+		LogSuccess "User name entered successfully" 
+		"Utilities/GenericOperations".CaptureScreenshot
+	else
+		LogError "Unable to enter User name successfully"
+		"Utilities/GenericOperations".CaptureScreenshot
+	end if
+	
+	if  ImageFound(text:"Password", waitFor: 5) Then
+		click ImageLocation(text:"Password", WaitFor:20, caseSensitive:yes)
+		typetext controlKey, a
+		typetext Password
+		LogSuccess "Password entered successfully"
+		"Utilities/GenericOperations".CaptureScreenshot
+	else
+		LogError "Unable to enter Password successfully"
+		"Utilities/GenericOperations".CaptureScreenshot
+	end if	
+	if  ImageFound(text:"Submit", waitFor: 5) Then
+		click item 1 of EveryImageLocation(text:"Submit", waitfor:20)
+		LogSuccess "Submit clicked successfully"
+		"Utilities/GenericOperations".CaptureScreenshot
+	else
+		LogError  "Unable to click Submit"
+		"Utilities/GenericOperations".CaptureScreenshot
+	end if
+	set the SearchRectangle to empty
+	
+	set the SearchRectangle to ScreenPart("APILoadingIconArea")
+	"Utilities/GenericOperations".ApiSynchronization
+	set the SearchRectangle to empty
+	put "Utilities/GetAuthorizationToken".getAutherizationTokenForAPI into authToken
+end Login
+
+to Logout 
+	set the SearchRectangle to ScreenPart("LogoffArea")
+	if ImageFound(text:"Logout", waitFor:20)
+		click FoundImageLocation()
+		Click text:"Logout", waitfor:20
+		LogSuccess "Logout clicked successfully"
+	else
+		LogError "Unable to click Logout"
+	end if
+end Logout
+
+to handle verifyErrorMsg  msg, x1,y1,x2,y2
+	Log "****Verifying the Toast Message after clicking AssignRunAndTrackButton"
+	set the SearchRectangle to ScreenPart("ErrorMsgArea")
+	--put "Utilities/CommonActions".GetTextByText (toastMsg, 80, 10) into actualMsg
+	put "Utilities/CommonActions".ReadTextFromDynamicSearchRectangle (msg, x1,y1,x2,y2) into actualMsg
+	log actualMsg
+	
+	if "Utilities/CommonActions".containsValue (msg, actualMsg)
+		LogSuccess "Message is appearing correctly, msg--> "&&actualMsg
+	else
+		LogError "Message is not appearing correctly, msg--> "&&actualMsg
+	end if
+	return actualMsg
+	set the SearchRectangle to empty
+end verifyErrorMsg

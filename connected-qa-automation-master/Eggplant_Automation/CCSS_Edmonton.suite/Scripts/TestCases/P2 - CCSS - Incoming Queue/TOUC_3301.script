@@ -1,0 +1,34 @@
+﻿(***
+@Author: Mohammed Gouse
+@Date: 22/March/22
+@TC_ID: TOUC_3301
+@TC_Description: CCSS-RRT-IQ: Incoming Queue components
+***)
+
+BeginTestCase TOUC_3301
+
+Log "###########   Started execution of Test Case--> TOUC_3301   ##############"
+Log "#######################################################"
+--testdata
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+"CCSS_Pages/PrerequsiteTestData/IncomingQ".AddBusInIncomingQ "BusesData", "VIN_Number"
+"CCSS_Pages/PrerequsiteTestData/IncomingQ".AddBusInIncomingQ "BusesData", "VIN_Number2"
+"CCSS_Pages/PrerequsiteTestData/IncomingQ".AddBusInIncomingQ "BusesData", "VIN_Number3"
+"CCSS_Pages/PrerequsiteTestData/IncomingQ".AddBusInIncomingQ "BusesData", "VIN_Number4"
+"CCSS_Pages/PrerequsiteTestData/IncomingQ".AddBusInIncomingQ "BusesData", "VIN_Number5"
+"CCSS_Pages/PrerequsiteTestData/IncomingQ".AddBusInIncomingQ "BusesData", "VIN_Number6"
+"CCSS_Pages/PrerequsiteTestData/IncomingQ".AddBusInIncomingQ "BusesData", "VIN_Number7"
+"CCSS_Pages/PrerequsiteTestData/IncomingQ".AddBusInIncomingQ "BusesData", "VIN_Number8"
+"CCSS_Pages/PrerequsiteTestData/IncomingQ".AddBusInIncomingQ "BusesData", "VIN_Number9"
+"CCSS_Pages/PrerequsiteTestData/IncomingQ".AddBusInIncomingQ "BusesData", "VIN_Number10"
+
+
+
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyElevenBusesInIQ 
+
+Log "#############  Finished execution of Test Case--> TOUC_3301 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3301

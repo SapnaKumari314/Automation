@@ -1,0 +1,41 @@
+{
+	"lastmodifieddate": 1659600108.7280002,
+	"ocrcapturestring": "0",
+	"originalcapturelocation": [
+		1190,
+		154,
+		42,
+		32
+	],
+	"createddate": 1659600108.7280002,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Tolerance": "_45",
+					"HotSpot": "[-66,18]",
+					"Scale": "    1",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "CommonImages/FolderRefreshIcon.png",
+				"connectionname": "SUT",
+				"type": 1,
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com",
+				"capturerect": [
+					1190,
+					154,
+					42,
+					32
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "0"
+			}
+	],
+	"name": "CommonImages/FolderRefreshIcon"
+}

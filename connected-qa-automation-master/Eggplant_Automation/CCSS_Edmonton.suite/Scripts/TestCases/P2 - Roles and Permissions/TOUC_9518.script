@@ -1,0 +1,37 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 27/July/22
+@TC_ID: TOUC_9518
+@TC_Description: ETS - Validate the ETS Customer's COE APEX Read Only role permissions
+***)
+
+BeginTestCase TOUC_9518
+
+Log "###########   Started execution of Test Case--> TOUC_9518   ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login "COE_APEX_RO"
+
+
+"CCSS_Pages/BasePage".verifyErrorMsg  "You do not have sufficient permissions",0,0,1530,256
+
+
+Log "#############  Finished execution of Test Case--> TOUC_9518 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_9518
+
+
+
+
+
+
+
+
+
+
+
+

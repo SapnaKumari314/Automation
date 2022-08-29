@@ -1,0 +1,80 @@
+﻿(***
+@Author: Shalini Vijayakumar
+@Date: 25/July/2022
+@TC_ID: TOUC_10951
+@TC_Description:  Verify that when a user able to see all fault data fields in Individual fault screen for the EcoRide BE35 with critical fault in sequential view
+***)
+
+BeginTestCase TOUC_10951
+Log "###########   Started execution of Test Case--> TOUC_10951  ##############"
+Log "#######################################################"
+--"1.Login as an superadmin in Apex Portal.
+
+"LoginPage".OpenApplication
+
+"LoginPage".Login "ProterraAdmin"
+
+--2.Under Historical Data on Left menu choose Fault Dashboard
+"ApexPages/FaultDashboardSearchCriteria".NavigateTo "HISTORICAL DATA","FAULT DASHBOARD"
+--3.Select the vehicle option and select the customer in dropdown with the appropriate vehicle name,status,date and click on Get Data in sequential format and select the Critical fault in priority and click on get data
+set DatasheetPath to Resourcepath("TestData\S2_TC01_TOUC-10951.xlsx")
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "CustomerName") into CustomerNames
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "AssetName") into VehicleName
+
+"ApexPages/FaultDashboardSearchCriteria".SelectCustomer CustomerNames
+
+get  "ApexPages/FaultDashboardSearchCriteria".AssetTypeSelection ("Vehicle")
+
+get "ApexPages/FaultDashboardSearchCriteria".SelectAssetID ("Vehicle",VehicleName)
+
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultPriority ("Red")
+get "ApexPages/FaultDashboardSearchCriteria".SelectFaultStatus ("All")
+
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDateTime") into FromDateTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDateTime") into ToDateTime
+
+"ApexPages/FaultDashboardSearchCriteria".SelectDateRange FromDateTime,ToDateTime
+
+get "ApexPages/FaultDashboardSearchCriteria".ClickGetDataBtn
+
+
+"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Sequential"
+
+--verify if the time of fault is between the date range selected
+put "ApexPages/FaultDashboardVehicle".Fetch_VehicleFault_TimeofFaultRowValues into faultdateTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromDate") into FromDate
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToDate") into ToDate
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "FromTime") into FromTime
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "ToTime") into ToTime
+"ApexPages/FaultDashboardCharger".VerifyTimeofFaultRange FromDate,ToDate,FromTime,ToTime,faultdateTime
+--verify the data fields in sequential view
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "SequentialHeaders") into DatafieldColnames
+"ApexPages/FaultDashboardVehicle".ValidateDatafieldColumnNames_Vehicle DatafieldColnames
+
+--select all options under customization
+"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "All"
+put "Utilities/ExcelOperations".ApexreadTestDataFrom (DatasheetPath, "TestData", "VIN") into VINID
+"ApexPages/FaultDashboardSearchCriteria".SelectFilterDropdown "VIN",VINID,"VEHICLE"
+--4.click on any data filed  in sequential view and verify the individual screen 
+--Data should be shown with below fields
+--Status
+--Vehicle Name
+--VIN
+--Device
+--Fault Name
+--Time of Fault
+--Fault Duration
+--Fault Description
+--Troubleshooting
+--Notes
+--Vehicle (replaces vehicle model)
+--Source Address
+
+"ApexPages/FaultDashboardVehicle".ToClickOnSpecificDatafieldColumnDataAndOpenFaultPopup VINID,"Vehicle Name,SPN,VIN,FMI,Priority,Status,Fault name,Fault description,Time of fault,Fault duration (hh:mm:ss),Source Address"
+
+"LoginPage".Logout
+
+Log "#############  Finished execution of Test Case--> TOUC_10951 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_10951

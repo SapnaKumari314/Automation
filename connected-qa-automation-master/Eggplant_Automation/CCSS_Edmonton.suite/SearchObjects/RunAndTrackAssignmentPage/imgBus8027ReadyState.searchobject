@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		670,
+		541,
+		31,
+		55
+	],
+	"lastmodifieddate": 1648465614.2810001,
+	"createddate": 1648465614.2810001,
+	"name": "RunAndTrackAssignmentPage/imgBus8027ReadyState",
+	"lastfounddate": 1649342971.266,
+	"ocrcapturestring": "I",
+	"lastfoundlocation": [
+		895,
+		517,
+		31,
+		55
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[15,27]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/imgBus8027ReadyState.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com",
+				"capturerect": [
+					670,
+					541,
+					31,
+					55
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "I"
+			}
+	]
+}

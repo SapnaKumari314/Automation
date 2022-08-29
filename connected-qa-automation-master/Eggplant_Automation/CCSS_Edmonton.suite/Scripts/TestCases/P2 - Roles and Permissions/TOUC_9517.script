@@ -1,0 +1,100 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 29/July/22
+@TC_ID: TOUC_9517
+@TC_Description: ETS - Validate the ETS Customer's COE CSO Supervisor role permissions
+***)
+
+BeginTestCase TOUC_9517
+
+Log "###########   Started execution of Test Case--> TOUC_9517   ##############"
+Log "#######################################################"
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+-------------------------------------Test Data preparation for the test case
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login 
+
+"CCSS_Pages/PrerequsiteTestData/RolesAndPermissions".RemoveBusFromAPI "CCSS_P2_TestData", "RolesPermissions", "BusId", "RunID", "API_Bus_Details_busVins", "TOUC_9517"
+
+--"CCSS_Pages/BasePage".Logout
+--------------------------------------------
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login "COE_CSO"
+
+--Verify that user is able to assign Run & Track for Buses
+"CCSS_Pages/PrerequsiteTestData/RolesAndPermissions".CreateBusWithAnStatusAndAssignOnTrack "not ready", "RunAndTrackAssignmentPage\imgActiveCharger" ,"CCSS_P2_TestData", "RolesPermissions", "BusId", "customerGarageId", "RunID", "API_Bus_Details_busVins", "TOUC_9517", "ToastMsg", "no"
+
+--Verify that user is able to re-assign Run & Track for Buses
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "RolesPermissions", "BusID") into BusId
+--Reassigning bus to other position
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+
+
+--Select a Charger Track Position using Track Override if the default track does not match the requirement
+"CCSS_Pages/RunAndAssignmentTrackPage".clickOverridInRecommendedTrack
+"CCSS_Pages/RunAndAssignmentTrackPage".SelectTrackAndClickConfirmAfterOverrideClick "RunAndTrackAssignmentPage\imgActiveCharger"
+--Click the Assign Run & Track button
+"CCSS_Pages/RunAndAssignmentTrackPage".clickAssignRunAndTrackButton "yes"
+
+
+--Verify that user is able to Drag and Drop Buses
+"CCSS_Pages/RunAndAssignmentTrackPage".DragBusAndDropToAnyPosition "RunAndTrackAssignmentPage/bus_8035.png", "RunAndTrackAssignmentPage/imgBlackTrack"
+
+
+--Click Menu and click Charger Control screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control",2
+
+--Verify that user is able to perform Charger Actions from Alerts section
+--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "RolesPermissions", "InitiateChargingBtn") into InitiateChargingBtn
+--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P2_TestData.xlsx", "RolesPermissions", "InitiateChargingMsg") into InitiateChargingMsg
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickCheckAlertButton "Check" , "Alert was acknowledged successfully",0,15
+
+--Click the Emergency Stop All button from the garage legend
+--Click Yes
+TypeText pagedown
+"CCSS_Pages/RunAndAssignmentTrackPage".ClickEmergencyStopAllButton "Yes"
+TypeText pageUp
+
+--Verify that user is able to download CSV and PDF from LCQ section
+"CCSS_Pages/GarageOverview".SelectMenuOptionFrom "LogicalChargeQueueArea", "Export to PDF"
+
+--Navigate to Garage Overview screen by selecting 'Garage Overview' link from main menu
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+--Navigate to Logical Charge Queue section
+"CCSS_Pages/GarageOverview".NavigateToElement "Logical Charge Queue", "LogicalChargeQueueArea"
+--Repeat Steps 11-14 on Garage Overview Screen
+"CCSS_Pages/GarageOverview".SelectMenuOptionFrom "LogicalChargeQueueArea", "Export to PDF"
+
+
+--Navigate to ECMS screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Energy Management", "Energy Management", 1
+--Verify user is not able to modify the Online Power  Capacity
+"CCSS_Pages/EnergyManagement".CheckFieldIsEditable  "Online Power Capacity", 0,0,0,80,"ElectricalServiceMonitoringArea"
+--Verify user is able to download PDF and CSV files for the Power Monitoring graph
+"CCSS_Pages/EnergyManagement".SelectMenuOptionFrom "PowerMonitoringAreaEllipse", "Export to CSV"
+
+--Navigate to Configuration screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "CCSS Configuration", "CCSS Configuration", 1
+"CCSS_Pages/CCSSConfiguration".CheckFieldIsEditable  "ROB Server URL", 300,-15,800,10,"GlobalTabFieldsArea"
+
+
+Log "#############  Finished execution of Test Case--> TOUC_9517 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_9517
+
+
+
+
+
+
+
+
+
+
+
+

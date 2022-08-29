@@ -1,0 +1,37 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 04/Apr/22
+@TC_ID: TOUC_3331
+@TC_Description: CCSS-RRT-Track Details: Track Details Components
+***)
+
+BeginTestCase TOUC_3331
+
+Log "###########   Started execution of Test Case--> TOUC_3331   ##############"
+Log "#######################################################"
+
+"CCSS_Pages/BasePage".OpenApplication
+"CCSS_Pages/BasePage".Login
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P0_TestData.xlsx", "RunAndTrackComponents", "BusID") into BusId
+"CCSS_Pages/RunAndAssignmentTrackPage".SearchBusFromBEB BusId
+
+"CCSS_Pages/RunAndAssignmentTrackPage".clickRecommendedRunAndTrackButton
+"CCSS_Pages/RunAndAssignmentTrackPage".verifyRecommendedRunDetails 
+"CCSS_Pages/RunAndAssignmentTrackPage".VerifyButtonsAreAppearing
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3331 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_3331
+
+
+
+
+
+
+
+
+
+

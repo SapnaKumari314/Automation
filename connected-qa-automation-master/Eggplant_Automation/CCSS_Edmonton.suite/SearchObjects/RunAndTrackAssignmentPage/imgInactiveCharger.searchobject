@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		1030,
+		448,
+		18,
+		17
+	],
+	"lastmodifieddate": 1650369631.513,
+	"createddate": 1650369571.483,
+	"name": "RunAndTrackAssignmentPage/imgInactiveCharger",
+	"lastfounddate": 1658416781.6030002,
+	"ocrcapturestring": "E",
+	"lastfoundlocation": [
+		1083,
+		527,
+		14,
+		14
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[9,8]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/imgInactiveCharger.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com",
+				"capturerect": [
+					1030,
+					448,
+					18,
+					17
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "ft"
+			}
+	]
+}

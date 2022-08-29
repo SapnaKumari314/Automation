@@ -1,0 +1,46 @@
+{
+	"lastmodifieddate": 1658504399.079,
+	"lastfoundlocation": [
+		685,
+		461,
+		30,
+		30
+	],
+	"originalcapturelocation": [
+		687,
+		465,
+		30,
+		30
+	],
+	"createddate": 1658504399.079,
+	"lastfounddate": 1658859221.24,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[14,13]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "img_FileNotFound.png",
+				"connectionname": "PROSUT",
+				"type": 1,
+				"capturerect": [
+					687,
+					465,
+					30,
+					30
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-3-81-234-4.compute-1.amazonaws.com"
+			}
+	],
+	"name": "img_FileNotFound"
+}

@@ -1,0 +1,46 @@
+{
+	"lastmodifieddate": 1658853954.0420001,
+	"lastfoundlocation": [
+		1778,
+		584,
+		64,
+		93
+	],
+	"originalcapturelocation": [
+		1148,
+		658,
+		64,
+		93
+	],
+	"createddate": 1658853954.0420001,
+	"lastfounddate": 1660925688.869,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[32,46]",
+					"Tolerance": "_1",
+					"Discrepancy": "_0",
+					"SearchType": "Precise to Pixel"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "RunAndTrackAssignmentPage/imgEmptyTrack.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"capturerect": [
+					1148,
+					658,
+					64,
+					93
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com"
+			}
+	],
+	"name": "RunAndTrackAssignmentPage/imgEmptyTrack"
+}

@@ -1,0 +1,1118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testResults version="1.2">
+<httpSample t="894" it="0" lt="892" ct="500" ts="1596151990315" s="true" lb="CCSS-Login  To get Access Token" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="2486" sby="542" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/cognitoLogin</java.net.URL>
+</httpSample>
+<httpSample t="118" it="0" lt="118" ct="0" ts="1596151991250" s="true" lb="Load Garages" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1233" sby="2452" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups?requestId=GET_LOAD_GARAGES-1dd3167e-1847-44a9-8b96-9caf08156248&amp;tenantId=f83c33ad-760e-4041-a8d4-b92d79d1f35e</java.net.URL>
+</httpSample>
+<httpSample t="792" it="0" lt="614" ct="0" ts="1596151991390" s="true" lb="Centennial_Garage_Details" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="270012" sby="2498" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups/b675171a-a418-4a33-81fd-92d76b502a98?tenantId=f83c33ad-760e-4041-a8d4-b92d79d1f35e&amp;requestId=LOAD_TRACK_LIST_REQUEST_ID7f0ccbd8-d9f1-4e55-ab27-3718b356b6d0</java.net.URL>
+</httpSample>
+<httpSample t="316" it="0" lt="316" ct="0" ts="1596151992184" s="true" lb="GET_LOGICAL_CHARGE_QUEUE" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1549" sby="2470" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups/b675171a-a418-4a33-81fd-92d76b502a98/logicalChargeQueue?requestId=GET_LOGICAL_CHARGE_QUEUE-e878b483-b546-487d-843c-e859646ff751</java.net.URL>
+</httpSample>
+<httpSample t="134" it="0" lt="133" ct="0" ts="1596151992504" s="true" lb="GET_INCOMING_BUS_QUEUE" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="827" sby="2493" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-iq-ets-test/iq/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/incomingBuses?size=11&amp;requestId=GET_INCOMING_BUS_QUEUE-d19cb902-1909-43af-a2a0-85a092c7f8ef&amp;sortBy=bookInTime&amp;order=ASC</java.net.URL>
+</httpSample>
+<httpSample t="261" it="0" lt="261" ct="0" ts="1596151992641" s="true" lb="GET_NOTIFICATIONS" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1919" sby="2487" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/notifications?notificationState=TRIGGERED&amp;requestId=GET_NOTIFICATIONS-152cd159-5381-4e98-acc4-4ac9c0ad208b&amp;trackSetupId=b675171a-a418-4a33-81fd-92d76b502a98</java.net.URL>
+</httpSample>
+<httpSample t="168" it="0" lt="168" ct="0" ts="1596151992903" s="false" lb="getm5busstatus (Maintenance Buses)" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="536" sby="2532" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/8/getm5busstatus</java.net.URL>
+</httpSample>
+<httpSample t="276" it="0" lt="276" ct="0" ts="1596151993072" s="false" lb="Get Runs For A Bus" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="536" sby="2677" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-runs-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/runs/7JZTH13JXKS000158</java.net.URL>
+</httpSample>
+<httpSample t="292" it="0" lt="292" ct="0" ts="1596151993350" s="false" lb="getBusDetails" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="536" sby="2708" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/bus/getBusDetails</java.net.URL>
+</httpSample>
+<httpSample t="428" it="0" lt="426" ct="0" ts="1596151993643" s="true" lb="Assets" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="41832" sby="2336" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/assets</java.net.URL>
+</httpSample>
+<httpSample t="478" it="0" lt="478" ct="0" ts="1596151994073" s="true" lb="Charger_States" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="9062" sby="2410" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/chargerStates?requestId=GET_CHARGING_STATES-b5dec2e4-67f9-44d0-9afc-a82c538ab4ca</java.net.URL>
+</httpSample>
+<httpSample t="375" it="0" lt="374" ct="0" ts="1596151994554" s="true" lb="bus?scroll=5m" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="22737" sby="2925" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/counts/bus?scroll=5m</java.net.URL>
+</httpSample>
+<httpSample t="265" it="0" lt="264" ct="0" ts="1596151994929" s="true" lb="GET_CHARGER_FAULTS -charger?scroll=5m" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="38474" sby="2682" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/counts/charger?scroll=5m&amp;requestId=GET_CHARGER_FAULTS-fc4d8214-429e-4695-8917-cc668e94e2fb</java.net.URL>
+</httpSample>
+<httpSample t="354" it="0" lt="354" ct="0" ts="1596151995200" s="true" lb="GET_CHARGER_HISTORY" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="510" sby="2575" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/chargers/chargeSessions?ocppIds=NAMHVC150-US1-1619-975%2C00120C2DF6B03F01%2CHVC150-IT1-1119-045%2CNAMHVC150-US1-1619-974%2CHVC150-IT1-1019-119&amp;start=2020-07-29T04%3A33%3A15Z&amp;end=2020-07-30T04%3A33%3A15Z&amp;requestId=GET_CHARGER_HISTORY-94f06da0-65fb-4d7a-bafc-e24ac674b8ac</java.net.URL>
+</httpSample>
+<httpSample t="116" it="0" lt="116" ct="0" ts="1596151995557" s="false" lb="GET_ECMS_POWER_CAPACITY" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="536" sby="2457" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/ecms/power?requestId=GET_ECMS_POWER_CAPACITY-25453e60-2c8f-4770-9086-0e665253930d</java.net.URL>
+</httpSample>
+<httpSample t="107" it="0" lt="107" ct="0" ts="1596151995678" s="false" lb="ECMS_POWER_MONITORING" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="536" sby="2540" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/ecms/monitoring?requestId=ECMS_POWER_MONITORING-00407710-fa72-415f-9e8e-68344114ab7c&amp;start=2020-07-29T04%3A33%3A15Z&amp;end=2020-07-30T04%3A33%3A15Z&amp;aggIntervalInS=3600</java.net.URL>
+</httpSample>
+<sample t="5374" it="147" lt="5189" ct="500" ts="1596151990266" s="false" lb="CCSS - Transaction Controller" rc="" rm="Number of samples in transaction : 16, number of failing samples : 5" tn="Thread Group 1-1" dt="" by="393321" sby="38784" ng="1" na="1"/>
+
+<httpSample t="1102" it="0" lt="1100" ct="480" ts="1596152029148" s="true" lb="CCSS-Login  To get Access Token" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="2486" sby="542" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/cognitoLogin</java.net.URL>
+</httpSample>
+<httpSample t="264" it="0" lt="264" ct="0" ts="1596152030291" s="true" lb="Load Garages" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1233" sby="2452" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups?requestId=GET_LOAD_GARAGES-0aea37dd-915e-4337-a756-2ed51f436634&amp;tenantId=f83c33ad-760e-4041-a8d4-b92d79d1f35e</java.net.URL>
+</httpSample>
+<httpSample t="910" it="0" lt="735" ct="0" ts="1596152030566" s="true" lb="Centennial_Garage_Details" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="270012" sby="2498" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups/b675171a-a418-4a33-81fd-92d76b502a98?tenantId=f83c33ad-760e-4041-a8d4-b92d79d1f35e&amp;requestId=LOAD_TRACK_LIST_REQUEST_IDc18a3c3d-fd8f-4084-b2f6-62556f119b80</java.net.URL>
+</httpSample>
+<httpSample t="318" it="0" lt="318" ct="0" ts="1596152031477" s="true" lb="GET_LOGICAL_CHARGE_QUEUE" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1549" sby="2470" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups/b675171a-a418-4a33-81fd-92d76b502a98/logicalChargeQueue?requestId=GET_LOGICAL_CHARGE_QUEUE-a50208a1-d16a-46c3-8c22-d2ec873b596c</java.net.URL>
+</httpSample>
+<httpSample t="435" it="0" lt="435" ct="0" ts="1596152031798" s="true" lb="GET_INCOMING_BUS_QUEUE" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="827" sby="2493" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-iq-ets-test/iq/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/incomingBuses?size=11&amp;requestId=GET_INCOMING_BUS_QUEUE-2db9e191-f892-4b77-bc7d-2acefa2f2b5c&amp;sortBy=bookInTime&amp;order=ASC</java.net.URL>
+</httpSample>
+<httpSample t="230" it="0" lt="230" ct="0" ts="1596152032234" s="true" lb="GET_NOTIFICATIONS" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1919" sby="2487" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/notifications?notificationState=TRIGGERED&amp;requestId=GET_NOTIFICATIONS-fc0b7a2f-99e0-49a1-8321-50f04c1bc561&amp;trackSetupId=b675171a-a418-4a33-81fd-92d76b502a98</java.net.URL>
+</httpSample>
+<httpSample t="343" it="0" lt="343" ct="0" ts="1596152032465" s="false" lb="getm5busstatus (Maintenance Buses)" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="536" sby="2532" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/8/getm5busstatus</java.net.URL>
+</httpSample>
+<httpSample t="149" it="0" lt="149" ct="0" ts="1596152032813" s="false" lb="Get Runs For A Bus" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="536" sby="2677" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-runs-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/runs/7JZTH13JXKS000158</java.net.URL>
+</httpSample>
+<httpSample t="137" it="0" lt="137" ct="0" ts="1596152032965" s="false" lb="getBusDetails" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="536" sby="2708" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/bus/getBusDetails</java.net.URL>
+</httpSample>
+<httpSample t="468" it="0" lt="463" ct="0" ts="1596152033103" s="true" lb="Assets" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="41832" sby="2336" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/assets</java.net.URL>
+</httpSample>
+<httpSample t="276" it="0" lt="276" ct="0" ts="1596152033574" s="true" lb="Charger_States" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="9062" sby="2410" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/chargerStates?requestId=GET_CHARGING_STATES-7a5e490d-2c4e-4fe6-a857-3b5be7465d48</java.net.URL>
+</httpSample>
+<httpSample t="402" it="0" lt="401" ct="0" ts="1596152033851" s="true" lb="bus?scroll=5m" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="22737" sby="2925" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/counts/bus?scroll=5m</java.net.URL>
+</httpSample>
+<httpSample t="203" it="0" lt="201" ct="0" ts="1596152034254" s="true" lb="GET_CHARGER_FAULTS -charger?scroll=5m" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="38474" sby="2682" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/counts/charger?scroll=5m&amp;requestId=GET_CHARGER_FAULTS-f935f491-94b2-440e-9bf8-3276b77a0324</java.net.URL>
+</httpSample>
+<httpSample t="154" it="0" lt="154" ct="0" ts="1596152034463" s="true" lb="GET_CHARGER_HISTORY" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="510" sby="2575" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/chargers/chargeSessions?ocppIds=NAMHVC150-US1-1619-975%2C00120C2DF6B03F01%2CHVC150-IT1-1119-045%2CNAMHVC150-US1-1619-974%2CHVC150-IT1-1019-119&amp;start=2020-07-29T04%3A33%3A54Z&amp;end=2020-07-30T04%3A33%3A54Z&amp;requestId=GET_CHARGER_HISTORY-77f303c6-2c5c-4386-9909-1e8836431b3d</java.net.URL>
+</httpSample>
+<httpSample t="110" it="0" lt="110" ct="0" ts="1596152034618" s="false" lb="GET_ECMS_POWER_CAPACITY" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="536" sby="2457" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/ecms/power?requestId=GET_ECMS_POWER_CAPACITY-525cc44b-8bb0-47b4-9d07-08375ad52232</java.net.URL>
+</httpSample>
+<httpSample t="122" it="0" lt="122" ct="0" ts="1596152034733" s="false" lb="ECMS_POWER_MONITORING" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="536" sby="2540" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/ecms/monitoring?requestId=ECMS_POWER_MONITORING-2bf95be2-e1dc-4f7d-b6b9-a9338c248993&amp;start=2020-07-29T04%3A33%3A54Z&amp;end=2020-07-30T04%3A33%3A54Z&amp;aggIntervalInS=3600</java.net.URL>
+</httpSample>
+<sample t="5623" it="135" lt="5438" ct="480" ts="1596152029098" s="false" lb="CCSS - Transaction Controller" rc="" rm="Number of samples in transaction : 16, number of failing samples : 5" tn="Thread Group 1-1" dt="" by="393321" sby="38784" ng="1" na="1"/>
+
+<httpSample t="951" it="0" lt="950" ct="510" ts="1596153044488" s="true" lb="CCSS-Login  To get Access Token" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="2487" sby="542" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/cognitoLogin</java.net.URL>
+</httpSample>
+<httpSample t="277" it="0" lt="277" ct="0" ts="1596153045481" s="true" lb="Load Garages" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1234" sby="2452" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups?requestId=GET_LOAD_GARAGES-66b42315-b05a-45be-ac71-b18a890a44dd&amp;tenantId=f83c33ad-760e-4041-a8d4-b92d79d1f35e</java.net.URL>
+</httpSample>
+<httpSample t="935" it="0" lt="756" ct="0" ts="1596153045770" s="true" lb="Centennial_Garage_Details" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="270013" sby="2498" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups/b675171a-a418-4a33-81fd-92d76b502a98?tenantId=f83c33ad-760e-4041-a8d4-b92d79d1f35e&amp;requestId=LOAD_TRACK_LIST_REQUEST_IDe236a9f7-3eca-43b7-8aba-0d1bd2da2625</java.net.URL>
+</httpSample>
+<httpSample t="199" it="0" lt="199" ct="0" ts="1596153046706" s="true" lb="GET_LOGICAL_CHARGE_QUEUE" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1550" sby="2470" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups/b675171a-a418-4a33-81fd-92d76b502a98/logicalChargeQueue?requestId=GET_LOGICAL_CHARGE_QUEUE-573e650b-e7f4-4c3c-92e6-f518f7f1cb6b</java.net.URL>
+</httpSample>
+<httpSample t="233" it="0" lt="233" ct="0" ts="1596153046908" s="true" lb="GET_INCOMING_BUS_QUEUE" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="828" sby="2493" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-iq-ets-test/iq/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/incomingBuses?size=11&amp;requestId=GET_INCOMING_BUS_QUEUE-f7e5cf5b-76b4-49cc-81aa-715b7808f716&amp;sortBy=bookInTime&amp;order=ASC</java.net.URL>
+</httpSample>
+<httpSample t="227" it="0" lt="227" ct="0" ts="1596153047142" s="true" lb="GET_NOTIFICATIONS" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1920" sby="2487" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/notifications?notificationState=TRIGGERED&amp;requestId=GET_NOTIFICATIONS-ab5a393e-ef13-4fa8-9e15-0fc8263fbba1&amp;trackSetupId=b675171a-a418-4a33-81fd-92d76b502a98</java.net.URL>
+</httpSample>
+<httpSample t="288" it="0" lt="288" ct="0" ts="1596153047373" s="false" lb="getm5busstatus (Maintenance Buses)" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2532" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/8/getm5busstatus</java.net.URL>
+</httpSample>
+<httpSample t="249" it="0" lt="249" ct="0" ts="1596153047663" s="false" lb="Get Runs For A Bus" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2677" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-runs-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/runs/7JZTH13JXKS000158</java.net.URL>
+</httpSample>
+<httpSample t="267" it="0" lt="267" ct="0" ts="1596153047915" s="false" lb="getBusDetails" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2708" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/bus/getBusDetails</java.net.URL>
+</httpSample>
+<httpSample t="556" it="0" lt="553" ct="0" ts="1596153048184" s="true" lb="Assets" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="41833" sby="2336" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/assets</java.net.URL>
+</httpSample>
+<httpSample t="328" it="0" lt="328" ct="0" ts="1596153048741" s="true" lb="Charger_States" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="9063" sby="2410" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/chargerStates?requestId=GET_CHARGING_STATES-7df244e8-8d4f-4f7b-92bf-02a21225b817</java.net.URL>
+</httpSample>
+<httpSample t="176" it="0" lt="175" ct="0" ts="1596153049072" s="true" lb="bus?scroll=5m" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="25416" sby="2925" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/counts/bus?scroll=5m</java.net.URL>
+</httpSample>
+<httpSample t="310" it="0" lt="307" ct="0" ts="1596153049250" s="true" lb="GET_CHARGER_FAULTS -charger?scroll=5m" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="38476" sby="2682" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/counts/charger?scroll=5m&amp;requestId=GET_CHARGER_FAULTS-d143ed1e-4e41-4877-b126-3cfc8c75ecd0</java.net.URL>
+</httpSample>
+<httpSample t="168" it="0" lt="168" ct="0" ts="1596153049566" s="true" lb="GET_CHARGER_HISTORY" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="511" sby="2575" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/chargers/chargeSessions?ocppIds=NAMHVC150-US1-1619-975%2C00120C2DF6B03F01%2CHVC150-IT1-1119-045%2CNAMHVC150-US1-1619-974%2CHVC150-IT1-1019-119&amp;start=2020-07-29T04%3A50%3A49Z&amp;end=2020-07-30T04%3A50%3A49Z&amp;requestId=GET_CHARGER_HISTORY-80460d18-c1f5-477b-aaea-aa79281248c8</java.net.URL>
+</httpSample>
+<httpSample t="95" it="0" lt="95" ct="0" ts="1596153049738" s="false" lb="GET_ECMS_POWER_CAPACITY" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2457" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/ecms/power?requestId=GET_ECMS_POWER_CAPACITY-ca58e6e6-7c88-4de4-b3d1-de70b42fc4a6</java.net.URL>
+</httpSample>
+<httpSample t="311" it="0" lt="311" ct="0" ts="1596153049839" s="false" lb="ECMS_POWER_MONITORING" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2540" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/ecms/monitoring?requestId=ECMS_POWER_MONITORING-42d30b15-b9e2-4a7b-95ec-f04ad97c3022&amp;start=2020-07-29T04%3A50%3A49Z&amp;end=2020-07-30T04%3A50%3A49Z&amp;aggIntervalInS=3600</java.net.URL>
+</httpSample>
+
+<httpSample t="1412" it="0" lt="1407" ct="529" ts="1596154173741" s="true" lb="CCSS-Login  To get Access Token" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="2487" sby="542" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/cognitoLogin</java.net.URL>
+</httpSample>
+<httpSample t="220" it="0" lt="220" ct="0" ts="1596154175203" s="true" lb="Load Garages" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1234" sby="2452" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups?requestId=GET_LOAD_GARAGES-36164a30-cbe4-4eee-9eb1-832825dfea45&amp;tenantId=f83c33ad-760e-4041-a8d4-b92d79d1f35e</java.net.URL>
+</httpSample>
+<httpSample t="924" it="0" lt="745" ct="0" ts="1596154175433" s="true" lb="Centennial_Garage_Details" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="270011" sby="2498" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups/b675171a-a418-4a33-81fd-92d76b502a98?tenantId=f83c33ad-760e-4041-a8d4-b92d79d1f35e&amp;requestId=LOAD_TRACK_LIST_REQUEST_ID5d75210d-4292-4dd0-a6e3-0bd79eeea3d1</java.net.URL>
+</httpSample>
+<httpSample t="145" it="0" lt="145" ct="0" ts="1596154176358" s="true" lb="GET_LOGICAL_CHARGE_QUEUE" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1549" sby="2470" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups/b675171a-a418-4a33-81fd-92d76b502a98/logicalChargeQueue?requestId=GET_LOGICAL_CHARGE_QUEUE-f3a41a48-d3a2-49a4-95d2-afb9e8e975c2</java.net.URL>
+</httpSample>
+<httpSample t="269" it="0" lt="269" ct="0" ts="1596154176507" s="true" lb="GET_INCOMING_BUS_QUEUE" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="828" sby="2493" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-iq-ets-test/iq/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/incomingBuses?size=11&amp;requestId=GET_INCOMING_BUS_QUEUE-21a95f3c-290e-4957-93c8-61b9bed2fc22&amp;sortBy=bookInTime&amp;order=ASC</java.net.URL>
+</httpSample>
+<httpSample t="257" it="0" lt="257" ct="0" ts="1596154176777" s="true" lb="GET_NOTIFICATIONS" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1920" sby="2487" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/notifications?notificationState=TRIGGERED&amp;requestId=GET_NOTIFICATIONS-11d17bee-e9e6-4733-b518-7fa0c1ba7a87&amp;trackSetupId=b675171a-a418-4a33-81fd-92d76b502a98</java.net.URL>
+</httpSample>
+<httpSample t="187" it="0" lt="187" ct="0" ts="1596154177038" s="false" lb="getm5busstatus (Maintenance Buses)" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2532" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/8/getm5busstatus</java.net.URL>
+</httpSample>
+<httpSample t="231" it="0" lt="231" ct="0" ts="1596154177228" s="false" lb="Get Runs For A Bus" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2677" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-runs-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/runs/7JZTH13JXKS000158</java.net.URL>
+</httpSample>
+<httpSample t="310" it="0" lt="310" ct="0" ts="1596154177460" s="false" lb="getBusDetails" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2708" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/bus/getBusDetails</java.net.URL>
+</httpSample>
+<httpSample t="622" it="0" lt="620" ct="0" ts="1596154177771" s="true" lb="Assets" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="41833" sby="2336" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/assets</java.net.URL>
+</httpSample>
+<httpSample t="389" it="0" lt="389" ct="0" ts="1596154178393" s="true" lb="Charger_States" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="9063" sby="2410" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/chargerStates?requestId=GET_CHARGING_STATES-cdd029c6-fbba-45d4-b65f-76ef0e274955</java.net.URL>
+</httpSample>
+<httpSample t="275" it="0" lt="275" ct="0" ts="1596154178784" s="true" lb="bus?scroll=5m" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="17378" sby="2925" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/counts/bus?scroll=5m</java.net.URL>
+</httpSample>
+<httpSample t="186" it="0" lt="184" ct="0" ts="1596154179060" s="true" lb="GET_CHARGER_FAULTS -charger?scroll=5m" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="38475" sby="2682" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/counts/charger?scroll=5m&amp;requestId=GET_CHARGER_FAULTS-f297560d-a7f3-4135-956f-984ac7addba4</java.net.URL>
+</httpSample>
+<httpSample t="313" it="0" lt="313" ct="0" ts="1596154179252" s="true" lb="GET_CHARGER_HISTORY" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="511" sby="2575" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/chargers/chargeSessions?ocppIds=NAMHVC150-US1-1619-975%2C00120C2DF6B03F01%2CHVC150-IT1-1119-045%2CNAMHVC150-US1-1619-974%2CHVC150-IT1-1019-119&amp;start=2020-07-29T05%3A09%3A39Z&amp;end=2020-07-30T05%3A09%3A39Z&amp;requestId=GET_CHARGER_HISTORY-e67d1aba-47b8-4136-8486-ed625b11a3bf</java.net.URL>
+</httpSample>
+<httpSample t="314" it="0" lt="314" ct="0" ts="1596154179568" s="false" lb="GET_ECMS_POWER_CAPACITY" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2457" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/ecms/power?requestId=GET_ECMS_POWER_CAPACITY-609e3c49-be81-4455-92e8-afc5af43e615</java.net.URL>
+</httpSample>
+<httpSample t="142" it="0" lt="142" ct="0" ts="1596154179886" s="false" lb="ECMS_POWER_MONITORING" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2540" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/ecms/monitoring?requestId=ECMS_POWER_MONITORING-1dc58619-0052-49bc-809c-d8540e34a8e0&amp;start=2020-07-29T05%3A09%3A39Z&amp;end=2020-07-30T05%3A09%3A39Z&amp;aggIntervalInS=3600</java.net.URL>
+</httpSample>
+
+<httpSample t="1167" it="0" lt="1165" ct="534" ts="1596169034894" s="true" lb="CCSS-Login  To get Access Token" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="2487" sby="542" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/cognitoLogin</java.net.URL>
+</httpSample>
+<httpSample t="263" it="0" lt="263" ct="0" ts="1596169036100" s="true" lb="Load Garages" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1234" sby="2452" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups?requestId=GET_LOAD_GARAGES-b04017e0-39ea-4cc4-affe-5d8e241b7f7a&amp;tenantId=f83c33ad-760e-4041-a8d4-b92d79d1f35e</java.net.URL>
+</httpSample>
+<httpSample t="1045" it="0" lt="860" ct="0" ts="1596169036374" s="true" lb="Centennial_Garage_Details" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="270012" sby="2498" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups/b675171a-a418-4a33-81fd-92d76b502a98?tenantId=f83c33ad-760e-4041-a8d4-b92d79d1f35e&amp;requestId=LOAD_TRACK_LIST_REQUEST_ID5655d84e-6f56-4473-8a48-6d94d810169c</java.net.URL>
+</httpSample>
+<httpSample t="145" it="0" lt="145" ct="0" ts="1596169037420" s="true" lb="GET_LOGICAL_CHARGE_QUEUE" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1550" sby="2470" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups/b675171a-a418-4a33-81fd-92d76b502a98/logicalChargeQueue?requestId=GET_LOGICAL_CHARGE_QUEUE-5a9484c3-3723-4c9f-b8c4-374fb572ed35</java.net.URL>
+</httpSample>
+<httpSample t="297" it="0" lt="297" ct="0" ts="1596169037568" s="true" lb="GET_INCOMING_BUS_QUEUE" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="828" sby="2493" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-iq-ets-test/iq/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/incomingBuses?size=11&amp;requestId=GET_INCOMING_BUS_QUEUE-bf9002d8-bb89-4798-a7a8-805460d9313a&amp;sortBy=bookInTime&amp;order=ASC</java.net.URL>
+</httpSample>
+<httpSample t="285" it="0" lt="285" ct="0" ts="1596169037869" s="true" lb="GET_NOTIFICATIONS" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1920" sby="2487" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/notifications?notificationState=TRIGGERED&amp;requestId=GET_NOTIFICATIONS-3616213f-686e-448a-9858-6c84435fac0c&amp;trackSetupId=b675171a-a418-4a33-81fd-92d76b502a98</java.net.URL>
+</httpSample>
+<httpSample t="314" it="0" lt="314" ct="0" ts="1596169038157" s="false" lb="getm5busstatus (Maintenance Buses)" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2532" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/8/getm5busstatus</java.net.URL>
+</httpSample>
+<httpSample t="401" it="0" lt="401" ct="0" ts="1596169038475" s="false" lb="Get Runs For A Bus" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2677" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-runs-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/runs/7JZTH13JXKS000158</java.net.URL>
+</httpSample>
+<httpSample t="374" it="0" lt="374" ct="0" ts="1596169038878" s="false" lb="getBusDetails" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2708" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/bus/getBusDetails</java.net.URL>
+</httpSample>
+<httpSample t="686" it="0" lt="685" ct="0" ts="1596169039255" s="true" lb="Assets" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="41833" sby="2336" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/assets</java.net.URL>
+</httpSample>
+<httpSample t="481" it="0" lt="481" ct="0" ts="1596169039943" s="true" lb="Charger_States" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="9062" sby="2410" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/chargerStates?requestId=GET_CHARGING_STATES-10feaf6b-3068-4b52-9ae3-2640dcc3a2e4</java.net.URL>
+</httpSample>
+<httpSample t="236" it="0" lt="235" ct="0" ts="1596169040427" s="true" lb="bus?scroll=5m" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="20116" sby="2925" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/counts/bus?scroll=5m</java.net.URL>
+</httpSample>
+<httpSample t="244" it="0" lt="241" ct="0" ts="1596169040666" s="true" lb="GET_CHARGER_FAULTS -charger?scroll=5m" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="38475" sby="2682" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/counts/charger?scroll=5m&amp;requestId=GET_CHARGER_FAULTS-bcb63d84-b526-45af-ad0f-8243b79bde09</java.net.URL>
+</httpSample>
+<httpSample t="139" it="0" lt="139" ct="0" ts="1596169040917" s="true" lb="GET_CHARGER_HISTORY" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="511" sby="2575" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/chargers/chargeSessions?ocppIds=NAMHVC150-US1-1619-975%2C00120C2DF6B03F01%2CHVC150-IT1-1119-045%2CNAMHVC150-US1-1619-974%2CHVC150-IT1-1019-119&amp;start=2020-07-29T09%3A17%3A20Z&amp;end=2020-07-30T09%3A17%3A20Z&amp;requestId=GET_CHARGER_HISTORY-f6ca4438-092f-449e-a9d3-0ee30eed542d</java.net.URL>
+</httpSample>
+<httpSample t="364" it="0" lt="364" ct="0" ts="1596169041059" s="false" lb="GET_ECMS_POWER_CAPACITY" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2457" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/ecms/power?requestId=GET_ECMS_POWER_CAPACITY-99b4a9bf-0c15-43ec-a19e-9bbc6b5be392</java.net.URL>
+</httpSample>
+<httpSample t="119" it="0" lt="119" ct="0" ts="1596169041426" s="false" lb="ECMS_POWER_MONITORING" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2540" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/ecms/monitoring?requestId=ECMS_POWER_MONITORING-aafb0215-94cb-4708-8dcf-fea652a96de7&amp;start=2020-07-29T09%3A17%3A21Z&amp;end=2020-07-30T09%3A17%3A21Z&amp;aggIntervalInS=3600</java.net.URL>
+</httpSample>
+
+<httpSample t="1166" it="0" lt="1162" ct="580" ts="1596169650722" s="true" lb="CCSS-Login  To get Access Token" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="2487" sby="542" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/cognitoLogin</java.net.URL>
+</httpSample>
+<httpSample t="308" it="0" lt="308" ct="0" ts="1596169651938" s="true" lb="Load Garages" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1234" sby="2452" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups?requestId=GET_LOAD_GARAGES-c653d1e1-636a-44f2-9353-f7c78e2d404e&amp;tenantId=f83c33ad-760e-4041-a8d4-b92d79d1f35e</java.net.URL>
+</httpSample>
+<httpSample t="1274" it="0" lt="1062" ct="0" ts="1596169652257" s="true" lb="Centennial_Garage_Details" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="270012" sby="2498" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups/b675171a-a418-4a33-81fd-92d76b502a98?tenantId=f83c33ad-760e-4041-a8d4-b92d79d1f35e&amp;requestId=LOAD_TRACK_LIST_REQUEST_IDc8e6659b-3970-4282-ae5d-615b2bffbf5d</java.net.URL>
+</httpSample>
+<httpSample t="348" it="0" lt="348" ct="0" ts="1596169653532" s="true" lb="GET_LOGICAL_CHARGE_QUEUE" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1550" sby="2470" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups/b675171a-a418-4a33-81fd-92d76b502a98/logicalChargeQueue?requestId=GET_LOGICAL_CHARGE_QUEUE-d42d7cdc-b828-403a-9fe7-781f9ecb91a8</java.net.URL>
+</httpSample>
+<httpSample t="324" it="0" lt="324" ct="0" ts="1596169653883" s="true" lb="GET_INCOMING_BUS_QUEUE" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="828" sby="2493" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-iq-ets-test/iq/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/incomingBuses?size=11&amp;requestId=GET_INCOMING_BUS_QUEUE-eb98c5f2-085a-4ca8-802e-e1babc860077&amp;sortBy=bookInTime&amp;order=ASC</java.net.URL>
+</httpSample>
+<httpSample t="399" it="0" lt="399" ct="0" ts="1596169654209" s="true" lb="GET_NOTIFICATIONS" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1920" sby="2487" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/notifications?notificationState=TRIGGERED&amp;requestId=GET_NOTIFICATIONS-b56b0dd2-4a72-4b47-8d53-10bb4f8b493c&amp;trackSetupId=b675171a-a418-4a33-81fd-92d76b502a98</java.net.URL>
+</httpSample>
+<httpSample t="156" it="0" lt="156" ct="0" ts="1596169654610" s="false" lb="getm5busstatus (Maintenance Buses)" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2532" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/8/getm5busstatus</java.net.URL>
+</httpSample>
+<httpSample t="391" it="0" lt="390" ct="0" ts="1596169654769" s="false" lb="Get Runs For A Bus" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2677" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-runs-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/runs/7JZTH13JXKS000158</java.net.URL>
+</httpSample>
+<httpSample t="434" it="0" lt="434" ct="0" ts="1596169655163" s="false" lb="getBusDetails" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2708" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/bus/getBusDetails</java.net.URL>
+</httpSample>
+<httpSample t="560" it="0" lt="558" ct="0" ts="1596169655599" s="true" lb="Assets" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="41833" sby="2336" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/assets</java.net.URL>
+</httpSample>
+<httpSample t="592" it="0" lt="592" ct="0" ts="1596169656160" s="true" lb="Charger_States" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="9062" sby="2410" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/chargerStates?requestId=GET_CHARGING_STATES-6ea8cbdb-befb-4996-99a5-05dd786fa1b1</java.net.URL>
+</httpSample>
+<httpSample t="429" it="0" lt="428" ct="0" ts="1596169656754" s="true" lb="bus?scroll=5m" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="20116" sby="2925" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/counts/bus?scroll=5m</java.net.URL>
+</httpSample>
+<httpSample t="211" it="0" lt="207" ct="0" ts="1596169657185" s="true" lb="GET_CHARGER_FAULTS -charger?scroll=5m" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="38475" sby="2682" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/counts/charger?scroll=5m&amp;requestId=GET_CHARGER_FAULTS-cd42ba14-b7ed-4092-9bdb-6baea5b8aa6b</java.net.URL>
+</httpSample>
+<httpSample t="179" it="0" lt="179" ct="0" ts="1596169657402" s="true" lb="GET_CHARGER_HISTORY" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="511" sby="2575" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/chargers/chargeSessions?ocppIds=NAMHVC150-US1-1619-975%2C00120C2DF6B03F01%2CHVC150-IT1-1119-045%2CNAMHVC150-US1-1619-974%2CHVC150-IT1-1019-119&amp;start=2020-07-29T09%3A27%3A37Z&amp;end=2020-07-30T09%3A27%3A37Z&amp;requestId=GET_CHARGER_HISTORY-fe7f36d9-f4c5-44cc-846b-250dff474f00</java.net.URL>
+</httpSample>
+<httpSample t="394" it="0" lt="394" ct="0" ts="1596169657582" s="false" lb="GET_ECMS_POWER_CAPACITY" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2457" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/ecms/power?requestId=GET_ECMS_POWER_CAPACITY-b4d5dd3d-24ac-4d9b-8af3-e1ef8787a940</java.net.URL>
+</httpSample>
+<httpSample t="143" it="0" lt="143" ct="0" ts="1596169657977" s="false" lb="ECMS_POWER_MONITORING" rc="504" rm="Gateway Timeout" tn="Thread Group 1-1" dt="text" by="537" sby="2540" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>true</failure>
+    <error>false</error>
+    <failureMessage>Test failed: code expected to equal /
+
+****** received  : [[[504]]]
+
+****** comparison: [[[200]]]
+
+/</failureMessage>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/ecms/monitoring?requestId=ECMS_POWER_MONITORING-ee55e2f0-ec60-4a7b-8ea4-4a2f686cfb7e&amp;start=2020-07-29T09%3A27%3A37Z&amp;end=2020-07-30T09%3A27%3A37Z&amp;aggIntervalInS=3600</java.net.URL>
+</httpSample>
+
+<httpSample t="1521" it="0" lt="1519" ct="542" ts="1596818954630" s="true" lb="CCSS-Login  To get Access Token" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="2491" sby="542" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/cognitoLogin</java.net.URL>
+</httpSample>
+<httpSample t="248" it="0" lt="248" ct="0" ts="1596818956200" s="true" lb="Load Garages" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1234" sby="2456" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups?requestId=GET_LOAD_GARAGES-18a3b99d-9322-46cf-9c6c-d88fa76aaf73&amp;tenantId=f83c33ad-760e-4041-a8d4-b92d79d1f35e</java.net.URL>
+</httpSample>
+<httpSample t="771" it="0" lt="587" ct="0" ts="1596818956458" s="true" lb="Centennial_Garage_Details" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="269773" sby="2502" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups/b675171a-a418-4a33-81fd-92d76b502a98?tenantId=f83c33ad-760e-4041-a8d4-b92d79d1f35e&amp;requestId=LOAD_TRACK_LIST_REQUEST_ID4301d737-f131-4a41-9cba-460541cd57f6</java.net.URL>
+</httpSample>
+<httpSample t="244" it="0" lt="244" ct="0" ts="1596818957230" s="true" lb="GET_LOGICAL_CHARGE_QUEUE" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="702" sby="2474" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/trackSetups/b675171a-a418-4a33-81fd-92d76b502a98/logicalChargeQueue?requestId=GET_LOGICAL_CHARGE_QUEUE-655e732f-6558-4dd8-8f9a-6df4cd58e63f</java.net.URL>
+</httpSample>
+<httpSample t="133" it="0" lt="133" ct="0" ts="1596818957475" s="true" lb="GET_INCOMING_BUS_QUEUE" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1778" sby="2497" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-iq-ets-test/iq/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/incomingBuses?size=11&amp;requestId=GET_INCOMING_BUS_QUEUE-e7394b0d-41c6-4473-aa7b-90e4d5b4c844&amp;sortBy=bookInTime&amp;order=ASC</java.net.URL>
+</httpSample>
+<httpSample t="263" it="0" lt="263" ct="0" ts="1596818957609" s="true" lb="GET_NOTIFICATIONS" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1298" sby="2491" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/notifications?notificationState=TRIGGERED&amp;requestId=GET_NOTIFICATIONS-6eb7d27c-05e7-4d18-898f-ddb6dba993af&amp;trackSetupId=b675171a-a418-4a33-81fd-92d76b502a98</java.net.URL>
+</httpSample>
+<httpSample t="330" it="0" lt="330" ct="0" ts="1596818957872" s="true" lb="getm5busstatus (Maintenance Buses)" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="983" sby="2536" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/8/getm5busstatus</java.net.URL>
+</httpSample>
+<httpSample t="699" it="0" lt="699" ct="0" ts="1596818958203" s="true" lb="Get Runs For A Bus" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="11649" sby="2681" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-runs-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/runs/7JZTH13JXKS000158</java.net.URL>
+</httpSample>
+<httpSample t="808" it="0" lt="808" ct="0" ts="1596818958903" s="true" lb="getBusDetails" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="15684" sby="2712" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/bus/getBusDetails</java.net.URL>
+</httpSample>
+<httpSample t="565" it="0" lt="563" ct="0" ts="1596818959711" s="true" lb="Assets" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="41833" sby="2340" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/assets</java.net.URL>
+</httpSample>
+<httpSample t="332" it="0" lt="332" ct="0" ts="1596818960277" s="true" lb="Charger_States" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="8988" sby="2414" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ams-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/chargerStates?requestId=GET_CHARGING_STATES-96190d28-b977-4bd1-a3a5-4229c02575d1</java.net.URL>
+</httpSample>
+<httpSample t="378" it="0" lt="378" ct="0" ts="1596818960610" s="true" lb="bus?scroll=5m" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="1014" sby="2929" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/counts/bus?scroll=5m</java.net.URL>
+</httpSample>
+<httpSample t="293" it="0" lt="292" ct="0" ts="1596818960989" s="true" lb="GET_CHARGER_FAULTS -charger?scroll=5m" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="23407" sby="2686" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/counts/charger?scroll=5m&amp;requestId=GET_CHARGER_FAULTS-54ac6794-78be-41bf-9332-28114b41132a</java.net.URL>
+</httpSample>
+<httpSample t="191" it="0" lt="191" ct="0" ts="1596818961317" s="true" lb="GET_CHARGER_HISTORY" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="7328" sby="2579" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-datalake-ets-test/v1/connectedportal/chargers/chargeSessions?ocppIds=NAMHVC150-US1-1619-975%2C00120C2DF6B03F01%2CHVC150-IT1-1119-045%2CNAMHVC150-US1-1619-974%2CHVC150-IT1-1019-119&amp;start=2020-08-06T09%3A49%3A21Z&amp;end=2020-08-07T09%3A49%3A21Z&amp;requestId=GET_CHARGER_HISTORY-0ad4c167-f629-4127-bcdd-676e583494a1</java.net.URL>
+</httpSample>
+<httpSample t="161" it="0" lt="161" ct="0" ts="1596818961509" s="true" lb="GET_ECMS_POWER_CAPACITY" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="904" sby="2461" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/ecms/power?requestId=GET_ECMS_POWER_CAPACITY-94355d13-b7e0-4f19-bf8c-3051ff692a35</java.net.URL>
+</httpSample>
+<httpSample t="310" it="0" lt="310" ct="0" ts="1596818961672" s="true" lb="ECMS_POWER_MONITORING" rc="200" rm="OK" tn="Thread Group 1-1" dt="text" by="2426" sby="2544" ng="1" na="1">
+  <assertionResult>
+    <name>Response Assertion - 200</name>
+    <failure>false</failure>
+    <error>false</error>
+  </assertionResult>
+  <java.net.URL>https://exp-api.proterra.com/exp-ccss-ets-test/v1/tenants/f83c33ad-760e-4041-a8d4-b92d79d1f35e/garages/b675171a-a418-4a33-81fd-92d76b502a98/ecms/monitoring?requestId=ECMS_POWER_MONITORING-e14b0ab5-080e-45b0-b590-097a8118d91e&amp;start=2020-08-06T09%3A49%3A21Z&amp;end=2020-08-07T09%3A49%3A21Z&amp;aggIntervalInS=3600</java.net.URL>
+</httpSample>
+
+</testResults>

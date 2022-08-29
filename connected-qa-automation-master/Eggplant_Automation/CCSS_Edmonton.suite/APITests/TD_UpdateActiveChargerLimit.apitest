@@ -1,0 +1,27 @@
+{
+    URLparameters = (
+	{
+	    checkedNumber = <*BY>;
+	    param = "";
+	    showCheckedNumber = <*BY>;
+	    value = "";
+	}
+    );
+    authenticationType = None;
+    httpVerb = POST;
+    oauth1Token = "";
+    password = "";
+    requestBody = "{
+    \"id\": \"UPDATE_ECMS_POWER_CAPACITY-42f34733-6dd9-485f-ba44-f51b69f8d5c6\",
+    \"chargerLimit\": [[chargerLimit]]
+}";
+    requestBodyFormat = "JSON (application/json)";
+    requestHeaders = "<![CDATA[authorization:[[authToken]]
+content-type:application/json
+]]>";
+    requests = "";
+    testResults = "";
+    testScript = "";
+    url = "[[BaseURI]]/tenants/[[tenantId]]/garages/[[garageId]]/ecms/power";
+    userName = "";
+}

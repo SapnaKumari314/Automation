@@ -1,0 +1,48 @@
+{
+	"originalcapturelocation": [
+		610,
+		158,
+		420,
+		560
+	],
+	"lastmodifieddate": 1647952210.9060001,
+	"createddate": 1647950396.6160002,
+	"name": "Generic/imgSynch1",
+	"lastfounddate": 1647952133.6269999,
+	"ocrcapturestring": "150 0 8:00-16:00 00:00-8:00 16:00-24:00 https://proterrauatedmonton.ca/ROB^te^ 5",
+	"lastfoundlocation": [
+		954,
+		530,
+		28,
+		27
+	],
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"deleted": true,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[210,280]",
+					"Tolerance": "_66",
+					"Discrepancy": "_0",
+					"SearchType": "Smoothed for Text"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "Generic/imgSynch1/imgSynch1.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"capturerect": [
+					610,
+					158,
+					420,
+					560
+				],
+				"connectiontype": "RDP",
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com"
+			}
+	]
+}

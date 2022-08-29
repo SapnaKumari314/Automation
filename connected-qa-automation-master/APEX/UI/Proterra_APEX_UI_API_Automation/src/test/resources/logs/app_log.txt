@@ -1,0 +1,9 @@
+INFO    2021-02-22 09:24:45,039 [main] test.java.com.proterra.testcases.apexUI.BaseTestClass  - Config properties file loaded
+INFO    2021-02-22 09:24:51,217 [main] test.java.com.proterra.testcases.apexUI.BaseTestClass  - Driver Initialized !!!
+INFO    2021-02-22 09:24:51,493 [main] test.java.com.proterra.testcases.apexUI.BaseTestClass  - Test Started
+INFO    2021-02-22 09:24:54,834 [main] test.java.com.proterra.testcases.apexUI.BaseTestClass  - Test Completed
+INFO    2021-02-22 09:24:54,836 [main] test.java.com.proterra.testcases.apexUI.BaseTestClass  - Test Started
+INFO    2021-02-22 09:25:04,966 [main] test.java.com.proterra.testcases.apexUI.BaseTestClass  - Test Completed
+INFO    2021-02-22 09:25:04,966 [main] test.java.com.proterra.testcases.apexUI.BaseTestClass  - Test Started
+INFO    2021-02-22 09:25:07,367 [main] test.java.com.proterra.testcases.apexUI.BaseTestClass  - Test Completed
+INFO    2021-02-22 09:25:08,722 [main] test.java.com.proterra.testcases.apexUI.BaseTestClass  - Test Suite Execution Completed !!!

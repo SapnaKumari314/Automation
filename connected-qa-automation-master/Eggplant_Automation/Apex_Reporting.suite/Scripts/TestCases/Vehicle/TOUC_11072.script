@@ -1,0 +1,223 @@
+﻿(***
+@Author: Himaja R
+@Date: 1/Aug/22
+@TC_ID: TOUC_11072
+@TC_Description: NTC162_Verify data correctness of csv exported for Proterra Admin User for Asset Type Vehicle & Time Type Specific Point Of Time while using option Data fields & Explanations both radio button
+@Modified Date:
+***)
+
+BeginTestCase TOUC_11072
+
+Log "###########   Started execution of Test Case--> TOUC_11072   ##############"
+Log "#######################################################"
+--testdata
+
+set Global ConfigValues to {MinTimeOut:"4",BasicTimeOut:"10",MediumTimeOut:"20",LongTimeOut:"30"}
+set AssetType to "Vehicle"
+set Global TimeZone to  "UTC"
+set CSVFileName to "TOUC_11072"
+set TestDataExcelFileName to "Vehicle.xlsx"
+set ExcelSheetName to "SpecificTimeofDay"
+set ExcelColsExplainationSheetName to "SpecificTimeofDayExplanations"
+
+--To get response from Open Search
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+get OpenSearchDashboard.OpenApplication_OpenSearch
+
+get OpenSearchDashboard.OpenSearchLogin
+
+
+put "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), ExcelSheetName, "BusVIN") into  BusVIN
+put "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), ExcelSheetName, "QueryFromDate") into  From
+put "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), ExcelSheetName, "QueryToDate") into  To
+put  "Handlers/VehicleSpecificTimeofDay".VehicleSpecificTimeofDayQuery(BusVIN,From,To) into Query
+put "Handlers/ReportHandlers".getTheResponseFromOpenSearchAndSave(Query,"TOUC_11072_Response") into Response
+
+
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
+get LoginPage.OpenApplication
+
+--Step 1:
+--Login as a Proterra Admin in Apex Portal
+--Logged In successful to Apex Portal.
+get LoginPage.Login
+
+--Step 2:
+--Under Historical Data on Left menu choose Reporting
+--Reporting Dashboard Page Opens on Right
+put ApexCommonHandlers.NavigateTo("Historical Data","Reporting") into ReturnVal
+put "Handlers/ReportHandlers".VerifyReportingPageOpened into ReturnVal
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Step 3
+--Select Customers, Asset Type As Vehicle, Asset IDs as  Vehicle Names , Time Type as Aggregation, From Date and To Date
+put  "Utilities/ExcelOperations".readColumDataFrom(Resourcepath("Vehicle.xlsx"), ExcelSheetName, "CustomersName") into Customers
+
+//3.1To select customer
+put "Handlers/ReportHandlers".SelectCustomer(Customers) into  ReturnVal 
+
+//3.2 To select AssetType
+set AssetType to "Vehicle"
+put "Handlers/ReportHandlers".SelectAssetType(AssetType)
+
+//3.3 To select Asset ID
+put  "Utilities/ExcelOperations".readColumDataFrom(Resourcepath("Vehicle.xlsx"), ExcelSheetName, "AssetID") into AssetID
+put "Handlers/ReportHandlers".SelectAssetID(AssetID) into  ReturnVal 
+
+
+//3.4 To select time type
+set TimeType to "Specific Time of Day"
+put "Handlers/ReportHandlers".SelectAndVerifyTimeType(TimeType) into  ReturnVal 
+
+//3.5 To Select date
+
+put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), ExcelSheetName, "SelectDateDay") into SelectDateDay
+put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), ExcelSheetName, "SelectDateMon") into SelectDateMon
+put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), ExcelSheetName, "SelectDateYear") into SelectDateYear
+put "Handlers/ReportHandlers".SelectDateFromDatePickerWindow(SelectDateDay,SelectDateMon,SelectDateYear,"Select Date")
+
+
+////3.6 To Select Time
+put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), ExcelSheetName, "TimeValues") into TimeValues
+
+put "Handlers/ReportHandlers".DatePickerTime(TimeValues,"Select Date")
+
+//--Step 4: To select all the data fileds
+//All Columns Selected and comes in Drag and Drop Zone
+get  "Handlers/ReportHandlers".SelectAllDataFields
+
+
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Step 5:Click on the Export CSV button
+--A Pop Up page appears with two radio buttons having a single select option, where user can choose from the valid options:
+--> Both data columns and data column explanations
+--or
+--> Only data columns
+
+--Step 6:
+--Verify that by default Both data columns and data column explanations radio button  is selected
+--Verified that by default Both data columns and data column explanations radio button is selected
+
+--Step 7:
+--Click on Export Button
+--Verify that a pop up message comes that Success : Your file [Asset Type][Time Type][ReportRunDateTime].CSV ( CSV name format ) is now processing
+
+put "Handlers/ReportHandlers".VerifyExportCSVProcessingPopUp("Data fields and explanations","2.5","Specific Time of Day",AssetType)
+
+
+put "Handlers/ReportHandlers".ExportCSVAndReturnTimeStamp("Data fields and explanations","UTC") into TimeStampList
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--Step 8:
+--Wait for few minutes ( approx 1 minute ) and then Click on Downloads button
+--Verify that we see the Downloaded file in browser to user in name format -
+--[Asset Type][Time Type][ReportRunDateTime].CSV
+
+get "Handlers/ReportHandlers".ClickAndVerifyDownloadsBtn
+
+put "Handlers/VehicleSpecificTimeofDay".validateSpecificTimeofDayFileDownloaded("Vehicle","SpecificTimeofDay",TimeStampList) into TimeStamp
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Step 9:
+--Verify the name format of downloaded CSV is correct
+--Verified the name format of downloaded CSV is correct
+//C:\Users\Rhimaja\Downloads\Vehicle_Aggregation_2022-07-04_18-01-05.csv
+put "Handlers/FileOperations".VerifyAndOpenDownloadedFile("C:\Users\Rhimaja\Downloads\Vehicle_Specific Time of Day_"&TimeStamp&".csv") into CSVDataToVerify
+
+put "Handlers/FileOperations".createCSVFileAndWrite(CSVFileName,CSVDataToVerify)
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+--Step 10:
+--Verify that downloaded CSV contains - columns explanations first and then column names as per Reporting Matrix
+--Verified that downloaded CSV contains - columns explanations first and then column names as per Reporting Matrix
+
+--Step 11:
+--Verify that the exported data in CSV is sorted as per columns chosen in drag and drop zone - (cross check column orders in downloaded CSV as per reporting matrix)
+--Verified that the exported data is sorted as per user data attributes filters chosen in drag and drop zone and is matching the reporting matrix
+
+put "Handlers/ReportHandlers".readAndVerifyDataFieldExplanations(CSVFileName,TestDataExcelFileName,ExcelColsExplainationSheetName)
+
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+--12
+--Verify the data accuracy of the column values in downloaded csv by comparing values obtained from open search against the indexes  mentioned for Data Attributes Column in Reporting Matrix
+
+--Verified the data accuracy of the column values in downloaded csv by comparing values obtained from open search against the indexes  mentioned for Data Attributes Column in Reporting Matrix
+
+
+
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX------TEST DATA------------XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+set JSONFileName to "TOUC_11072_Response"
+set CSVFileName to "TOUC_11072"
+put "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "SpecificTimeofDay", "BusVIN") into  BusVIN
+put "Handlers/FileOperations".ReadFromCSVFile(CSVFileName ) into CSVData
+put "Handlers/FileOperations".getJSONValueFromJSONFile(JSONFileName) into Response
+put  "Utilities/ExcelOperations".readTestDataFrom(Resourcepath("Vehicle.xlsx"), "SpecificTimeofDay", "Metric") into Metric
+
+------------------------------------------Customer Name---------------------------------------------------------------------------------
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+------------------------------------------Customer Vehicle Name---------------------------------------------------------------------------------
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+get "Handlers/VehicleSpecificTimeofDay".ValidateDataCorrectness(BusVIN,CSVData,Response,2,Metric,"getCustomerVehicleName","Customer Vehicle Name")
+
+------------------------------------------Vehicle Identification Number---------------------------------------------------------------------------------
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+get "Handlers/VehicleSpecificTimeofDay".ValidateDataCorrectness(BusVIN,CSVData,Response,2,Metric,"getVehicleIdentificationNumber","Vehicle Identification Number")
+
+
+------------------------------------------Last Data Transmission---------------------------------------------------------------------------------
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+get "Handlers/VehicleSpecificTimeofDay".ValidateDataCorrectness(BusVIN,CSVData,Response,2,Metric,"getLastDataTransmission","Last Data Transmission")
+
+------------------------------------------Odometer Value---------------------------------------------------------------------------------
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+//zzzzzzzzzzzzz
+get "Handlers/VehicleSpecificTimeofDay".ValidateDataCorrectness(BusVIN,CSVData,Response,2,Metric,"getOdometerValue","Odometer Value")
+
+
+
+------------------------------------------Battery State of Charge (%)---------------------------------------------------------------------------------
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
+get "Handlers/VehicleSpecificTimeofDay".ValidateDataCorrectness(BusVIN,CSVData,Response,2,Metric,"getBatteryStateofCharge","Battery State of Charge (%)")
+
+
+--------------------------------------------------------Efficiency (Distance driven per kWh)---------------------------------------------------------------------------------
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+get "Handlers/VehicleSpecificTimeofDay".ValidateDataCorrectness(BusVIN,CSVData,Response,2,Metric,"getEfficiencyDistancedrivenperkWh","Efficiency (Distance driven per kWh)")
+--------------------------------
+------------------------Vehicle Status---------------------------------------------------------------------------------
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+get "Handlers/VehicleSpecificTimeofDay".ValidateDataCorrectness(BusVIN,CSVData,Response,2,Metric,"getVehicleStatus","Vehicle Status")
+
+--------------------------------------------------------Ambient Temperature---------------------------------------------------------------------------------
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+get "Handlers/VehicleSpecificTimeofDay".ValidateDataCorrectness(BusVIN,CSVData,Response,2,Metric,"getAmbientTemperature","Ambient Temperature")
+
+
+--------------------------------------------------------Cabin Temperature---------------------------------------------------------------------------------
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+get "Handlers/VehicleSpecificTimeofDay".ValidateDataCorrectness(BusVIN,CSVData,Response,2,Metric,"getCabinTemperature","Cabin Temperature")
+
+--------------------------------------------------------Vehicle Model---------------------------------------------------------------------------------
+//XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+get "Handlers/VehicleSpecificTimeofDay".ValidateDataCorrectness(BusVIN,CSVData,Response,2,Metric,"getVehicleModel","Vehicle Model")
+
+get "Handlers/ReportHandlers".CloseDownloadsWindow
+
+LoginPage.Logout
+//====================
+Log "#############  Finished execution of Test Case--> TOUC_11072 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_11072
+
+
+

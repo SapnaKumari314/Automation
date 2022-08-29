@@ -1,0 +1,82 @@
+﻿(***
+@Author: Vivek Mamgain
+@Date: 05/Aug/22
+@TC_ID: TOUC_3440
+@TC_Description: CCSS-Charger History: Charge History component
+***)
+
+BeginTestCase TOUC_3440
+
+Log "###########   Started execution of Test Case--> TOUC_3440 ##############"
+Log "#######################################################"
+
+--Navigate to the Proterra CCSS Home Page
+"CCSS_Pages/BasePage".OpenApplication
+
+--Enter valid username and password and submit
+"CCSS_Pages/BasePage".Login
+
+--Simulator setup - Generate fault
+"CCSS_Pages/PrerequsiteTestData/ChargerSimulator".StartSimulator
+"CCSS_Pages/PrerequsiteTestData/ChargerSimulator".GenerateFault
+"CCSS_Pages/PrerequsiteTestData/ChargerSimulator".NavigateToApplicationTab
+-------
+
+--Navigate to Garage Overview screen by selecting 'Garage Overview' link from main menu
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Garage Overview", "Garage Overview",1
+"CCSS_Pages/GarageOverview".NavigateToElement "Charge History", "LogicalChargeQueueArea"
+--Click on ellipsis / Menu should be disabled
+
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", "Charging Station ID", "LogicalChargeQueueArea", 0,0,10,20
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", "Bus ID", "LogicalChargeQueueArea", 0,0,10,20
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", "Charging Start Time", "LogicalChargeQueueArea", 0,0,10,20
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", "Charging Session Duration", "LogicalChargeQueueArea", 0,0,10,20
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", "Energy Delivered (kWh)", "LogicalChargeQueueArea", 0,0,10,20
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", "Termination Reason", "LogicalChargeQueueArea", 0,0,10,20
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P3_TestData.xlsx", "ChargeHistory", "ChargingStationID") into ChargingStationID
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", ChargingStationID, "LogicalChargeQueueArea", 0,0,10,20
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P3_TestData.xlsx", "ChargeHistory", "BusID") into BusID
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", BusID, "LogicalChargeQueueArea", 0,0,10,20
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P3_TestData.xlsx", "ChargeHistory", "EnergyDelivered") into EnergyDelivered
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", EnergyDelivered, "LogicalChargeQueueArea", 0,0,10,20
+--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P3_TestData.xlsx", "ChargeHistory", "TerminationReason") into TerminationReason
+--"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", TerminationReason, "LogicalChargeQueueArea", 0,0,10,20
+
+put today  into chargingStartTime
+put formattedtime("%d-%m-%y", chargingStartTime) into chargingStartTime
+log chargingStartTime
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent "", chargingStartTime, "LogicalChargeQueueArea", 0,0,10,20
+
+
+--Click on Main Menu and navigate to 'Charger Control' screen
+"CCSS_Pages/RunAndAssignmentTrackPage".NavigatePageAfterClickMenuIcon "Charger Control", "Charger Control", 2
+"CCSS_Pages/GarageOverview".NavigateToElement "Charge History", "LogicalChargeQueueArea"
+--Click on ellipsis / Menu should be disabled
+
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", "Charging Station ID", "LogicalChargeQueueArea", 0,0,10,20
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", "Bus ID", "LogicalChargeQueueArea", 0,0,10,20
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", "Charging Start Time", "LogicalChargeQueueArea", 0,0,10,20
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", "Charging Session Duration", "LogicalChargeQueueArea", 0,0,10,20
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", "Energy Delivered (kWh)", "LogicalChargeQueueArea", 0,0,10,20
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", "Termination Reason", "LogicalChargeQueueArea", 0,0,10,20
+
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P3_TestData.xlsx", "ChargeHistory", "ChargingStationID") into ChargingStationID
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", ChargingStationID, "LogicalChargeQueueArea", 0,0,10,20
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P3_TestData.xlsx", "ChargeHistory", "BusID") into BusID
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", BusID, "LogicalChargeQueueArea", 0,0,10,20
+put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P3_TestData.xlsx", "ChargeHistory", "EnergyDelivered") into EnergyDelivered
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", EnergyDelivered, "LogicalChargeQueueArea", 0,0,10,20
+--put "Utilities/ExcelOperations".readTestDataFrom ("TestData\CCSS_P3_TestData.xlsx", "ChargeHistory", "TerminationReason") into TerminationReason
+--"CCSS_Pages/GarageOverview".VerifyTextIsPresent  "", TerminationReason, "LogicalChargeQueueArea", 0,0,10,20
+
+put today  into chargingStartTime
+put formattedtime("%d-%m-%y", chargingStartTime) into chargingStartTime
+log chargingStartTime
+"CCSS_Pages/GarageOverview".VerifyTextIsPresent "", chargingStartTime, "LogicalChargeQueueArea", 0,0,10,20
+
+
+Log "#############  Finished execution of Test Case--> TOUC_3440############"
+Log "#######################################################"
+
+EndTestCase TOUC_3440

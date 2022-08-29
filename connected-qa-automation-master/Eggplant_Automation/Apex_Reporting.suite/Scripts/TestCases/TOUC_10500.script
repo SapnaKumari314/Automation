@@ -1,0 +1,71 @@
+﻿(***
+@Author: Himaja R
+@Date: 13/Jul/22
+@TC_ID: TOUC_10500
+@TC_Description:TC072_Verify that for a Proterra Admin User when he clicks on Export Button he gets two single select option - 1) Both data columns and data column explanations (default) and 2) Only data columns
+@Modified Date:
+***)
+
+BeginTestCase TOUC_10500
+
+Log "###########   Started execution of Test Case--> TOUC_10500   ##############"
+Log "#######################################################"
+--testdata
+set Global ConfigValues to {MinTimeOut:"4",BasicTimeOut:"15",MediumTimeOut:"20",LongTimeOut:"35"}
+get LoginPage.OpenApplication
+
+--Step 1:
+--Login as a Proterra Admin in Apex Portal
+--Logged In successful to Apex Portal.
+get LoginPage.Login
+
+--Step 2:
+--Under Historical Data on Left menu choose Reporting
+--Reporting Dashboard Page Opens on Right
+
+put ApexCommonHandlers.NavigateTo("Historical Data","Reporting") into ReturnVal
+put "Handlers/ReportHandlers".VerifyReportingPageOpened into ReturnVal
+
+
+--To Select Customers, Asset Type As Vehicle, Asset IDs as Vehicle Names , Time Type as Daily Intervals , From Date and To Date
+put  "Utilities/ExcelOperations".readColumDataFrom(Resourcepath("Vehicle.xlsx"), "DailyIntervals", "CustomersName") into Customers
+
+//To select customer
+put "Handlers/ReportHandlers".SelectCustomer(Customers) into  ReturnVal 
+
+set AssetType to ["Vehicle","Charger"]
+Put any item of AssetType into AssetType
+
+// To select Asset ID
+if AssetType is "Vehicle"
+	put  "Utilities/ExcelOperations".readColumDataFrom(Resourcepath("TOUC_10500_TestData.xlsx"), "Data", "VehicleAssetID") into AssetID
+else
+	put  "Utilities/ExcelOperations".readColumDataFrom(Resourcepath("TOUC_10500_TestData.xlsx"), "Data", "ChargerAssetID") into AssetID
+end if 
+
+
+//Step 3
+//Choose all mandatory column values for any asset type and charger type combination
+//Selected a mandatory column values for any asset type and charger type combination
+"Handlers/ReportHandlers".SelectAnyAssetTypeAndTimeType AssetType
+
+put "Handlers/ReportHandlers".SelectAssetID(AssetID) into  ReturnVal 
+
+//To select al the data fileds
+"Handlers/ReportHandlers".SelectAllDataFields
+
+--Step 4:
+--Click on the Export CSV button
+--User gets two single select option - 1) Both data columns and data column explanations (default) and 2) Only data columns
+"Handlers/ReportHandlers".VerifyExportToCSVWindow
+
+"Handlers/ReportHandlers".CancelExportToCSVPrompt
+
+LoginPage.Logout
+
+///====================
+Log "#############  Finished execution of Test Case--> TOUC_10500 ############"
+Log "#######################################################"
+
+EndTestCase TOUC_10500
+

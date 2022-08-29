@@ -1,0 +1,2721 @@
+﻿(***
+@Author: Shalini V
+@Date: 27/June/2022
+@Description: Its a Global Library to use across the test cases.
+***)
+
+function ScreenPart Portion
+	// Set up an easy-to-maintain property list that stores the necessary multipliers for the specified screen portion parameter value
+	set screenPortions to {
+		ApexPagesArea :[[0,0.12],[.15,0.95]],
+		CustomerSelection:[[.125,.125],[.5,.5]],
+		AssetSelection:[[0.45,.105],[.90,.30]],
+		FaultDashboard:[[0.12,.35],[1,0.95]],
+		GetData:[[.9,0.2],[1,.35]],
+		FaultPriority:[[.125,.1],[.5,.45]],
+		FaultStatus:[[.3,.15],[0.5,.40]],
+		VIN:[[.15,1],[0.5,10]],
+		IndividualPopup:[[.6,0],[1,0.85]],
+	}
+	set multiplier to screenPortions.(Portion) // Retrieves the value for the key in the property list. The name of the key is passed as a parameter into the function.
+	// Error handling is needed in the event that an unrecognized parameter is passed to the function
+	if multiplier is empty then
+		throw "Parameter error", Portion && "is not a recognized screen portion."
+	end if
+	return [the remoteScreenSize,the remotescreenSize] * multiplier
+End ScreenPart
+
+function SearchRect AreaName
+	set screenPortions to {
+		
+		FDDashboard:[474,452,1890,499],
+		FaultDetails:[1177,210,1885,329],
+		FDDescription:[1166,333,1891,446],
+		FaultDashboard:[273,394,1905,943],
+		FDDashboardFiltered:[267,453,1893,1002],
+		VehicleNameDashboard:[279,451,1883,500],
+		SPNColumn:[655,406,786,453],  
+		GroupByFaultSPNColumn:[659,445,740,503],
+		VINColumn:[477,401,658,458],
+		FMIColumn:[827,451,989,499], 
+		SourceAddressColumn:[1689,448,1858,496],
+		CustomizeArea:[1450,342,1685,666],
+		SPNColumnwithFilter:[663,461,827,515],
+		TimeofFaultCoumn:[1526,405,1678,454],
+	
+	}
+	return screenPortions.(AreaName)
+	
+end SearchRect
+
+--put SearchRect(FDDashboard) into SearchArea 
+------------------------------------------------------------------------------------------------
+--Description: Handler to fetch the row data from fault dashboard
+---Input : MainPageTab,SubPageTab
+---output: None
+---Created by:Shalini V
+------------------------------------------------------------------------------------------------
+
+(*put SearchRect("VehicleNameDashboard") into Position 
+put FetchFaultDashboardHorizontalData_Vehicle (SearchArea,"FDFrontEndValueVehicle") into NumofRows
+log NumofRows*)
+
+FetchFaultDashboardHorizontalData_Vehicle 
+
+
+to handle FetchFaultDashboardHorizontalData_Vehicle  
+	try 
+		Global Iteration,ConfigValues
+		Log "Start fetching values from FD dashboard"
+		put 0 into iFlag
+		--put SearchRect(Position) into Position 
+		
+		
+		set the searchrectangle to ScreenPart("FaultDashboard")
+		put imagelocation(text:"Vehicle Name") into  DashboardSearchPortion
+		
+		put DashboardSearchPortion+[-50,-23] into Pos1
+		Put DashboardSearchPortion+[1800,30] into Pos2
+		set Position to   [item 1 of Pos1,item 2 of Pos1, item 1 of Pos2,item 2 of Pos2]
+		set the searchrectangle to Position
+		
+		If  ImageFound(Text:"No Rows To Show",caseSensitive:no, waitFor:ConfigValues.BasicTimeOut)  is false then
+			set the searchrectangle to Position
+			
+			--	log readtext( the searchrectangle,contrastColor:"#323355", contrast:"On", WaitFor:8, contrastTolerance:"45")
+			Repeat until length of readtext( the searchrectangle,searchrectangle:Position) < 15
+				If readtext( the searchrectangle) contains "Vehicle Name" is false
+					put iFlag +1 into iFlag	
+				end if
+				
+				set the searchrectangle to Position
+				
+				put  readtext( the searchrectangle) into DashboardRowData
+				log DashboardRowData
+				put (item 2 of Position)+50 into item 2 of Position 
+				put (item 4 of Position)+50 into item 4 of Position 
+				
+				wait 3
+				
+			End Repeat
+			--	log "There are totally" &&iFlag-1 &&"data fetched from frontend"
+			log "There are totally" &&iFlag &&"data fetched from frontend"
+		Else
+			
+			Logerror "There are no values in the Fault dashboard"
+			
+			
+		End if
+		--put iFlag-1 into NoOfRows
+		put iFlag into NoOfRows
+		set the SearchRectangle to empty
+	Catch exception	
+		get "Utilities/GenericOperations".LogException(exception,FetchFaultDashboardHorizontalData_Vehicle)
+		
+	End try
+	return NoOfRows
+End FetchFaultDashboardHorizontalData_Vehicle
+
+
+to handle FetchFaultDashboardHorizontalData_Vehicle_Obsolete   Position
+	try 
+		Global Iteration,ConfigValues
+		Log "Start fetching values from FD dashboard"
+		put 0 into iFlag
+		put SearchRect(Position) into Position 
+		
+		
+		(*set the searchrectangle to ScreenPart("FaultDashboard")
+		put imagelocation(text:"Vehicle Name") into  DashboardSearchPortion
+		
+		put DashboardSearchPortion+[-50,-23] into Pos1
+		Put DashboardSearchPortion+[1800,28] into Pos2
+		set Position to   [item 1 of Pos1,item 2 of Pos1, item 1 of Pos2,item 2 of Pos2]*)
+		set the searchrectangle to Position
+		
+		If  ImageFound(Text:"No Rows To Show",caseSensitive:no, waitFor:ConfigValues.BasicTimeOut)  is false then
+			set the searchrectangle to Position
+			
+			//	log readtext( the searchrectangle)
+			Repeat until length of readtext( the searchrectangle) < 15
+				If readtext( the searchrectangle) contains "Vehicle Name" is false
+					put iFlag +1 into iFlag	
+				end if
+				
+				set the searchrectangle to Position
+				
+				put  readtext( the searchrectangle) into DashboardRowData
+				log DashboardRowData
+				put (item 2 of Position)+50 into item 2 of Position 
+				put (item 4 of Position)+50 into item 4 of Position 
+				
+				wait 3
+				//	put "RowValue"&& iFlag into RowdataValue
+				
+				(*if length of readtext( the searchrectangle) < 15 is false then
+				"Utilities\exceloperations".CreateOutputFile Outputfilename&&(iFlag)
+				"Utilities\exceloperations".WriteIntoFile Outputfilename&&(iFlag),  "", DashboardRowData
+			End if*)
+				
+			End Repeat
+			log "There are totally" &&iFlag-1 &&"data fetched from frontend"
+			--log "There are totally" &&iFlag &&"data fetched from frontend"
+		Else
+			
+			Logerror "There are no values in the Fault dashboard"
+			
+			
+		End if
+		put iFlag-1 into NoOfRows
+		--put iFlag into NoOfRows
+		set the SearchRectangle to empty
+	Catch exception	
+		get "Utilities/GenericOperations".LogException(exception,FetchFaultDashboardHorizontalData_Vehicle)
+		
+	End try
+	return NoOfRows
+End FetchFaultDashboardHorizontalData_Vehicle_Obsolete
+-----------------------------------------------------
+--Description: Handler to verify the text value in the fault dashboard
+---Input : textContent, x, y
+---output: None
+---Created by:Shalini V
+-----------------------------------------------------
+to handle VerifyTextInFaultDashboard textContent,x,y
+	Global ConfigValues
+	log "Start of Verifying the given text in the screen"
+	try
+		if x=""
+			put 30 into x
+			put 15 into y
+		end if
+		If ImageFound(text:textContent, waitFor:10) then
+			put ReadText((ImageLocation(text:textContent, WaitFor:ConfigValues.LongTimeout) + [x,y])) into val
+			Log "Text " && val&&" found successfully- "&&textContent
+			"Utilities/GenericOperations".CaptureScreenshot
+		else 
+			LogError "Unable to find the Text for field:---> "&&textContent
+			"Utilities/GenericOperations".CaptureScreenshotScreenName textContent
+		End if
+		
+	catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,VerifyTextInFaultDashboard)
+	end try
+	log "End of Verifying the given text in the screen"
+	return val
+	
+end VerifyTextInFaultDashboard
+
+--log ToClickonDataField("VIN", "7JZTH13J9KS000152")
+--log ToClickonRowDataFieldAndFetchDetailsFromPopup("SPN", "516213","FDDashboardFiltered")
+--log ToClickonRowDataFieldAndFetchDetailsFromPopup("SPN", "7454","FDDashboardFiltered")
+-----------------------------------------------------
+
+--Description: This handler is used toclick on each vehicle fault and fetch the details
+---Input : datafield name, reference value
+---output: fault description, notes, troubleshooting, vehicle and source address
+---Created by:Shalini V
+-----------------------------------------------------
+
+Function ToClickonRowDataFieldAndFetchDetailsFromPopup datafieldName, datafieldValue,SearchArea
+	try 
+		Log "start of function ToClickonRowDataFieldAndFetchDetailsFromPopup"
+		set the SearchRectangle to SearchRect(SearchArea)
+		
+		Global Iteration,ConfigValues
+		
+		--Set StatusRectangles to EveryImageRectangle(text:datafieldValue) 
+		Set DatafieldArea to EveryImageLocation(text:datafieldValue,validwords:datafieldValue) 
+		If		number of items in DatafieldArea >0 then
+			put [] into newOutputfilelist
+			set 	iUIDataFlag to 0
+			repeat with each item of DatafieldArea
+				put iUIDataFlag +1 into iUIDataFlag
+				
+				set the SearchRectangle to SearchRect(SearchArea)
+				click it
+				set the SearchRectangle to empty
+				"Utilities/GenericOperations".CaptureScreenshotScreenName datafieldName
+				--function call for ToFetchDetailsFromIndividualFaultPopup
+				--put ToFetchDetailsFromFaultPopup_Fieldwise_SequentialView (datafieldName&&"_"&&datafieldValue)into TestOutputfile
+				
+				--ToFetchDescTroubleshootNotesSourceAndVehicleFromPopup  datafieldName,TestOutputfile
+				set the SearchRectangle to ScreenPart("IndividualPopup")
+				VerifyTextInFaultDashboard "Fault Details",0,0 
+				VerifyTextInFaultDashboard "Fault Description",0,0 
+				VerifyTextInFaultDashboard "Troubleshooting",0,0
+				VerifyTextInFaultDashboard "Notes",0,0
+				VerifyTextInFaultDashboard "Vehicle:",0,0
+				VerifyTextInFaultDashboard "Source Address",0,0
+				set iUIDataFlag to iUIDataFlag+1
+				put "Utilities\GenericOperations".FormattedDateTime into CurrentDateTime
+				put CurrentDateTime into stroutputFilename
+				put "FaultDetails"&&stroutputFilename  into outputFilename
+				--"Utilities\exceloperations".CreateOutputFile outputFilename
+				put FetchFDDetailsFromPopup("IndividualPopup\FaultDetails_PopupA","IndividualPopup\FaultDetails_PopupB",outputFilename,"Fault details") into UIOutputdata
+				
+				put FetchFDDetailsFromPopup("IndividualPopup\FaultDescription_A","IndividualPopup\FaultDescription_B",outputFilename,"FaultDescription") into UIOutputdata
+				put FetchFDDetailsFromPopup("IndividualPopup\TroubleshootingArea_A","IndividualPopup\TroubleshootingArea_B",outputFilename,"Troubleshoot") into UIOutputdata
+				put FetchFDDetailsFromPopup("IndividualPopup\Notes_A","IndividualPopup\Notes_B",outputFilename,"Notes") into UIOutputdata	
+				put ImageRectangle(text:"Source Address", waitFor:20) into ImageRectangleOfSourceAddress	
+				put  ReadText(ImageRectangleOfSourceAddress.TopRight+[5,20],ImageRectangleOfSourceAddress.BottomRight+[100,-20],contrastcolor:"#313c4a",Contrast:on,contrasttolerance:99)  into SourceAddress
+				
+				WriteFaultDashboardDataToFile UIOutputdata,SourceAddress,"SourceAddress"
+				put UIOutputdata into item iUIDataFlag of newOutputfilelist
+				Click "IndividualPopup/CloseFaultDetailsPopup"
+				wait 10
+				--		log UIOutputdata
+				"Utilities/GenericOperations".Success( "Data is fetched from the UI for the given filter criteria in "&UIOutputdata)
+			end repeat
+		Else
+			"Utilities/GenericOperations".Error( "There are no fault details in the dashboard for the given filter criteria")
+			
+		End if
+		
+	Catch exception 
+		
+		get "Utilities/GenericOperations".LogException(exception,ToClickonRowDataField)
+	End try
+	set the SearchRectangle to empty
+	log "End of function ToClickonRowDataFieldAndFetchDetailsFromPopup"
+	return newOutputfilelist
+end ToClickonRowDataFieldAndFetchDetailsFromPopup
+
+-------------------------------------------------------------------------------------------------
+
+--Description: This handler is used to fetch the details from fault popup using image
+---Input : None
+---output: 
+---Created by:Shalini V
+---Created On 05 July 2022
+-------------------------------------------------------------------------------------------------
+to handle FetchFDDetailsFromPopup TLI,BRI,outputFilename,Fieldname
+	try
+		put readtext(TLI, BRI) into myval
+		If myval is not empty then
+			WriteFaultDashboardDataToFile outputFilename,myval,Fieldname
+			log "Data is writtent output file for "&Fieldname
+		else
+			logwarning "The data is empty "&Fieldname
+		end if
+	Catch exception 
+		
+		get "Utilities/GenericOperations".LogException(exception,FetchFDDetailsFromPopup)
+	End try
+	return outputFilename
+end FetchFDDetailsFromPopup
+
+-------------------------------------------------------------------------------------------------
+
+--Description: This handler is used to fetch the details from fault popup using image
+---Input : None
+---output: Write the data in the notepad file
+---Created by:Shalini V
+---Created On 05 July 2022
+-------------------------------------------------------------------------------------------------
+
+to handle WriteFaultDashboardDataToFile outputFilename,myval,Fieldname
+	put resourcePath("\OutputData\outputdata"&outputFilename&".txt") into MyFileVar
+	If there is a file  MyFileVar then
+		open file MyFileVar// opens the file	
+		--put myval into MyWrite
+		put Fieldname&":"&myval into MyWrite
+		write return to file MyFileVar at eof
+		write MyWrite to file MyFileVar
+		close file MyFileVar// closes the file
+	Else
+		
+		put the abbrev time into ti
+		log ti
+		replace every occurrence of ":" with "-" in ti 
+		log ti
+		create new file resourcePath ( "\OutputData\outputdata"&outputFilename&".txt")
+		put resourcePath ( "\OutputData\outputdata"&outputFilename&".txt") into MyFileVar
+		open file MyFileVar// opens the file	
+		--put myval into MyWrite
+		put Fieldname&":"&myval into MyWrite
+		write MyWrite to file MyFileVar
+		--"Utilities\exceloperations".WriteIntoFile outputFilename, Fieldname, myval
+	End If
+end WriteFaultDashboardDataToFile
+
+
+
+----------------------------Function
+-------------------------------------------------------------------------------------------------
+
+--Description: This handler is used to create list from the FD details of the notepad
+---Input : None
+---output: Write the data in the notepad file
+---Created by:Shalini V
+---Created On 05 July 2022
+-------------------------------------------------------------------------------------------------
+--ExtractFromTextFileForBackendValidation_Sequential "FaultDetails 19_07_2022_01_35_27"
+to handle ExtractFromTextFileForBackendValidation_Sequential outputFilename
+	log "Start of ExtractFromTextFileForBackendValidation"
+	open file  resourcePath("\OutputData\outputdata"&outputFilename&".txt")
+	
+	read from file  resourcePath("\OutputData\outputdata"&outputFilename&".txt") until eof
+	
+	
+	put  it into mydata
+	-- we've reached the end of the file
+	delete newline from it
+	put it-- or do other processing with 'it' here
+	--	if key = fieldName
+	replace "SPN:" in it with enter&& " SPN:"
+	replace "FMI:" in it with enter&& " FMI:"
+	
+	replace "Vehicle Name" in it with enter&& " VehicleName:"
+	
+	replace "Fault Name:" in it  with enter&&" Fault Name:"
+	
+	replace "Time of Fault:" in it  with enter &&" Time of Fault:"
+	replace "Priority:" in it  with enter &&" Priority:"
+	replace "Status:" in it  with  enter &&" Status:"
+	replace "VIN:" in it  with enter&& " VIN:"
+	replace "VIN" in it  with enter&& " VIN:"
+	replace "Fault Duration:" in it  with enter&&" Fault Duration:"
+	replace "TroubleShoot:" in it  with enter&&" TroubleShoot:"
+	replace "FaultDescription:" in it  with enter&&" FaultDescription:"
+	replace "Notes:" in it  with enter&&" Notes:"
+	replace "VehicleType:" in it  with enter&&" VehicleType:"
+	replace "SourceAddress:" in it  with enter&&" SourceAddress:"
+	
+	log it
+	
+	put split (it, "") into keyValList
+	delete tab in  keyValList
+	log keyVal1
+	
+	repeat with each item of keyValList
+		
+		log it
+	end repeat
+	log "End of ExtractFromTextFileForBackendValidation_Sequential"
+	return keyValList
+	
+	
+end	ExtractFromTextFileForBackendValidation_Sequential
+
+
+-------------------------------------------------------------------------------------------------
+
+--Description: This handler is used to  series of data for the specific datafield column
+---Input : ReferenceColValue,DatafieldColname
+---output: Write the data in the notepad file
+---Created by:Shalini V
+---Created On 05 July 2022
+-------------------------------------------------------------------------------------------------
+
+
+(*Extract_DatafieldRowSeries_from_FD_WithReferenceValue "KMHDU4AD4AU955646","SPN"
+Extract_DatafieldRowSeries_from_FD_WithReferenceValue "KMHDU4AD4AU955646","FMI"
+Extract_DatafieldRowSeries_from_FD_WithReferenceValue "KMHDU4AD4AU955646","Source Address"*)
+
+Extract_DatafieldRowSeries_from_FD_WithReferenceValue "5GZEV337X7J141405","Priority"
+Extract_DatafieldRowSeries_from_FD_WithReferenceValue "5GZEV337X7J141405","SPN_ALL"
+Extract_DatafieldRowSeries_from_FD_WithReferenceValue "5GZEV337X7J141405","Status"
+Extract_DatafieldRowSeries_from_FD_WithReferenceValue "5NPEC4AC5BH041176","FMI"
+--set the SearchRectangle to ScreenPart("FaultDashboard")
+--use only for Priory, spn status and fmi, source address
+to handle Extract_DatafieldRowSeries_from_FD_WithReferenceValue RefDataFieldName, DatafieldColname
+	try
+		--set the SearchRectangle to ScreenPart("FaultDashboard")
+		"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "VEHICLE"
+		Global Iteration,ConfigValues
+		
+		--Set StatusRectangles to EveryImageRectangle(text:datafieldValue) 
+		put RefDataFieldName into RefValue
+		Set DatafieldArea to EveryImageLocation(text:RefValue,validwords:RefValue)
+		If number of items in DatafieldArea is 0
+			replace "0" with"O" in RefValue
+			put   Everyimagelocation(text:RefValue,validwords:RefValue,waitFor:2) into DatafieldArea
+		End If
+		(*If number of items in DatafieldArea is 0
+		replace "11" with"T1" in RefValue
+	put   Everyimagelocation(text:RefValue, waitFor:2) into DatafieldArea
+		End If*)
+		If number of items in DatafieldArea is 0
+			LogError "Imagelocation of given text is not found"
+			Exit all
+		End If
+		put 0 into iValFlag
+		put [] into Valuelist
+		repeat with DatafieldArea
+			put iValFlag +1 into iValFlag
+			put it into referencearea
+			If DatafieldColname is "Priority" or DatafieldColname is "Status" or DatafieldColname is "SPN" or DatafieldColname is "FMI"
+				put imagelocation(text:DatafieldColname) into expectearea
+				
+				put referencearea.y into posy
+				put expectearea.x into posx
+				
+				put [posx,posy] into imageloc
+				
+				put imageloc +[-30,-18] into pos1
+				put imageloc +[90,30] into pos2
+				log readtext(pos1,pos2)
+				If readtext(pos1,pos2) is ""
+					Put readtext(pos1,pos2,contrast:on) into DatacolomnValues
+					If DatacolomnValues is ""
+						Put readtext(pos1,pos2,contrast:on,contrasttolerance:90) into DatacolomnValues
+					End If
+				else 
+					put readtext(pos1,pos2) into DatacolomnValues
+				End If
+			Else if DatafieldColname is "SPN_ALL"
+				put imagelocation(text:"SPN") into expectearea
+				
+				put referencearea.y into posy
+				put expectearea.x into posx
+				
+				put [posx,posy] into imageloc
+				put imageloc +[-30,-18] into pos1
+				put imageloc +[60,30] into pos2
+				
+				If  readtext(pos1,pos2) is ""
+					Put readtext(pos1,pos2,contrast:on) into DatacolomnValues
+					If DatacolomnValues is ""
+						Put readtext(pos1,pos2,contrast:on,contrasttolerance:90) into DatacolomnValues
+					End If
+					
+				Else
+					put readtext(pos1,pos2) into DatacolomnValues
+				End If
+				
+			End If
+			log DatacolomnValues
+			(*
+			log readtext(posx,posy,contrastcolor:"#313c4a",Contrast:on,contrasttolerance:99)
+			
+			If UPPERCASE(DatafieldColname) is "PRIORITY" OR UPPERCASE(DatafieldColname) is "STATUS"
+				put readtext(posx,posy,validwords:"Red Yellow Green Active Inactive") into DatacolomnValues
+				If DatacolomnValues is ""
+					put  readtext(posx,posy,Contrast:on,contrasttolerance:80) into DataColomnValues
+				end if
+				
+			Else
+				put readtext(posx,posy,contrastcolor:"#313c4a",Contrast:on,contrasttolerance:99) into DatacolomnValues
+			End if*)
+			put DatacolomnValues into item iValFlag of Valuelist
+		end repeat
+		set the SearchRectangle to empty
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,Extract_DatafieldRowSeries_from_FD_WithReferenceValue)
+	End try
+	set the SearchRectangle to empty
+	--log	ColumnValue
+	return Valuelist
+end Extract_DatafieldRowSeries_from_FD_WithReferenceValue
+
+-------------------------------------------------------------------------------------------------
+
+--Description: This handler is used to Scroll the horizontal scroll bar to right in the FD screen and verify if the vehicle column is not moving 
+---Input : None
+---output: non
+---Created by:Shalini V
+---Created On 05 July 2022
+-------------------------------------------------------------------------------------------------
+
+--Verify_VehicleName_Freeze_Column_OnRightScrolling
+to handle Verify_VehicleName_Freeze_Column_OnRightScrolling ReferenceCol
+	try
+		If  ImageFound(Text:"No Rows To Show",caseSensitive:no, waitFor:ConfigValues.LongTimeOut)  is false then
+			log "Start of function Verify_VehicleName_Freeze_Column_OnRightScrolling"
+			set the SearchRectangle to ScreenPart("FaultDashboard")
+			put imagerectangle(text:"Vehicle Name",wait:10) into ImgRectOfVehicleNameBefore
+			log ImgRectOfVehicleNameBefore
+			put ReadText(ImgRectOfVehicleNameBefore.TopRight+[-100,20],ImgRectOfVehicleNameBefore.BottomRight+[100,450]) into VehilceNamesBeforeScroll
+			log VehilceNamesBeforeScroll
+			--function call for scroll right
+			"Utilities/GenericOperations".CaptureScreenshotScreenName "VehicleColumnBeforeScroll"
+			put "Utilities/CommonActions".scrollCursorRightHorizontally_WithReferenceText (ReferenceCol,"FD_HorizontalScrollRight")into ScrollStatus
+			IF ScrollStatus is 1 then
+				--Logsuccess "Scroll bar is moved right"
+				"Utilities/GenericOperations".Success( "Scroll bar is moved right")
+			Else
+				--logerror "Scroll bar is not moved"
+				"Utilities/GenericOperations".Error( "Scroll bar is not moved right")
+			End If
+			
+			(*	put imagerectangle(text:"Vehicle Name",wait:10) into ImgRectOfVehicleNameAfter
+		log ImgRectOfVehicleNameAfter*)
+			
+			put ReadText(ImgRectOfVehicleNameBefore.TopRight+[-100,20],ImgRectOfVehicleNameBefore.BottomRight+[100,450]) into VehilceNamesAfterScroll
+			log VehilceNamesAfterScroll
+			If   VehilceNamesAfterScroll is VehilceNamesBeforeScroll considering case then
+				--Logsuccess "Scroll bar is moved right and Vehicle Name is freezed"
+				"Utilities/GenericOperations".Success("Scroll bar is moved right and Vehicle Name is freezed")
+			Else
+				"Utilities/GenericOperations".Error "Scroll bar is moved right and Vehicle Name is not freezed"
+				
+			End If
+			"Utilities/GenericOperations".CaptureScreenshotScreenName "VehicleName column"
+			
+			log "End of function Verify_VehicleName_Freeze_Column_OnRightScrolling"
+			set the SearchRectangle to empty
+		Else
+			
+			"Utilities/GenericOperations".Error "There are no values in the Fault dashboard"
+			
+			
+		End if
+		
+	Catch exception 
+		
+		get "Utilities/GenericOperations".LogException(exception,Verify_VehicleName_Freeze_Column_OnRightScrolling)
+	End try
+	
+End Verify_VehicleName_Freeze_Column_OnRightScrolling
+--"Utilities/CommonActions".scrollCursorLeftHorizontally_WithReferenceText "VIN","FD_LeftScrollbar"
+--"Utilities/CommonActions".scrollCursorRightHorizontally_WithReferenceText "Model","FD_HorizontalScrollRightScrollbar"
+-------------------------------------------------------------------------------------------------
+--Description: to select the customization option for vehicle
+---Input : 
+---output: 
+---Created by:Shalini V
+---Created On 06 July 2022
+-------------------------------------------------------------------------------------------------
+--SelectCustomiztionOption_Vehicle "Customer name"
+to handle SelectCustomiztionOption_Vehicle ValueToSelect
+	Global ConfigValues,Iteration
+	try
+		if ImageFound(Text:"No Rows To Show",caseSensitive:no, waitFor:ConfigValues.MediumTimeOut)  is false then
+			
+			
+			log "start of function SelectCustomiztionOption_Vehicle"
+			set the SearchRectangle to SearchRect("CustomizeArea")
+			"Utilities/CommonActions".ClickBtnByText ("Customize")
+			WaitFor 20, "ScrollDownImages"
+			
+			If  "Utilities/CommonActions".ClickScrollBarDownVertically (ValueToSelect,"ScrollDownImages",SearchRect("CustomizeArea"))  is true then
+				--"Utilities/CommonActions".ClickLeftOfTextLocation ValueToSelect, 20,SearchRect("CustomizeArea")
+				put ImageLocation(text:ValueToSelect,waitFor:ConfigValues.MediumTimeOut) into checkboxstatus
+				Put checkboxstatus+[10,30] into Pos2
+				Put checkboxstatus+[-100,-20] into Pos1
+				set the searchrectangle to [Pos1,Pos2]
+				(*		if imagefound (Image:"CustomizeCheckbox/CheckBoxUnselected",waitfor:ConfigValues.MediumTimeOut,SearchRectangle:[Pos1,Pos2]) *)
+				"Utilities/CommonActions".SelectCheckBox "CustomizeCheckbox/CheckBoxSelected", "CustomizeCheckbox/CheckBoxUnselected"	
+				"Utilities/GenericOperations".Success "The given datafield"&&ValueToSelect&&"is found and selected"
+				
+			Else
+				--Logerror "The given datafield is not found"
+				"Utilities/GenericOperations".Error "The given datafield"&&ValueToSelect&&"is not found and not selected"
+			End If
+			set the SearchRectangle to SearchRect("CustomizeArea")
+			Click text:"Apply",waitFor:ConfigValues.BasicTimeOut
+			
+		Else
+			"Utilities/GenericOperations".Error "There are no values in the Fault dashboard"
+			
+			
+		End if
+		set the SearchRectangle to empty
+	catch exception
+		
+		
+		get "Utilities/GenericOperations".LogException(exception,SelectCustomiztionOption_Vehicle)
+	End try
+	"Utilities/GenericOperations".CaptureScreenshotScreenName "customized option selected"
+	log "End of function SelectCustomiztionOption_Vehicle"
+end SelectCustomiztionOption_Vehicle
+
+--------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------
+--Description: to select the Layout in the fault dashboard
+---Input : layout to select
+---output: 
+---Created by:Shalini V
+---Created On 07 July 2022
+-------------------------------------------------------------------------------------------------
+FD_Fetch_TripletWithReferenceColumnValue_Vehicle "KMHDU4AD4AU955646"
+to handle FD_Fetch_TripletWithReferenceColumnValue_Vehicle VINID
+	try 
+		set the SearchRectangle to SearchRect("FDDashboardFiltered")
+		Global Iteration,ConfigValues
+		Log "Start fetching values from FD dashboard"
+		put 0 into iFlag
+		If  ImageFound(Text:"No Rows To Show",caseSensitive:no, waitFor:ConfigValues.BasicTimeOut)  is false then
+			put [] into newSimilarfaultList 
+			put VINID into RefID
+			put everyimagelocation(text:RefID,validwords:RefID) into referenceLoc --vinlocation
+			If number of items in referenceLoc is 0
+				replace "0" with"O" in RefID
+				put   Everyimagelocation(text:RefID,validwords:RefID,waitFor:2) into referenceLoc
+			End If
+			(*If number of items in referenceLoc is 0
+			replace "11" with"T1" in RefID
+		put   Everyimagelocation(text:RefID, waitFor:2) into referenceLoc
+			End If*)
+			If number of items in referenceLoc is 0
+				LogError "Imagelocation of given text is not found"
+				Exit all
+			End If
+			
+			
+			repeat for each item in referenceLoc
+				put it into VINLOC
+				set VINLocation to   [VINLOC.x-90,VINLOC.y-25,VINLOC.X+100,VINLOC.y+30]
+				put iFlag +1 into iFlag
+				set the searchrectangle to VINLocation
+				
+				put ExtractDatafieldRowValueWithReferenceColValue (VINLocation,"SPN") into SPNValue
+				put ExtractDatafieldRowValueWithReferenceColValue (VINLocation,"FMI") into FMIValue
+				put ExtractDatafieldRowValueWithReferenceColValue (VINLocation,"Source Address") into SourceAddressValue
+				put ExtractDatafieldRowValueWithReferenceColValue (VINLocation,"Time of fault") into TimeofFaultValue
+				put SPNValue&":"&FMIValue&":"&SourceAddressValue into SimilarFault
+				put SimilarFault into item iFlag of newSimilarfaultList
+				
+			end repeat
+			
+		Else
+			Logerror "There are no values in the Fault dashboard"
+			
+		End if
+		
+		
+		set the SearchRectangle to empty
+	Catch exception	
+		get "Utilities/GenericOperations".LogException(exception,FD_Fetch_TripletWithReferenceColumnValue_Vehicle)
+		
+	End try
+	return newSimilarfaultList
+	
+End FD_Fetch_TripletWithReferenceColumnValue_Vehicle
+-------------------------------------------------------------------------------------------------
+--Description: to fetch the specific datafield value from the dashboard
+---Input : valuesearchrect,DatafieldColname
+---output: value of DatafieldColname
+---Created by:Shalini V
+---Created On 26 July 2022
+-------------------------------------------------------------------------------------------------
+ExtractDatafieldRowValueWithReferenceColValue_GF "470,512,660,567","Time of fault"
+to handle ExtractDatafieldRowValueWithReferenceColValue_GF valuesearchrect, DatafieldColname
+	try
+		set the SearchRectangle to SearchRect("FDDashboardFiltered")
+		Global Iteration,ConfigValues
+		
+		
+		put imagelocation(text:DatafieldColname) into expectearea
+		
+		put (item 2 of valuesearchrect+item 4 of valuesearchrect)/2 into referencearea
+		put referencearea into posy
+		put expectearea.x into posx
+		
+		
+		IF  DatafieldColname is "VIN" then
+			
+			set the searchrectangle to [posx-40,posy-30,posx+150,posy+20]
+			log readtext( the searchrectangle)
+			put readtext( the searchrectangle,contrast:on,contrasttolerance:90) into DatacolomnValues
+			If DatacolomnValues is ""
+				set the searchrectangle to [posx-40,posy-30,posx+140,posy+30]
+				put readtext( the searchrectangle,contrast:on) into DatacolomnValues
+			end if
+		Else if DatafieldColname is "SPN" then
+			set the searchrectangle to [posx-30,posy-30,posx+80,posy+20]
+			put readtext( the searchrectangle) into DatacolomnValues
+			If DatacolomnValues is empty
+				put readtext( the searchrectangle,contrast:on) into DatacolomnValues
+			end if
+			
+		else if DatafieldColname is "FMI"
+			set the searchrectangle to [posx-15,posy-30,posx+70,posy+20]	
+			put readtext( the searchrectangle) into DatacolomnValues
+			If DatacolomnValues is "" 
+				put readtext( the searchrectangle,contrast:on) into DatacolomnValues
+			end if
+			If DatacolomnValues is ""
+				Logerror "FMI is not fetched from the dashbard"
+			end if
+			
+		else if DatafieldColname is "Source Address"
+			
+			set the searchrectangle to [posx-50,posy-30,posx+90,posy+20]
+			put readtext( the searchrectangle) into DatacolomnValues
+			If DatacolomnValues is "" 
+				put readtext( the searchrectangle,contrast:on,contrasttolerance:90) into DatacolomnValues
+			end if
+			If DatacolomnValues is ""
+				Logerror "Source address is not fetched from the dashbard"
+			end if
+		Else if  DatafieldColname is "Number of occurrences"
+			
+			set the searchrectangle to [posx-80,posy-30,posx+85,posy+23]
+			put readtext( the searchrectangle) into DatacolomnValues
+			If DatacolomnValues is "" 
+				put readtext( the searchrectangle,contrastcoloe:"#394552",contrast:on,contrasttolerance:80,validpattern:"[0-9]") into DatacolomnValues
+			end if
+		else
+			Logwarning "Add the condition for given datafield column"
+		End if
+		
+		--end repeat
+		set the SearchRectangle to empty
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,ExtractDatafieldRowValueWithReferenceColValue_GF)
+	End try
+	
+	set the SearchRectangle to empty
+	--log	ColumnValue
+	return trim(DatacolomnValues)
+end ExtractDatafieldRowValueWithReferenceColValue_GF
+
+-------------------------------------------------------------------------------------------------
+--Description: to select the Layout in the fault dashboard
+---Input : layout to select - used in groupby fault functionality
+---output: 
+---Created by:Shalini V
+---Created On 07 July 2022
+-------------------------------------------------------------------------------------------------
+
+to handle ExtractDatafieldRowValueWithReferenceColValue valuesearchrect, DatafieldColname
+	try
+		set the SearchRectangle to SearchRect("FDDashboardFiltered")
+		Global Iteration,ConfigValues
+		
+		
+		put imagelocation(text:DatafieldColname) into expectearea
+		
+		put (item 2 of valuesearchrect+item 4 of valuesearchrect)/2 into referencearea
+		put referencearea into posy
+		put expectearea.x into posx
+		
+		
+		IF  DatafieldColname is "VIN" then
+			
+			set the searchrectangle to [posx-40,posy-30,posx+150,posy+20]
+			log readtext( the searchrectangle)
+			put readtext( the searchrectangle,contrast:on,contrasttolerance:90) into DatacolomnValues
+			If DatacolomnValues is ""
+				set the searchrectangle to [posx-40,posy-30,posx+140,posy+30]
+				put readtext( the searchrectangle,contrast:on) into DatacolomnValues
+			end if
+		Else if DatafieldColname is "SPN" then
+			set the searchrectangle to [posx-40,posy-30,posx+150,posy+20]
+			put readtext( the searchrectangle) into DatacolomnValues
+			If DatacolomnValues is empty
+				put readtext( the searchrectangle,contrast:on) into DatacolomnValues
+			end if
+		Else if DatafieldColname is "Time of fault" 
+			
+			set the searchrectangle to [posx-50,posy-30,posx+110,posy+20]
+			put readtext( the searchrectangle) into DatacolomnValues
+		else if DatafieldColname is "FMI"
+			set the searchrectangle to [posx-15,posy-30,posx+130,posy+20]
+			
+			put readtext( the searchrectangle) into DatacolomnValues
+			If DatacolomnValues is "" 
+				put readtext( the searchrectangle,contrast:on) into DatacolomnValues
+			end if
+			If DatacolomnValues is ""
+				Logerror "FMI is not fetched from the dashbard"
+			end if
+			
+		else if DatafieldColname is "Source Address"
+			
+			set the searchrectangle to [posx-50,posy-30,posx+90,posy+20]
+			put readtext( the searchrectangle) into DatacolomnValues
+			If DatacolomnValues is "" 
+				put readtext( the searchrectangle,contrast:on,contrasttolerance:90) into DatacolomnValues
+			end if
+			If DatacolomnValues is ""
+				Logerror "Source address is not fetched from the dashbard"
+			end if
+			
+		else
+			Logwarning "Add the condition for given datafield column"
+		End if
+		
+		--end repeat
+		set the SearchRectangle to empty
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,ExtractDatafieldRowValueWithReferenceColValue)
+	End try
+	
+	set the SearchRectangle to empty
+	--log	ColumnValue
+	return trim(DatacolomnValues)
+end ExtractDatafieldRowValueWithReferenceColValue
+
+
+//*****************************************************
+--Description: Handler to select the Fault priority 
+---Input : FaultPriority- red, green, yellow or all
+---output: None
+---Created by:Shalini V
+--Created on: 08 July 2022
+//*****************************************************
+to handle getSPNListfromSequentialView FaultValues
+	log "Start of handler getSPNListfromSequentialView"
+	try
+		put " " into  SPNValue
+		repeat for each item of FaultValues
+			put item 1 of split(it,":") into SPN
+			
+			insert SPN after SPNValue
+			
+		end repeat
+		
+		delete item 1 of SPNValue 
+		
+		log SPNValue --gives the list of spn
+		
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,getSPNListfromSequentialView)
+	end try
+	log "End of handler getSPNListfromSequentialView"
+	return SPNValue
+end getSPNListfromSequentialView
+
+//*****************************************************
+--Description: Handler to get the number of occurences from Triplet value of Sequential
+---Input : Fault Values list(spn, fmi and source address)
+---output: None
+---Created by:Shalini V
+--Created on: 08 July 2022
+//*****************************************************
+--set FaultValues to ["516131:2:21:1","516122:2:21:1","516102:4:21:2","516102:4:21:2"]
+--NumberofOccurrencesFromTripletValuesFromSequential FaultValues  
+--to get the number of repeated occurence in sequential
+to handle NumberofOccurrencesFromTripletValuesFromSequential FaultValues
+	try
+		log "Start of NumberofOccurrencesFromTripletValuesFromSequential"
+		put " " into datatoverify
+		repeat for each item in FaultValues
+			put every occurrence of it in FaultValues into val
+			put  number of items  of val into numberofOccurrences
+			If numberofOccurrences >0
+				IF (it&":"&numberofOccurrences) is not in datatoverify
+					insert (it&":"&numberofOccurrences) after datatoverify
+				End If
+			End if
+		end repeat
+		
+		If GroupByFaultData is empty then
+			LogWarning "there is no data for group by fault"
+		else
+			delete item 1 of datatoverify 
+			If item 1 of datatoverify contains "SPN" then
+				delete item 1 of datatoverify 
+				
+			End If
+			Log datatoverify ---gives output with number of occurences in sequential
+		end if
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,NumberofOccurrencesFromTripletValuesFromSequential)
+	end try
+	log "End of handler NumberofOccurrencesFromTripletValuesFromSequential"
+	return datatoverify
+end NumberofOccurrencesFromTripletValuesFromSequential
+
+
+--CheckGroupByFaultFunctionality_Vehicle "2HKRM4H73CH623544",SearchRect("SPNColumnwithFilter")
+
+------------------------------------------------------------------------------------------------
+--Description: to check the group by fault functionality of vehicle
+---Input : None
+---output: Write the data in the notepad file
+---Created by:Shalini V
+---Created On 08 July 2022
+-------------------------------------------------------------------------------------------------
+CheckGroupByFaultFunctionality_Vehicle "KMHDU4AD4AU955646"
+to handle CheckGroupByFaultFunctionality_Vehicle VINID
+	log "Start of function CheckGroupByFaultFunctionality_Vehicle"
+	try
+		---to fetch the triplet value from sequential
+		put FD_Fetch_TripletWithReferenceColumnValue_Vehicle (VINID) into FaultValues
+		--log FaultValues
+		getSPNListfromSequentialView FaultValues
+		put NumberofOccurrencesFromTripletValuesFromSequential (FaultValues) into ListOfOccurences
+		"ApexPages/FaultDashboardSearchCriteria".Select_FaultDashboardLayout "Group By Fault"
+		wait 10
+		"ApexPages/FaultDashboardSearchCriteria".SelectFilterDropdown "VIN",VINID,"VEHICLE"	
+		set the SearchRectangle to SearchRect("FDDashboardFiltered")
+		"ApexPages/FaultDashboardVehicle".SelectCustomiztionOption_Vehicle "Source Address"
+		
+		set 	iFlagOccurrence to 0
+		set the SearchRectangle to SearchRect("FDDashboardFiltered")
+		put EveryImageLocation(text:VINID) into VINLoc
+		put [] into newGroupByfaultList
+		set iGFFlag to 0
+		repeat with each item of VINLoc
+			put iGFFlag +1 into iGFFlag
+			put it into GFLoc
+			set GFVINLoc to   [GFLoc.x-90,GFLoc.y-25,GFLoc.X+100,GFLoc.y+30]
+			set the searchrectangle to GFVINLoc
+			put ExtractDatafieldRowValueWithReferenceColValue_GF (GFVINLoc,"SPN") into SPNGF
+			put ExtractDatafieldRowValueWithReferenceColValue_GF (GFVINLoc,"FMI") into FMIGF
+			put ExtractDatafieldRowValueWithReferenceColValue_GF (GFVINLoc,"Source Address") into SourceAddressGF
+			--	put ExtractDatafieldRowValueWithReferenceColValue (GFLoc,"Time of fault") into TimeofFaultValue
+			put ExtractDatafieldRowValueWithReferenceColValue_GF (GFVINLoc,"Number of occurrences") into NoOfOccurenceGF
+			put Trim(SPNGF)&":"&Trim(FMIGF)&":"&Trim(SourceAddressGF)&":"&Trim(NoOfOccurenceGF) into GroupByFaultData
+			put GroupByFaultData into item iGFFlag of newGroupByfaultList
+		end repeat
+		repeat with each item occurence of ListOfOccurences
+			repeat with each item of newGroupByfaultList
+				If it is occurence
+					set 	iFlagOccurrence to iFlagOccurrence+1
+				End If
+			end repeat
+			
+		end repeat
+		If iFlagOccurrence is equal to number of items in ListOfOccurences  then
+			--logerror "Triplet value is not found in the group by fault, check the data"
+			
+			"Utilities/GenericOperations".Success "Number of occurence is  equal to number of similar fault in sequential view"
+		else
+			--logsuccess  "Group by fault validation is success"
+			"Utilities/GenericOperations".Error "Number of occurence is not equal to number of similar fault in sequential view"
+		End If
+		
+		If number of items in ListOfOccurences is  number of items in newGroupByfaultList 
+			--logsuccess  "Group by fault validation is success"
+			"Utilities/GenericOperations".Success("The data is grouped according to the group by fault combination")
+		else
+			--logerror "Triplet value is not found in the group by fault, check the data"
+			"Utilities/GenericOperations".Error "The data is not grouped according to the group by fault combination"
+		End If 
+		
+		
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,NumberofOccurrencesFromTripletValuesFromSequential)
+	end try
+	log "End of function CheckGroupByFaultFunctionality_Vehicle"
+end CheckGroupByFaultFunctionality_Vehicle
+
+------------------------------------------------------------------------------------------------
+
+--Description: create the outputfile in the resource folder of fault dashboard
+---Input : None
+---output: Write the data in the notepad file
+---Created by:Shalini V
+---Created On 08 July 2022
+-------------------------------------------------------------------------------------------------
+
+to handle CreateOutputFile_FD fileName
+	try 
+		delete file  resourcePath ( "\OutputData\outputdata"&fileName&".txt")
+	catch  e
+		log "file is not found to delete"
+	end try
+	
+	put the abbrev time into ti
+	log ti
+	replace every occurrence of ":" with "-" in ti 
+	log ti
+	create new file resourcePath ( "\OutputData\outputdata"&fileName&".txt")
+	
+	--return "\OutputData\outputdata"&fileName&".txt"
+end CreateOutputFile_FD
+
+------------------------------------------------------------------------------------------------
+
+--Description: This handler is used to create list from the FD details of the notepad
+---Input : None
+---output: Write the data in the notepad file
+---Created by:Shalini V
+---Created On 08 July 2022
+-------------------------------------------------------------------------------------------------
+to handle ExtractFromTextFileForBackendValidationVehicle_GroupByFault outputFilename
+
+	try
+		log "Start of ExtractFromTextFileForBackendValidationVehicle_GroupByFault"
+		open file  resourcePath("\OutputData\outputdata"&outputFilename&".txt")
+		
+		read from file  resourcePath("\OutputData\outputdata"&outputFilename&".txt") until eof
+		
+		
+		put  it into mydata
+		-- we've reached the end of the file
+		delete newline from it
+		put it-- or do other processing with 'it' here
+		--	if key = fieldName
+		replace "SPN:" in it with enter&& " SPN:"
+		replace "FMI:" in it with enter&& " FMI:"
+		
+		replace "Vehicle Name" in it with enter&& " VehicleName:"
+		
+		replace "Fault Name:" in it  with enter&&" Fault Name:"
+		replace "First Occurence:" in it  with enter&&" First Occurence:"
+		replace "Priority:" in it  with enter &&" Priority:"
+		replace "Number Of Occurences" in it  with enter&&" Number Of Occurences:"
+		replace "VIN:" in it  with enter&& " VIN:"
+		replace "VIN" in it  with enter&& " VIN:"
+		
+		replace "TroubleShoot:" in it  with enter&&" TroubleShoot:"
+		replace "FaultDescription:" in it  with enter&&" FaultDescription:"
+		replace "Notes:" in it  with enter&&" Notes:"
+		replace "VehicleType:" in it  with enter&&" VehicleType:"
+		replace "SourceAddress:" in it  with enter&&" SourceAddress:"
+		
+		log it
+		
+		put split (it, "") into keyValList
+		log keyVal1
+		
+		repeat with each item of keyValList
+			
+			log it
+		end repeat
+		log "End of ExtractFromTextFileForBackendValidation_Sequential"
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,ExtractFromTextFileForBackendValidationVehicle_GroupByFault)
+	end try
+	return keyValList
+	
+	
+end	ExtractFromTextFileForBackendValidationVehicle_GroupByFault
+------------------------------------------------------------------------------------------------
+
+--Description: This handler is used to fetch the row values for particular data field column
+---Input : DatafieldColname name search area from SearchRect 
+---output: 
+---Created by:Shalini V
+---Created On 14 July 2022
+-------------------------------------------------------------------------------------------------
+Fetch_VehicleFault_RowValues_wrtColumn "TimeofFaultCoumn"
+to handle Fetch_VehicleFault_RowValues_wrtColumn DatafieldcolumnSearchArea
+	log "Start of function Fetch_VehicleFault_RowValues_wrtColumn"
+	global ConfigValues
+	put [] into newRowDataList 
+	put 0 into iRowFlag
+	
+	set ColumnRect to SearchRect(DatafieldcolumnSearchArea)
+	set the searchrectangle to ColumnRect
+	Repeat until length of readtext( the searchrectangle) < 2
+		put iRowFlag+1 into iRowFlag
+		set the searchrectangle to ColumnRect
+		put (item 2 of ColumnRect)+50 into item 2 of ColumnRect 
+		put (item 4 of ColumnRect)+50 into item 4 of ColumnRect 
+		put  readtext( the searchrectangle) into DashboardRowData
+		log DashboardRowData
+		put DashboardRowData into item iRowFlag of newRowDataList
+		set the searchrectangle to ColumnRect
+	end repeat
+	
+	log newRowDataList
+	log "end of function Fetch_VehicleFault_RowValues_wrtColumn"
+	set the searchrectangle to empty
+	return newRowDataList
+end Fetch_VehicleFault_RowValues_wrtColumn
+
+//*****************************************************
+--Description: Handler to validate data field column names for Vehicle
+---Input : DatafieldColnames
+---output: None
+---Created by:Shalini V
+--created on: 14 July 2022
+//*****************************************************
+to handle ValidateDatafieldColumnNames_Vehicle DatafieldColnames
+	try
+		log "Start of function ValidateDatafieldColumnNames_Vehicle"
+		global ConfigValues
+		repeat with each item of DatafieldColnames
+			set the searchrectangle to ScreenPart("FaultDashboard")
+			
+			if imagefound (text:it,waitfor:ConfigValues.LongTimeOut,SearchRectangle:ScreenPart("FaultDashboard")) then
+				"Utilities/GenericOperations".Success "Data field header"&& it && " is found in the fault dashboard"
+			else
+				put "Utilities//CommonActions".scrollCursorRightHorizontally_WithReferenceText (it,"FD_HorizontalScrollRight") into SearchFound
+				If SearchFound is 1 or SearchFound is  True  then
+					"Utilities/GenericOperations".Success "Data field header"&& it && " is found in the fault dashboard"
+				else
+					"Utilities/GenericOperations".Error "Data field header"&& it && " is not found in the fault dashboard"
+				end if
+			End if
+		end repeat
+		--"ApexPages/FaultDashboardCharger".ResetScrollPosition "FD_LeftScrollbar","FaultDashboard"
+		ResetScrollPosition "FD_LeftScrollbar","FaultDashboard"
+	catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,ValidateDatafieldColumnNames_Vehicle)
+	end try
+	log "End of function ValidateDatafieldColumnNames_Vehicle"
+	set the searchrectangle to empty
+end ValidateDatafieldColumnNames_Vehicle
+-------------------------------------------------------------------------------------------------
+--Description: to un select the customization option for vehicle
+---Input : 
+---output: 
+---Created by:Shalini V
+---Created On 06 July 2022
+-------------------------------------------------------------------------------------------------
+--SelectCustomiztionOption_Vehicle "Customer name"
+to handle UnSelectCustomiztionOption_Vehicle ValueToSelect
+	Global ConfigValues,Iteration
+	try
+		if ImageFound(Text:"No Rows To Show",caseSensitive:no, waitFor:ConfigValues.MediumTimeOut)  is false then
+			
+			
+			log "start of function SelectCustomiztionOption_Vehicle"
+			set the SearchRectangle to SearchRect("CustomizeArea")
+			"Utilities/CommonActions".ClickBtnByText ("Customize")
+			WaitFor 20, "ScrollDownImages"
+			
+			If  "Utilities/CommonActions".ClickScrollBarDownVertically (ValueToSelect,"ScrollDownImages",SearchRect("CustomizeArea"))  is true then
+				--"Utilities/CommonActions".ClickLeftOfTextLocation ValueToSelect, 20,SearchRect("CustomizeArea")
+				put ImageLocation(text:ValueToSelect,waitFor:ConfigValues.MediumTimeOut) into checkboxstatus
+				Put checkboxstatus+[10,30] into Pos2
+				Put checkboxstatus+[-100,-20] into Pos1
+				set the searchrectangle to [Pos1,Pos2]
+				(*		if imagefound (Image:"CustomizeCheckbox/CheckBoxUnselected",waitfor:ConfigValues.MediumTimeOut,SearchRectangle:[Pos1,Pos2]) *)
+				"Utilities/CommonActions".UnSelectCheckBoxByImage "CustomizeCheckbox/CheckBoxSelected", "CustomizeCheckbox/CheckBoxUnselected"	
+				"Utilities/GenericOperations".Success "The given datafield"&&ValueToSelect&&"is found and selected"
+				
+			Else
+				--Logerror "The given datafield is not found"
+				"Utilities/GenericOperations".Error "The given datafield"&&ValueToSelect&&"is not found and not selected"
+			End If
+			set the SearchRectangle to SearchRect("CustomizeArea")
+			Click text:"Apply",waitFor:ConfigValues.BasicTimeOut
+			
+		Else
+			"Utilities/GenericOperations".Error "There are no values in the Fault dashboard"
+			
+			
+		End if
+		set the SearchRectangle to empty
+	catch exception
+		
+		
+		get "Utilities/GenericOperations".LogException(exception,UnSelectCustomiztionOption_Vehicle)
+	End try
+	"Utilities/GenericOperations".CaptureScreenshotScreenName "customized option selected"
+	log "End of function UnSelectCustomiztionOption_Vehicle"
+end UnSelectCustomiztionOption_Vehicle
+
+-------------------------------------------------------------------------------------------------
+
+--Description: This handler is used to fetch the details from fault popup using image
+---Input : None
+---output: 
+---Created by:Shalini V
+---Created On 05 July 2022
+-------------------------------------------------------------------------------------------------
+--GetDatafieldColumnValuefromPopup_Description "Fault Description"
+to handle GetDatafieldColumnValuefromPopup_Description Fieldname
+	try
+	(*put readtext("IndividualPopup/FaultDescription_A", "IndividualPopup/FaultDescription_B",ignorenewlines:True) into myval
+		If myval is not empty then
+			
+			"Utilities/GenericOperations".Success "Data field column "&& myval && " fetched from popup"
+			
+			else
+			logwarning "The data is empty "&Fieldname
+		end if*)
+		
+		
+		set the SearchRectangle to ScreenPart("IndividualPopup")
+		log ImageFound(text:"Fault Description:",textDifference:1)
+		put  FoundImageLocation() into FDLoc
+		log ImageFound(text:"Troubleshooting:")
+		put  FoundImageLocation() into TBLoc
+		set the searchrectangle to [FDLoc-[55,15],TBLoc-[-750,0]]
+		put "Utilities/CommonActions".TodoTripleClickWRTImage ("IndividualPopup/FaultDescription_A") into FaultDescription 
+		If FaultDescription is not empty then
+			
+			"Utilities/GenericOperations".Success "Data field column "&& FaultDescription && " fetched from popup"
+			
+		else
+			logwarning "The data is empty "&Fieldname
+		end if
+		
+	Catch exception 
+		
+		get "Utilities/GenericOperations".LogException(exception,GetDatafieldColumnValuefromPopup_Description)
+	End try
+	delete newline from FaultDescription
+	return FaultDescription
+end GetDatafieldColumnValuefromPopup_Description
+
+-------------------------------------------------------------------------------------------------
+
+--Description: This handler is used to fetch the details from fault popup using image
+---Input : None
+---output: 
+---Created by:Shalini V
+---Created On 05 July 2022
+-------------------------------------------------------------------------------------------------
+GetDatafieldColumnValuefromPopup_TroubleShoot "Troubleshoot"
+to handle GetDatafieldColumnValuefromPopup_TroubleShoot Fieldname
+	try
+		set the SearchRectangle to ScreenPart("IndividualPopup")
+		log ImageFound(text:"Troubleshooting:",textdifference:1)
+		put  FoundImageLocation() into TBLoc
+		log ImageFound(text:"Notes:",textdifference:1)
+		put  FoundImageLocation() into NotesLoc
+		
+		set the searchrectangle to [TBLoc-[55,15],NotesLoc-[-750,0]]
+		if imagefound(image:"Verticalscroll") is true
+			Drag "IndividualPopup/TroubleshootingArea_A"
+			"ApexPages/FaultDashboardSearchCriteria".scrollCursorDownVertically_FaultPopup "Verticalscroll","VerticalScrollEnd"
+			Drop "VerticalScrollEnd"
+			RightClick  imagelocation("IndividualPopup/TroubleshootingArea_A")+[40,5]
+			wait 2
+			If imagefound(text:"Ctrl+C",waitfor:10)
+				wait 2
+				Click FoundImageLocation() 
+				
+				wait 2
+				put the remoteclipboard into UIValue
+				If UIValue contains "Notes:"
+					split UIValue by "Notes:"
+					put item 1 of UIValue into Tbleshootval
+				Else if UIValue contains "Notes"
+					split UIValue by "Notes"
+					put item 1 of UIValue into Tbleshootval
+				Else
+					put  UIValue into Tbleshootval
+				End if
+				
+				Click  "IndividualPopup/TroubleshootingArea_A"
+			Else
+				LogWarning "Value is not copied"
+			End if
+			
+		Else
+			set the SearchRectangle to ScreenPart("IndividualPopup")
+			put readtext("IndividualPopup/TroubleshootingArea_A", "IndividualPopup/TroubleshootingArea_B",ignorenewlines:True) into Tbleshootval
+			If Tbleshootval is not empty then
+				If Tbleshootval contains "Notes:" then
+					delete "Notes:" from Tbleshootval
+				End If
+				"Utilities/GenericOperations".Success "Data field column Troubleshoot"&& Tbleshootval && " fetched from popup"
+				
+			else
+				logwarning "The data is empty "&Fieldname
+			end if
+		end if
+		set the SearchRectangle to ScreenPart("IndividualPopup")
+	Catch exception 
+		
+		get "Utilities/GenericOperations".LogException(exception,GetDatafieldColumnValuefromPopup_TroubleShoot)
+	End try
+	return Tbleshootval
+end GetDatafieldColumnValuefromPopup_TroubleShoot
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch the fault dashboard
+---Input : searchArea, Vin
+---output: 
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+--FetchUIDashboardData "FDDashboardFiltered","7JZTH13J9KSOOO152"
+--FetchUIDashboardData "FDDashboardFiltered","1GTHK23617F510177"
+to handle FetchUIDashboardData searchArea,VIN
+	log "start of function FetchUIDashboardData"
+	--set the SearchRectangle to SearchRect(searchArea)
+	"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "VEHICLE"
+	--put   Everyimagelocation(text:"5GZEV337X7J141405", waitFor:2) into val
+	put VIN into BusID
+	put   Everyimagelocation(text:BusID,validwords:BusID, waitFor:2) into ReferenceLoc
+	
+	If number of items in ReferenceLoc is 0
+		
+		put   Everyimagelocation(text:BusID,validwords:BusID,contrastColor:"#323355", contrast:"On", waitFor:2) into ReferenceLoc
+	End If
+	
+	If number of items in ReferenceLoc is 0
+		replace "0" with"O" in BusID
+		put   Everyimagelocation(text:BusID,validwords:BusID, waitFor:2) into ReferenceLoc
+	End If
+	(*If number of items in ReferenceLoc is 0
+	replace "11" with"T1" in BusID
+put   Everyimagelocation(text:BusID, waitFor:2) into ReferenceLoc
+	End If*)
+	If number of items in ReferenceLoc is 0
+		LogError "Imagelocation of given text is not found"
+		Exit all
+	End If
+	set 	iUIDataFlag to 0
+	--	put [] into newDashboardOutputfilelist
+	set newDashboardOutputfilelist to ""
+	log ReferenceLoc
+	repeat with each item of ReferenceLoc
+		put iUIDataFlag +1 into iUIDataFlag
+		put "Utilities\GenericOperations".FormattedDateTime into CurrentDateTime
+		put CurrentDateTime into stroutputFilename
+		put "FaultDashboard"&&stroutputFilename  into outputFilename
+		--"Utilities\exceloperations".CreateOutputFile outputFilename
+		
+		log it
+		put  it into Loc
+		//put FoundImageLocation() into Loc --fmi
+		put 	fetchVehicleNamefromFaultDashboard(Loc) into VehicleName
+		put fetchFMIfromFaultDashboard(Loc) into FMI
+		put fetchTimeofFaultfromFaultDashboard(Loc) into UITimeofFault
+		put fetchSPNfromFaultDashboard(Loc) into SPN
+		put fetchPriorityFromFaultDashboard(Loc) into priority
+		put fetchStatusFromFaultDashboard(Loc) into status
+		put fetchFaultDurationFromFaultDashboard(Loc) into FaultDuration
+		--end repeat
+		
+		--repeat with each item of ReferenceLoc
+		click it
+		
+		set the SearchRectangle to ScreenPart("IndividualPopup")
+		VerifyTextInFaultDashboard "Fault Details",0,0 
+		//put FoundImageLocation() into Loc --fmi
+		put GetDatafieldColumnValuefromPopup_FaultDetails("FaultName") into FaultName
+		put GetDatafieldColumnValuefromPopup_Description("FaultDescription") into FaultDesc
+		put GetDatafieldColumnValuefromPopup_TroubleShoot("TroubleShoot") into Troubleshoot
+		
+		
+		Click "IndividualPopup/CloseFaultDetailsPopup"
+		--end repeat
+		
+		"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "VEHICLE"
+		"Utilities/CommonActions".scrollCursorRightHorizontally_WithReferenceText "Model", "FD_HorizontalScrollRight"
+		
+		--repeat with each item of ReferenceLoc
+		--log it
+		put  it into ScrolledLoc
+		put fetchSourceAddressfromFaultDashboard(ScrolledLoc) into SourceAddressValue
+		put fetchCustomerNamefromFaultDashboard(ScrolledLoc) into CustomerName
+		put fetchManufacturerfromFaultDashboard(ScrolledLoc) into Manufacturer
+		put fetchModelfromFaultDashboard(ScrolledLoc) into Model
+		"ApexPages/FaultDashboardCharger".ResetScrollPosition "FD_LeftScrollbar","FaultDashboard"
+		--end repeat
+		delete newline from Troubleshoot
+		--put VehicleName&","&SPN&","&FMI&","&priority&","&status&","&UITimeofFault&","&FaultDuration&","&SourceAddressValue&","&CustomerName&","&Manufacturer&","&Model&","&Trim(FaultName)&","&FaultDesc&","&Troubleshoot into FrontendData
+		put VehicleName&"##"&SPN&"##"&FMI&"##"&priority&"##"&status&"##"&UITimeofFault&"##"&FaultDuration&"##"&SourceAddressValue&"##"&CustomerName&"##"&Manufacturer&"##"&Model&"##"&Trim(FaultName)&"##"&FaultDesc&"##"&Troubleshoot&"##"&VIN into FrontendData
+		log FrontendData
+		put newDashboardOutputfilelist&FrontendData&"::" into newDashboardOutputfilelist
+		--put FrontendData into item iUIDataFlag of newDashboardOutputfilelist
+	end repeat
+	log newDashboardOutputfilelist
+	Log "End of function FetchUIDashboardData"
+	return newDashboardOutputfilelist
+end FetchUIDashboardData
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch model datafield from the dashboard
+---Input :  location of the reference column value
+---output: Model
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchModelfromFaultDashboard Position
+	log "Start of function fetchModelfromFaultDashboard"
+	put Position+[1120,-20] into Pos1
+	put Position+[1300,23] into Pos2
+	put ReadText(Pos1,Pos2) into Model
+	
+	if Model is "" then 
+		put  ReadText( Pos1,Pos2,SearchRectangle:[Pos1,Pos2])  into Model
+
+	end if
+	
+	If Model is "" then 
+		set Model to " "
+	End If
+	log Model
+	log "End of function fetchModelfromFaultDashboard"
+	return Model
+end fetchModelfromFaultDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch model datafield from the dashboard
+---Input :  location of the reference column value
+---output: Model
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchModelfromFaultDashboardGroupByFault Position
+	log "Start of function fetchModelfromFaultDashboardGroupByFault"
+	put Position+[1130,-20] into Pos1
+	put Position+[1310,23] into Pos2
+	put ReadText(Pos1,Pos2) into Model
+	
+	if Model is "" then 
+		put  ReadText( Pos1,Pos2,SearchRectangle:[Pos1,Pos2])  into Model
+
+	end if
+	
+	If Model is "" then 
+		set Model to " "
+	End If
+	log Model
+	log "End of function fetchModelfromFaultDashboardGroupByFault"
+	return Model
+end fetchModelfromFaultDashboardGroupByFault
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch manufacturer from the dashboard
+---Input : location of the reference column value
+---output: manufacturer
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchManufacturerfromFaultDashboard Position
+	log "Start of function fetchManufacturerfromFaultDashboard"
+	Put  Position+[945,-20] into Pos1
+	put Position+[1120,23] into Pos2
+	put ReadText(Pos1,Pos2) into Manufacturer
+	
+	if Manufacturer is "" then 
+		put  ReadText( Pos1,Pos2,SearchRectangle:[Pos1,Pos2])  into Manufacturer
+
+	end if
+	If Manufacturer is "" then 
+		set Manufacturer to " "
+	End If
+	log Manufacturer
+	log "End of function fetchManufacturerfromFaultDashboard"
+	return Manufacturer
+end fetchManufacturerfromFaultDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch FMI from the dashboard
+---Input : location of the reference column value
+---output: FMI
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to handle fetchFMIfromFaultDashboard Position
+	log "Start of function fetchFMIfromFaultDashboard"
+	Put Position+[190,-20] into Pos1
+	Put Position+[250,20] into Pos2
+	put ReadText(Pos1,Pos2) into FMI
+	
+	if FMI is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into FMI
+		
+	end if
+	if FMI contains "o" then 
+		replace "o" with "0" in FMI
+		
+	end if
+	If FMI is "" then 
+		logerror  "FMI is empty"
+	End If
+	log FMI
+	log "End of function fetchFMIfromFaultDashboard"
+	return FMI
+	
+end fetchFMIfromFaultDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch vehicle name from the dashboard
+---Input : location of the reference column value
+---output: Vehicle name
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+
+to  handle fetchVehicleNamefromFaultDashboard Position
+	log "Start of function fetchVehicleNamefromFaultDashboard"
+	Put  Position+[-255,-20] into Pos1
+	Put Position+[-78,23] into Pos2
+	--log ReadText(Pos1,Pos2,contrast:on,contrasttolerance:80)
+	--put  ReadText(Pos1,Pos2,contrast:on,contrasttolerance:80) into VehicleName
+	put  ReadText( Pos1,Pos2,SearchRectangle:[Pos1,Pos2]) into VehicleName
+	log VehicleName
+	If VehicleName is "" then 
+		logError "Vehicle Name value is empty"
+	End If
+	log "End of function fetchVehicleNamefromFaultDashboard"
+	If VehicleName contains "@"
+		delete "@" from VehicleName
+	End If
+	return VehicleName
+end fetchVehicleNamefromFaultDashboard
+
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch SPN from the dashboard
+---Input : location of the reference column value
+---output: SPN
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchSPNfromFaultDashboard Position
+	log "Start of function fetchSPNfromFaultDashboard"
+	Put  Position+[100,-20] into Pos1
+	Put Position+[190,23] into Pos2
+	put ReadText(Pos1,Pos2) into SPNValue
+	If SPNValue is "" then 
+		put ReadText(Pos1,Pos2,contrast:on) into SPNValue
+	end if
+	log SPNValue
+	If SPNValue is "" then 
+		logError "SPN value is empty"
+	End If
+	log "End of function fetchSPNfromFaultDashboard"
+	return SPNValue
+end fetchSPNfromFaultDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch Priority from the dashboard
+---Input : location of the reference column value
+---output: Priority
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+
+to  handle fetchPriorityFromFaultDashboard Position
+	log "Start of function fetchPriorityFromFaultDashboard"
+	put Position+[250,-20] into Pos1
+	Put Position+[350,23] into Pos2
+	put ReadText(Pos1,Pos2) into Priority
+	--log Priority
+	If Priority is "" 
+		put ReadText([Pos1,Pos2],Contrast:on,contrasttolerance:80) into Priority
+	end if
+	If Priority is "" then 
+		logError "Priority is empty"
+	End If
+	log Priority
+	log "end of function fetchPriorityFromFaultDashboard"
+	return Priority
+end fetchPriorityFromFaultDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch first occ from the dashboard
+---Input : location of the reference column value
+---output: first occ
+---Created by:Shalini V
+---Created On 03 August 2022
+-------------------------------------------------------------------------------------------------
+
+to  handle fetchFirstOccurenceFromFaultDashboard Position
+	log "Start of function fetchFirstOccurenceFromFaultDashboard"
+	put Position+[705,-20] into Pos1
+	Put Position+[880,23] into Pos2
+	put ReadText(Pos1,Pos2) into FirstOcc
+	if FirstOcc is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into FirstOcc
+		replace <<"_>> with ":"in FirstOcc
+		log FirstOcc
+		
+	end if
+	if FirstOcc contains "o" then 
+		replace "o" with "0" in FirstOcc
+		
+	end if
+	if FirstOcc contains "Q" then 
+		replace "Q" with "0" in FirstOcc
+		
+	end if
+	if FirstOcc contains "O" then 
+		replace "O" with "0" in FirstOcc
+		
+	end if
+	
+	If FirstOcc is "" then 
+		logerror "First occurence is not fetched from the dashboard"
+	End If
+	Delete " " from FirstOcc
+	Put " " after character 10 of FirstOcc
+	If character 14 of FirstOcc is not ":"
+		Put ":" after character 13 of FirstOcc
+	End If
+	
+	put  " " after  character 16 of FirstOcc
+	
+	log FirstOcc
+	log "end of function fetchFirstOccurenceFromFaultDashboard"
+	return FirstOcc
+end fetchFirstOccurenceFromFaultDashboard
+
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch first occ from the dashboard
+---Input : location of the reference column value
+---output: first occ
+---Created by:Shalini V
+---Created On 03 August 2022
+-------------------------------------------------------------------------------------------------
+
+to  handle fetchNumberofOccurenceFromFaultDashboard Position
+	log "Start of function fetchNumberofOccurenceFromFaultDashboard"
+	put Position+[890,-20] into Pos1
+	Put Position+[1050,23] into Pos2
+	put ReadText(Pos1,Pos2) into NoOfOcc
+	if NoOfOcc is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into NoOfOcc
+	end if
+	
+	If NoOfOcc is "" then 
+		logerror "First occurence is not fetched from the dashboard"
+	End If
+	log NoOfOcc
+	log "end of function fetchNumberofOccurenceFromFaultDashboard"
+	return NoOfOcc
+end fetchNumberofOccurenceFromFaultDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch Status from the dashboard
+---Input : location of the reference column value
+---output: Status
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchStatusFromFaultDashboard Position
+	log "Start of function fetchStatusFromFaultDashboard"
+	put Position+[350,-20] into Pos1
+	Put Position+[450,23] into Pos2
+	put ReadText(Pos1,Pos2) into Status
+	
+	If Status is "" 
+		put ReadText([Pos1,Pos2],Contrast:on) into Status
+	end if
+	If Status is "" then 
+		logError "Status is empty"
+	End If
+	log Status
+	log "End of function fetchStatusFromFaultDashboard"
+	return Status
+end fetchStatusFromFaultDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch Time of fault from the dashboard
+---Input : location of the reference column value
+---output: Time of fault
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchTimeofFaultfromFaultDashboard Position
+	Log "Start of function fetchTimeofFaultfromFaultDashboard"
+	Put  Position+[800,-20] into Pos1
+	Put Position+[950,23] into Pos2
+	put ReadText(Pos1,Pos2) into TimeofFaultvalue
+	
+	if TimeofFaultvalue is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into TimeofFaultvalue
+		replace <<"_>> with ":"in TimeofFaultvalue
+		log TimeofFaultvalue
+		
+	end if
+	if TimeofFaultvalue contains "o" then 
+		replace "o" with "0" in TimeofFaultvalue
+		
+	end if
+	if TimeofFaultvalue contains "Q" then 
+		replace "Q" with "0" in TimeofFaultvalue
+		
+	end if
+	if TimeofFaultvalue contains "O" then 
+		replace "O" with "0" in TimeofFaultvalue
+		
+	end if
+	
+	
+	If TimeofFaultvalue is "" then 
+		logerror "Time offault is not fetched"
+	End If
+	Delete " " from TimeofFaultvalue
+	Put " " after character 10 of TimeofFaultvalue
+	If character 14 of TimeofFaultvalue is not ":"
+		Put ":" after character 13 of TimeofFaultvalue
+	End If
+	
+	put  " " after  character 16 of TimeofFaultvalue
+	
+	log TimeofFaultvalue
+	log "End of function fetchTimeofFaultfromFaultDashboard"
+	return TimeofFaultvalue
+	
+end fetchTimeofFaultfromFaultDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch fault duration from the dashboard
+---Input : location of the reference column value
+---output: Fault duration
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchFaultDurationFromFaultDashboard Position
+	Log "Start of function fetchFaultDurationFromFaultDashboard"
+	Put  Position+[950,-20] into Pos1
+	Put Position+[1150,23] into Pos2
+	put ReadText(Pos1,Pos2) into FaultDuration
+	
+	if FaultDuration is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into FaultDuration
+		replace <<"_>> with ":"in FaultDuration
+		
+		
+	end if
+	if FaultDuration contains "o" then 
+		replace "o" with "0" in FaultDuration
+		
+	end if
+	IF  the number of occurrences of ":" in FaultDuration is 1
+		If character 3 of FaultDuration is not ":"
+			put ":" after character 2 of FaultDuration
+		END IF
+		If character 6 of FaultDuration is not ":"
+			put ":" after character 5 of FaultDuration
+		END IF
+		
+	End If
+	If FaultDuration is "" then 
+		logerror "Fault duration is blank"
+	End If
+	log FaultDuration
+	log "End of fetchFaultDurationFromFaultDashboard"
+	return FaultDuration
+end fetchFaultDurationFromFaultDashboard
+
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch Source Address from the dashboard
+---Input : location of the reference column value
+---output: Source Address
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchSourceAddressfromFaultDashboard Position
+	Log "Start of fetchSourceAddressfromFaultDashboard"
+	Put  Position+[585,-20] into Pos1
+	Put Position+[770,23] into Pos2
+	put ReadText(Pos1,Pos2) into SourceAddressVal
+	--log SourceAddressVal
+	
+	put ReadText([Pos1,Pos2],Contrast:on,ContrastTolerance:80) into SourceAddressVal
+
+	if SourceAddressVal contains "o" then 
+		replace "o" with "0" in SourceAddressVal
+		
+	end if
+	If SourceAddressVal is "" then 
+		logError "Source address is empty"
+	End If
+	Log SourceAddressVal
+	Log "end of function fetchSourceAddressfromFaultDashboard"
+	return SourceAddressVal
+end fetchSourceAddressfromFaultDashboard
+
+
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch Source Address from the dashboard
+---Input : location of the reference column value
+---output: Source Address
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchSourceAddressfromGroupByFaultDashboard Position
+	Log "Start of fetchSourceAddressfromGroupByFaultDashboard"
+	(*	Put  Position+[600,-20] into Pos1
+	Put Position+[775,23] into Pos2*)
+	Put  Position+[590,-20] into Pos1
+	Put Position+[770,23] into Pos2
+	put ReadText(Pos1,Pos2) into SourceAddressVal
+	--log SourceAddressVal
+	
+	put ReadText([Pos1,Pos2],Contrast:on,ContrastTolerance:80) into SourceAddressVal
+
+	if SourceAddressVal contains "o" then 
+		replace "o" with "0" in SourceAddressVal
+		
+	end if
+	
+	If SourceAddressVal is "" then 
+		logError "Source address is empty"
+	End If
+	Log SourceAddressVal
+	log "End of function fetchSourceAddressfromGroupByFaultDashboard"
+	return SourceAddressVal
+end fetchSourceAddressfromGroupByFaultDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch Customer name from the dashboard
+---Input : location of the reference column value
+---output: Customer name
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchCustomerNamefromGroupByFaultDashboard Position
+	Log "Start of function fetchCustomerNamefromGroupByFaultDashboard"
+	(*	Put  Position+[777,-20] into Pos1
+	Put Position+[960,23] into Pos2*)
+	Put  Position+[765,-20] into Pos1
+	Put Position+[950,23] into Pos2
+	put ReadText(Pos1,Pos2) into CustomerName
+	
+	if CustomerName is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into CustomerName
+		
+	end if
+	
+	If CustomerName is "" then 
+		set CustomerName to " "
+		Logwarning "Customername is blank"
+	End If
+	log CustomerName
+	Log "End of fetchCustomerNamefromGroupByFaultDashboard"
+	return CustomerName
+end fetchCustomerNamefromGroupByFaultDashboard
+-------------------------------------------------------------------------------------------------
+--Description: This handler is used to fetch Customer name from the dashboard
+---Input : location of the reference column value
+---output: Customer name
+---Created by:Shalini V
+---Created On 19 July 2022
+-------------------------------------------------------------------------------------------------
+to  handle fetchCustomerNamefromFaultDashboard Position
+	log "Start of function fetchCustomerNamefromFaultDashboard"
+	
+	Put  Position+[770,-20] into Pos1
+	Put Position+[945,23] into Pos2
+	put ReadText(Pos1,Pos2) into CustomerName
+	
+	if CustomerName is "" then 
+		put ReadText([Pos1,Pos2],Contrast:on) into CustomerName
+		
+	end if
+	
+	If CustomerName is "" then 
+		set CustomerName to " "
+		Logwarning "Customername is blank"
+	End If
+	log CustomerName
+	Log "End of fetchCustomerNamefromFaultDashboard"
+	return CustomerName
+end fetchCustomerNamefromFaultDashboard
+------------------------------------------------------------------------------------------------
+
+--Description: This handler is used to fetch the details from fault popup using image
+---Input : None
+---output: 
+---Created by:Shalini V
+---Created On 05 July 2022
+-------------------------------------------------------------------------------------------------
+--GetDatafieldColumnValuefromPopup_FaultDetails "FMI"
+To handle GetDatafieldColumnValuefromPopup_FaultDetails DatafieldName
+
+	try
+		put readtext("IndividualPopup\FaultDetails_PopupA","IndividualPopup\FaultDetails_PopupB") into myval
+		If myval is not empty then
+			replace "SPN" in myval with enter&& " SPN:"
+			replace "SPN:" in myval with enter&& " SPN:"
+			replace "FMI" in myval with enter&& " FMI:"
+			replace "FMI:" in myval with enter&& " FMI:"
+			
+			replace "Vehicle Name" in myval with enter&& " VehicleName:"
+			replace "Vehicle Name:" in myval with enter&& " VehicleName:"
+			replace "Fault Name" in myval  with enter&&" FaultName:"
+			replace "Fault Name:" in myval  with enter&&" FaultName:"
+			replace "Time of Fault" in myval  with enter &&" Time of Fault:"
+			replace "Time of Fault:" in myval  with enter &&" Time of Fault:"
+			replace "Priority" in myval  with enter &&" Priority:"
+			replace "Priority:" in myval  with enter &&" Priority:"
+			replace "Status" in myval  with  enter &&" Status:"
+			replace "Status:" in myval  with  enter &&" Status:"
+			replace "VIN" in myval  with enter&& " VIN:"
+			replace "VIN:" in myval  with enter&& " VIN:"
+			replace "Fault Duration:" in myval  with enter&& " FaultDuration:"
+			
+			put split (myval, "") into keyValList
+			set iFoundData to False
+			repeat with each item of keyValList
+				
+				If it contains DatafieldName then
+					--replace every occurrence of ":" with "" in it 
+					
+					replace every occurrence of DatafieldName&":" with "" in it
+					delete tab from it
+					put trim(it) into it
+					If DatafieldName is not "FaultDuration" and DatafieldName is not "Time of Fault"
+						Delete ":" from it
+						
+					end if
+					If DatafieldName is  "FaultDuration"  
+						If first character of it is ":"
+							delete first character of it
+						End If
+					end if 
+					If DatafieldName is  "Time of Fault"
+						If first character of it is ":"
+							delete first character of it
+						End If
+						Delete " " from it
+						Put " " after character 10 of it
+						If character 14 of it is not ":"
+							Put ":" after character 13 of it
+						End If
+						
+						put  " " after  character 16 of it
+					end if
+					put trim(it) into ColumnValue
+					set iFoundData to true
+					exit repeat
+					
+				End If
+			end repeat
+			--log "Data is writtent output file for "&Fieldname
+		else
+			logwarning "The data is empty "&Fieldname
+		end if
+		If iFoundData is True
+			"Utilities/GenericOperations".Success "Data field column"&& DatafieldName && " fetched from popup"
+		Else
+			"Utilities/GenericOperations".Error "Data field collumn"&& DatafieldName && " is not found in the popup"
+		End If
+	Catch exception 
+		
+		get "Utilities/GenericOperations".LogException(exception,FetchFDDetailsFromPopup_FaultDetails)
+	End try
+	log ColumnValue
+	return ColumnValue
+end GetDatafieldColumnValuefromPopup_FaultDetails
+------------------------------------------------------------------------------------------------
+
+--Description: This handler is used to click on specific datafield columndata, to open individual popup
+---Input : RefDataFieldName (can be VIN id),DatafieldColname
+---output: 
+---Created by:Shalini V
+---Created On 25 July 2022
+-------------------------------------------------------------------------------------------------
+
+--ToClickOnSpecificDatafieldColumnDataAndOpenFaultPopup "5GZEV337X7J141405","Vehicle Name,SPN,VIN,FMI,Priority,Status,Fault name,Fault description,Time of fault,Fault duration (hh:mm:ss),Source Address"
+to handle ToClickOnSpecificDatafieldColumnDataAndOpenFaultPopup RefDataFieldValue, DatafieldColnames
+	try
+		
+		log"Start of function ToClickOnSpecificDatafieldColumnDataAndOpenFaultPopup"
+		--set the SearchRectangle to SearchRect(SearchArea)
+		"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "VEHICLE"
+		Global ConfigValues
+		put RefDataFieldValue into RefVal
+		Set DatafieldArea to EveryImageLocation(text:RefVal,validwords:RefVal)
+		If number of items in  DatafieldArea is 0
+			If RefVal contains "0"
+				Replace "0" with "O" in RefVal
+				Set DatafieldArea to EveryImageLocation(text:RefVal,validwords:RefVal)
+			end if
+			
+		End If
+		(*	If number of items in  DatafieldArea is 0
+			If RefVal contains "11"
+				Replace "11" with "T1" in RefVal
+				Set DatafieldArea to EveryImageLocation(text:RefVal)
+			end if
+			
+		End If*)
+		If number of items in  DatafieldArea is  0
+			LogError RefDataFieldValue&"is not found in the dashboard"
+			exit all
+		End If
+		repeat with DatafieldArea
+			put it into referencearea
+			put 	fetchVehicleNamefromFaultDashboard(referencearea) into VehicleName
+			put fetchFMIfromFaultDashboard(referencearea) into FMI
+			put fetchTimeofFaultfromFaultDashboard(referencearea) into UITimeofFault
+			put fetchSPNfromFaultDashboard(referencearea) into SPN
+			put fetchPriorityFromFaultDashboard(referencearea) into priority
+			put fetchStatusFromFaultDashboard(referencearea) into status
+			put fetchFaultDurationFromFaultDashboard(referencearea) into FaultDuration
+			
+			set the SearchRectangle to SearchRect(SearchArea)
+			"Utilities/CommonActions".scrollCursorRightHorizontally_WithReferenceText "Model", "FD_HorizontalScrollRight"
+			
+			--put  it into referencearea
+			put fetchSourceAddressfromFaultDashboard(referencearea) into SourceAddressValue
+			put fetchCustomerNamefromFaultDashboard(referencearea) into CustomerName
+			
+			put fetchModelfromFaultDashboard(referencearea) into Model
+			--"ApexPages/FaultDashboardCharger".ResetScrollPosition "FD_LeftScrollbar","FaultDashboard"
+			ResetScrollPosition "FD_LeftScrollbar","FaultDashboard"
+			
+			repeat for each columnname in DatafieldColnames
+				"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "VEHICLE"
+				put imagelocation(text:columnname) into expectearea
+				log referencearea
+				put referencearea.y into posy
+				put expectearea.x into posx
+				
+				Click[posx,posy]
+				Log "Datafield column is clicked"
+				set the SearchRectangle to ScreenPart("IndividualPopup")
+				VerifyTextInFaultDashboard "Fault Details",0,0 
+				VerifyTextInFaultDashboard "SPN",0,0
+				VerifyTextInFaultDashboard "FMI",0,0
+				VerifyTextInFaultDashboard "Priority",0,0
+				VerifyTextInFaultDashboard "Status",0,0
+				VerifyTextInFaultDashboard "Vehicle Name",0,0
+				VerifyTextInFaultDashboard "VIN",0,0
+				VerifyTextInFaultDashboard "Fault Name",0,0 
+				VerifyTextInFaultDashboard "Time of Fault",0,0 
+				VerifyTextInFaultDashboard "Fault Duration",0,0 
+				VerifyTextInFaultDashboard "Fault Description",0,0 
+				VerifyTextInFaultDashboard "Troubleshooting",0,0
+				VerifyTextInFaultDashboard "Notes",0,0
+				VerifyTextInFaultDashboard "Vehicle:",0,0
+				VerifyTextInFaultDashboard "Source Address",0,0
+				put GetDatafieldColumnValuefromPopup_FaultDetails("SPN") into SPNPopup
+				put GetDatafieldColumnValuefromPopup_FaultDetails("FMI") into FMIPopup
+				put GetDatafieldColumnValuefromPopup_FaultDetails("Priority") into PriorityPopup
+				put GetDatafieldColumnValuefromPopup_FaultDetails("Status") into StatusPopup
+				put GetDatafieldColumnValuefromPopup_FaultDetails("VIN") into VINPopup
+				put GetDatafieldColumnValuefromPopup_FaultDetails("VehicleName") into VehicleNamePopup
+				put GetDatafieldColumnValuefromPopup_FaultDetails("FaultDuration") into FaultDurationPopup
+				put GetDatafieldColumnValuefromPopup_FaultDetails("Time of Fault") into TimeofFaultPopup
+				
+				put GetDatafieldColumnValuefromPopup_TroubleShoot("TroubleShoot") into TroubleshootPopup
+				Log TroubleshootPopup
+				put ImageRectangle(text:"Source Address", waitFor:20) into ImageRectangleOfSourceAddress	
+				put  ReadText(ImageRectangleOfSourceAddress.TopRight+[5,20],ImageRectangleOfSourceAddress.BottomRight+[100,-20])  into SourceAddressPopup
+				put ImageRectangle(text:"Vehicle:", waitFor:20) into ImageRectangleOfVehicleModel
+				put  ReadText(ImageRectangleOfVehicleModel.TopRight+[5,20],ImageRectangleOfVehicleModel.BottomRight+[100,-20])  into VehicleModel
+				If VehicleModel is "" then
+					put " " into VehicleModel
+				End If
+				----Compare the popup data with dashboard data
+				"Utilities/CommonActions".compareValues SPN,SPNPopup
+				"Utilities/CommonActions".compareValues FMI,FMIPopup
+				"Utilities/CommonActions".compareValues priority,PriorityPopup
+				"Utilities/CommonActions".compareValues status,StatusPopup
+				If RefDataFieldValue contains "0"
+					replace "0" with "O" in RefDataFieldValue
+				End If
+				If VINPopup contains "0"
+					replace "0" with "O" in VINPopup
+				End If
+				"Utilities/CommonActions".compareValues RefDataFieldValue,VINPopup
+				"Utilities/CommonActions".containsValue FaultDuration,FaultDurationPopup
+				Delete " " in VehicleName
+				Delete " " in VehicleNamePopup
+				"Utilities/CommonActions".compareValues VehicleName,VehicleNamePopup
+				"Utilities/CommonActions".compareValues SourceAddressValue,SourceAddressPopup
+				"Utilities/CommonActions".compareValues Model,VehicleModel
+				"Utilities/CommonActions".containsValue UITimeofFault,TimeofFaultPopup
+				Click "IndividualPopup/CloseFaultDetailsPopup"
+				Log "Data comparision between dashboard and popup is done successully for "&columnname
+				Repeat until ImageFound("IndividualPopup/CloseFaultDetailsPopup") is False
+					wait 2
+					If repeatindex() is more than 10
+						Exit repeat
+						
+					End If
+				End repeat
+				
+			end repeat
+			
+		end repeat
+		set the SearchRectangle to empty
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,ToClickOnSpecificDatafieldColumnDataAndOpenFaultPopup)
+	End try
+	Log "End of function ToClickOnSpecificDatafieldColumnDataAndOpenFaultPopup"
+end ToClickOnSpecificDatafieldColumnDataAndOpenFaultPopup
+
+ValidateGroupByFaultFaultPopupClosing_ByClickingOutsideGroupByFault "2T1KR32EX3C158977","Vehicle Name,SPN,VIN,FMI,Priority,Fault name,Fault description"
+
+to handle ValidateGroupByFaultFaultPopupClosing_ByClickingOutsideGroupByFault RefDataFieldValue,DatafieldColnames
+
+	log"Start of function ValidateFaultPopupClosing_ByClickingOutsideGroupByFault"
+	--set the SearchRectangle to SearchRect(SearchArea)
+	"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "VEHICLE"
+	Global ConfigValues
+	put RefDataFieldValue into RefValue
+	Set DatafieldArea to EveryImageLocation(text:RefValue,validwords:RefValue)
+	If number of items in  DatafieldArea is 0
+		If RefValue contains "0"
+			Replace "0" with "O" in RefValue
+			Set DatafieldArea to EveryImageLocation(text:RefValue,validwords:RefValue)
+		end if
+	End If
+	(*If number of items in  DatafieldArea is 0
+		If RefValue contains "11"
+			Replace "11" with "T1" in RefValue
+			Set DatafieldArea to EveryImageLocation(text:RefValue)
+		end if
+	End If*)
+	If number of items in  DatafieldArea is  0
+		LogError RefValue&"is not found in the dashboard"
+		exit all
+	End If
+	repeat with DatafieldArea
+		put it into referencearea
+		repeat for each columnname in DatafieldColnames
+			"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "VEHICLE"
+			put imagelocation(text:columnname) into expectearea
+			log referencearea
+			put referencearea.y into posy
+			put expectearea.x into posx
+			
+			Click[posx,posy]
+			Log "Datafield column is clicked"
+			set the SearchRectangle to ScreenPart("IndividualPopup")
+			VerifyTextInFaultDashboard "Fault Details",0,0 
+			
+			"Utilities/CommonActions".ClickLeftOfTextLocation  "Fault Details","150"
+			put  IsTextNotPresentOnScreen("Fault Details") into FoundFlag
+			If FoundFlag is false
+				
+				"Utilities/GenericOperations".Success "Fault popup is closed on clicking outside the popupwindow"
+			Else
+				"Utilities/GenericOperations".Error "Fault popup is not closed on clicking outside the popupwindow"
+			End If
+		end repeat
+		
+	end repeat
+	Log "End of function ValidateGroupByFaultFaultPopupClosing_ByClickingOutsideGroupByFault"
+end ValidateGroupByFaultFaultPopupClosing_ByClickingOutsideGroupByFault
+ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup  "2T1KR32EX3C158977","Vehicle Name,SPN,VIN,FMI,Priority,Fault name,Fault description,Number of occurrences"
+
+ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup  "WDCDA5HB2CA011690","Vehicle Name,SPN,VIN,FMI,Priority,Fault name,Fault description,Number of occurrences"
+log remoteclipboard()
+ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup "5NPEC4AC5BH041176","Vehicle Name"
+
+to handle ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup RefDataFieldValue, DatafieldColnames
+	try
+		
+		log"Start of function ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup"
+		--set the SearchRectangle to SearchRect(SearchArea)
+		"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "VEHICLE"
+		Global ConfigValues
+		put RefDataFieldValue into RefValue
+		Set DatafieldArea to EveryImageLocation(text:RefValue,validwords:RefValue)
+		If number of items in  DatafieldArea is 0
+			If RefValue contains "0"
+				Replace "0" with "O" in RefValue
+				Set DatafieldArea to EveryImageLocation(text:RefValue,validwords:RefValue)
+			end if
+		End If
+		(*If number of items in  DatafieldArea is 0
+			If RefValue contains "11"
+				Replace "11" with "T1" in RefValue
+				Set DatafieldArea to EveryImageLocation(text:RefValue)
+			end if
+		End If*)
+		If number of items in  DatafieldArea is  0
+			LogError RefValue&"is not found in the dashboard"
+			exit all
+		End If
+		repeat with DatafieldArea
+			put it into referencearea
+			put 	fetchVehicleNamefromFaultDashboard(referencearea) into VehicleName
+			put fetchFMIfromFaultDashboard(referencearea) into FMI
+			put fetchSPNfromFaultDashboard(referencearea) into SPN
+			put fetchPriorityFromFaultDashboard(referencearea) into priority
+			Put fetchFirstOccurenceFromFaultDashboard(referencearea) into FirstOcc
+			put fetchNumberofOccurenceFromFaultDashboard(referencearea) into NoofOcc
+			
+			set the SearchRectangle to SearchRect(SearchArea)
+			"Utilities/CommonActions".scrollCursorRightHorizontally_WithReferenceText "Model", "FD_HorizontalScrollRight"
+			
+			--put  it into referencearea
+			put fetchSourceAddressfromGroupByFaultDashboard(referencearea) into SourceAddressValue
+			put fetchCustomerNamefromGroupByFaultDashboard(referencearea) into CustomerName
+			
+			put fetchModelfromFaultDashboardGroupByFault(referencearea) into Model
+			--"ApexPages/FaultDashboardCharger".ResetScrollPosition "FD_LeftScrollbar","FaultDashboard"
+			ResetScrollPosition "FD_LeftScrollbar","FaultDashboard"
+			repeat for each columnname in DatafieldColnames
+				"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "VEHICLE"
+				put imagelocation(text:columnname) into expectearea
+				log referencearea
+				put referencearea.y into posy
+				put expectearea.x into posx
+				
+				Click[posx,posy]
+				Log "Datafield column is clicked"
+				set the SearchRectangle to ScreenPart("IndividualPopup")
+				VerifyTextInFaultDashboard "Fault Details",0,0 
+				VerifyTextInFaultDashboard "SPN",0,0
+				VerifyTextInFaultDashboard "FMI",0,0
+				VerifyTextInFaultDashboard "Priority",0,0
+				VerifyTextInFaultDashboard "Vehicle Name",0,0
+				VerifyTextInFaultDashboard "VIN",0,0
+				VerifyTextInFaultDashboard "Fault Name",0,0 
+				VerifyTextInFaultDashboard "Number Of Occurences",0,0 
+				VerifyTextInFaultDashboard "First Occurence",0,0 
+				VerifyTextInFaultDashboard "Fault Description",0,0 
+				VerifyTextInFaultDashboard "Troubleshooting",0,0
+				VerifyTextInFaultDashboard "Notes",0,0
+				VerifyTextInFaultDashboard "Vehicle:",0,0
+				VerifyTextInFaultDashboard "Source Address",0,0
+				put GetDatafieldColumnValuefromPopup_GroupByFaultDetails("SPN") into SPNPopup
+				put GetDatafieldColumnValuefromPopup_GroupByFaultDetails("FMI") into FMIPopup
+				put GetDatafieldColumnValuefromPopup_GroupByFaultDetails("Priority") into PriorityPopup
+				
+				put GetDatafieldColumnValuefromPopup_GroupByFaultDetails("VIN") into VINPopup
+				put GetDatafieldColumnValuefromPopup_GroupByFaultDetails("VehicleName") into VehicleNamePopup
+				put GetDatafieldColumnValuefromPopup_GroupByFaultDetails("First Occurence") into FirstOccPopup
+				put GetDatafieldColumnValuefromPopup_GroupByFaultDetails("Number Of Occurences") into NoOFOccPopup 
+				
+				put GetDatafieldColumnValuefromPopup_TroubleShoot("TroubleShoot") into TroubleshootPopup
+				Log TroubleshootPopup
+				put ImageRectangle(text:"Source Address", waitFor:20) into ImageRectangleOfSourceAddress	
+				put  ReadText(ImageRectangleOfSourceAddress.TopRight+[5,20],ImageRectangleOfSourceAddress.BottomRight+[100,-20])  into SourceAddressPopup
+				put ImageRectangle(text:"Vehicle:", waitFor:20) into ImageRectangleOfVehicleModel
+				put  ReadText(ImageRectangleOfVehicleModel.TopRight+[5,20],ImageRectangleOfVehicleModel.BottomRight+[100,-20])  into VehicleModel
+				If VehicleModel is "" then
+					put " " into VehicleModel
+				End If
+				----Compare the popup data with dashboard data
+				"Utilities/CommonActions".compareValues SPN,SPNPopup
+				"Utilities/CommonActions".compareValues FMI,FMIPopup
+				"Utilities/CommonActions".compareValues priority,PriorityPopup
+				"Utilities/CommonActions".compareValues NoofOcc,NoOFOccPopup
+				"Utilities/CommonActions".compareValues FirstOcc,FirstOccPopup
+				If RefDataFieldValue contains "0"
+					replace "0" with "O" in RefDataFieldValue
+				End If
+				If VINPopup contains "0"
+					replace "0" with "O" in VINPopup
+				End If
+				"Utilities/CommonActions".compareValues RefDataFieldValue,VINPopup
+				--	"Utilities/CommonActions".containsValue FaultDuration,FaultDurationPopup
+				Delete " " from VehicleName
+				Delete " " from VehicleNamePopup
+				"Utilities/CommonActions".compareValues VehicleName,VehicleNamePopup
+				"Utilities/CommonActions".compareValues SourceAddressValue,SourceAddressPopup
+				"Utilities/CommonActions".compareValues Model,VehicleModel
+				
+				Click "IndividualPopup/CloseFaultDetailsPopup"
+				Log "Data comparision between dashboard and popup is done successully for "&columnname
+				Repeat until ImageFound("IndividualPopup/CloseFaultDetailsPopup") is False
+					wait 2
+					If repeatindex() is more than 10
+						Exit repeat
+						
+					End If
+				End repeat
+				
+			end repeat
+			
+		end repeat
+		set the SearchRectangle to empty
+	Catch exception
+		get "Utilities/GenericOperations".LogException(exception,ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup)
+	End try
+	Log "End of function ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup"
+end ToClickOnSpecificDatafieldColumnDataAndOpenGroupByFaultPopup
+
+To handle GetDatafieldColumnValuefromPopup_GroupByFaultDetails DatafieldName
+
+	try
+		put readtext("IndividualPopup\FaultDetails_PopupA","IndividualPopup\FaultDetails_PopupB") into myval
+		If myval is not empty then
+			replace "SPN" in myval with enter&& " SPN:"
+			replace "SPN:" in myval with enter&& " SPN:"
+			replace "FMI" in myval with enter&& " FMI:"
+			replace "FMI:" in myval with enter&& " FMI:"
+			
+			replace "Vehicle Name" in myval with enter&& " VehicleName:"
+			replace "Vehicle Name:" in myval with enter&& " VehicleName:"
+			replace "Fault Name" in myval  with enter&&" FaultName:"
+			replace "Fault Name:" in myval  with enter&&" FaultName:"
+			replace "Priority" in myval  with enter &&" Priority:"
+			replace "Priority:" in myval  with enter &&" Priority:"
+			replace "First Occurence" in myval  with  enter &&" First Occurence:"
+			replace "First Occurence:" in myval  with  enter &&" First Occurence:"
+			replace "Number Of Occurences" in myval  with  enter &&" Number Of Occurences:"
+			replace "Number Of Occurences:" in myval  with  enter &&" Number Of Occurences:"
+			replace "VIN" in myval  with enter&& " VIN:"
+			replace "VIN:" in myval  with enter&& " VIN:"
+			replace "Fault Duration:" in myval  with enter&& " FaultDuration:"
+			
+			put split (myval, "") into keyValList
+			set iFoundData to False
+			repeat with each item of keyValList
+				
+				If it contains DatafieldName then
+					--replace every occurrence of ":" with "" in it 
+					
+					replace every occurrence of DatafieldName&":" with "" in it
+					delete tab from it
+					put trim(it) into it
+					If DatafieldName is not "First Occurence"
+						Delete ":" from it
+					end if
+					
+					
+					If  DatafieldName is  "First Occurence"
+						If first character of it is ":"
+							delete first character of it
+						End If
+						Delete " " from it
+						Put " " after character 10 of it
+						If character 14 of it is not ":"
+							Put ":" after character 13 of it
+						End If
+						
+						put  " " after  character 16 of it
+						
+					end if 
+					put trim(it) into ColumnValue
+					set iFoundData to true
+					exit repeat
+					
+				End If
+			end repeat
+			--log "Data is writtent output file for "&Fieldname
+		else
+			logwarning "The data is empty "&Fieldname
+		end if
+		If iFoundData is True
+			"Utilities/GenericOperations".Success "Data field column"&& DatafieldName && " fetched from popup"
+		Else
+			"Utilities/GenericOperations".Error "Data field collumn"&& DatafieldName && " is not found in the popup"
+		End If
+	Catch exception 
+		
+		get "Utilities/GenericOperations".LogException(exception,GetDatafieldColumnValuefromPopup_GroupByFaultDetails)
+	End try
+	log ColumnValue
+	return ColumnValue
+end GetDatafieldColumnValuefromPopup_GroupByFaultDetails
+
+Fetch_VehicleFault_TimeofFaultRowValues
+to handle Fetch_VehicleFault_TimeofFaultRowValues
+	log "start of function Fetch_VehicleFault_TimeofFaultRowValues"
+	try
+		put [] into newRowDataList 
+		put 0 into iRowFlag
+		If imagefound(text:"Time of fault") is true
+			put imagelocation(text:"Time of fault") into valloc
+			
+			put valloc +[-50,27] into Pos1
+			put valloc +[100,-20] into Pos2
+			log readtext(Pos1,Pos2)
+			repeat until length of readtext( Pos1,Pos2,searchrectangle:[Pos1,Pos2]) < 2
+				put iRowFlag+1 into iRowFlag
+				put Pos1+[0,50] into Pos1
+				put Pos2 +[0,50] into Pos2
+				put readtext(Pos1,Pos2,searchrectangle:[Pos1,Pos2]) into DashboardRowData
+				put DashboardRowData into item iRowFlag of newRowDataList
+				
+			end repeat
+			log newRowDataList
+		Else
+			"Utilities/GenericOperations".Error "The given datafield column is not found inthe dashboard"
+			put "" into newRowDataList
+		End if
+		
+		log "end of function Fetch_ChargerFault_TimeofFaultRowValues"
+		set the searchrectangle to empty
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,Fetch_VehicleFault_TimeofFaultRowValues)
+	End try
+	
+	return newRowDataList
+end Fetch_VehicleFault_TimeofFaultRowValues
+
+
+//*****************************************************
+--Description: Handler to validate the restricted datafield column
+---Input : imgHorizontalScroll, restricted field, searchrect area
+---output: None
+---Created by:Shalini V
+--created on: 14 July 2022
+//*****************************************************
+to handle VehicleRestrictedFieldsValidation imgHorizontalScroll, restrictedField,searchRectArea
+	--set imgHorizontalScroll to "FD_HorizontalScrollRight"
+	log "start of function VehicleRestrictedFieldsValidation"
+	try 
+		set  the searchrectangle to ScreenPart(searchRectArea)
+		set horizontalScrollLocation to ImageLocation(image:imgHorizontalScroll)
+		log horizontalScrollLocation
+		put item 1 of  horizontalScrollLocation into x
+		put item 2 of  horizontalScrollLocation into y
+		Log x
+		Log y
+		set restrictedfieldflag to true
+		Repeat until  horizontalScrollLocation.x is greater than 1800
+			
+			if imagefound(text:restrictedField,waitfor:3)then
+				set restrictedfieldflag to false
+				"Utilities/GenericOperations".Error "Restricted Datafield"&&restrictedField&&" is found"
+			end if
+			add 200 to x
+			if x>1900
+				set x to 1900
+			end if
+			MoveTo imgHorizontalScroll
+			MouseButtonDown 1 //Holds down the left mouse button
+			--MoveTo the remoteScreenSize*(3/4) 
+			MoveTo [x,y]
+			MouseButtonUp 1 //Releases the left mouse button
+			
+			MoveTo [500,500]
+			
+			
+			set horizontalScrollLocation to ImageLocation(image:imgHorizontalScroll)
+			
+		End Repeat
+		ResetScrollPosition "FD_LeftScrollbar",searchRectArea
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,VehicleRestrictedFieldsValidation)
+	End try
+	If  restrictedfieldflag is true then
+		"Utilities/GenericOperations".Success "Restricted Datafields"&&restrictedField&&" is not found"
+	End If
+	log "start of function VehicleRestrictedFieldsValidation"
+	set the searchrectangle to empty
+	return restrictedfieldflag
+end VehicleRestrictedFieldsValidation
+
+//*****************************************************
+--Description: Handler to reset the scroll  to initial position
+---Input : LeftScrollBarimage and its search rectangle
+---output: None
+---Created by:Shalini V
+--created on: 14 July 2022
+//*****************************************************
+to handle ResetScrollPosition LeftScrollBarimage,SearchrectArea
+	log "Start of function ResetScrollPosition"
+	try
+		set the SearchRectangle to ScreenPart(searchRectArea)
+		IF ImageFound(image:LeftScrollBarimage)
+			
+			set LeftScrollLocation to ImageLocation(image:LeftScrollBarimage)
+			log LeftScrollLocation
+			put item 1 of  LeftScrollLocation into a
+			put item 2 of  LeftScrollLocation into b
+			Log a
+			Log b
+			
+			Repeat until  LeftScrollLocation.x is less than 500
+				add -100 to a
+				if a < 400
+					set a to 400
+				end if
+				MoveTo "FD_LeftScrollbar"
+				MouseButtonDown 1 //Holds down the left mouse button
+				--MoveTo the remoteScreenSize*(3/4) 
+				MoveTo [a,b]
+				MouseButtonUp 1 //Releases the left mouse button
+				
+				MoveTo [500,500]
+				set LeftScrollLocation to ImageLocation(image:"FD_LeftScrollbar")
+			End Repeat
+		Else
+			Log "Scroll bar is in initial position"
+		End if
+		
+	Catch exception
+		
+		get "Utilities/GenericOperations".LogException(exception,ResetScrollPosition)
+	End try
+	set the searchrectangle to empty
+	log "end of function ResetScrollPosition"
+end ResetScrollPosition
+
+
+
+FetchUIDashboardDataForSpecificField "5GZEV337X7J141405","SPN,FMI,SOURCEADDRESS,CUSTOMERNAME,TIMEOFFAULT"
+//*****************************************************
+--Description: Handler to Fetch datafield column from dashboard for vehicle
+---Input : VINID,DatafieldColumnNames
+---output: 
+---Created by:Shalini V
+--created on: 17 August 2022
+//*****************************************************
+to handle FetchUIDashboardDataForSpecificField VINID,DatafieldColumnNames
+
+	log "start of function FetchUIDashboardDataForSpecificField"
+	
+	"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "VEHICLE"
+	
+	put VINID into BusID
+	put   Everyimagelocation(text:BusID,validwords:BusID, waitFor:2) into ReferenceLoc
+	
+	If number of items in ReferenceLoc is 0
+		
+		put   Everyimagelocation(text:BusID,validwords:BusID,contrastColor:"#323355", contrast:"On", waitFor:2) into ReferenceLoc
+	End If
+	
+	If number of items in ReferenceLoc is 0
+		replace "0" with"O" in BusID
+		put   Everyimagelocation(text:BusID,validwords:BusID, waitFor:2) into ReferenceLoc
+	End If
+	
+	If number of items in ReferenceLoc is 0
+		LogError "Imagelocation of given text is not found"
+		Exit all
+	End If
+	
+	set 	iUIDataFlag to 0
+	--	put [] into newDashboardOutputfilelist
+	set newDashboardOutputfilelist to ""
+	set DashboardOutputfilelist to ""
+	log ReferenceLoc
+	repeat with each item of ReferenceLoc
+		put iUIDataFlag +1 into iUIDataFlag
+		
+		log it
+		put  it into Loc
+		repeat for each item DatafieldColumnName in DatafieldColumnNames
+			If UPPERCASE(DatafieldColumnName) is "VEHICLENAME"
+				Logerror "Handle the function for fetching vehicle name"
+				else if UPPERCASE(DatafieldColumnName) is "FMI"
+				"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "VEHICLE"
+				--"Utilities/CommonActions".scrollCursorRightHorizontally_WithReferenceText "FMI", "FD_HorizontalScrollRight"
+				put imagelocation(text:"FMI") into expectearea
+				
+				put it into referencearea
+				put referencearea.y into posy
+				put expectearea.x into posx
+				
+				put [posx,posy] into imageloc
+				
+				put imageloc +[-30,-20] into pos1
+				put imageloc +[50,30] into pos2
+				set the searchrectangle to [pos1, pos2]
+				put readtext(pos1,pos2,searchrectangle:[pos1,pos2]) into FMIVal
+				If FMIVal is ""
+					put readtext(pos1,pos2,searchrectangle:[pos1,pos2],contrast:on) into FMIVal
+				end if
+				If FMIVal contains "O" or FMIVal contains "o"
+					Replace "O" with "0" in FMIVal
+					Replace "o" with "0" in FMIVal
+				End If
+				IF FMIVal is ""
+					LogError "FMI Value is not fetched from the dashboard"
+				END IF
+				
+				put "FMI "&trim(FMIVal) into sDatafieldRowValue
+				--ResetScrollPosition "FD_LeftScrollbar","FaultDashboard"
+				else if UPPERCASE(DatafieldColumnName) is "SPN"
+				"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "VEHICLE"
+				--"Utilities/CommonActions".scrollCursorRightHorizontally_WithReferenceText "SPN", "FD_HorizontalScrollRight"
+			put imagelocation(text:"SPN") into expectearea
+			
+			put it into referencearea
+			put referencearea.y into posy
+			put expectearea.x into posx
+			
+			put [posx,posy] into imageloc
+			
+			put imageloc +[-20,-20] into pos1
+			put imageloc +[60,30] into pos2
+			set the searchrectangle to [pos1, pos2]
+			put readtext(pos1,pos2,DPI:144) into SPNVal
+			If SPNVal is ""
+				put readtext(pos1,pos2,contrast:on) into SPNVal
+			end if
+			If SPNVal contains "O" or SPNVal contains "o"
+				Replace "O" with "0" in SPNVal
+				Replace "o" with "0" in SPNVal
+			End If
+			If SPNVal is ""
+				Logerror "SPN value is not fetched from the dashboard"
+			end if
+			
+			put "SPN "&trim(SPNVal) into sDatafieldRowValue
+			--ResetScrollPosition "FD_LeftScrollbar","FaultDashboard"
+			
+			else if UPPERCASE(DatafieldColumnName) is "PRIORITY"
+			Logerror "Handle the function for fetching PRIORITY"
+			else if UPPERCASE(DatafieldColumnName) is "STATUS"
+			Logerror "Handle the function for fetching STATUS"
+			else if UPPERCASE(DatafieldColumnName) is "FAULTDURATION"
+			Logerror "Handle the function for fetching FAULTDURATION"
+			else if UPPERCASE(DatafieldColumnName) is "TIMEOFFAULT"
+			
+			"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "VEHICLE"
+			--"Utilities/CommonActions".scrollCursorRightHorizontally_WithReferenceText "FMI", "FD_HorizontalScrollRight"
+			put imagelocation(text:"Time of fault") into expectearea
+			
+			put it into referencearea
+			put referencearea.y into posy
+			put expectearea.x into posx
+			
+			put [posx,posy] into imageloc
+			
+			put imageloc +[-35,-20] into pos1
+			put imageloc +[110,30] into pos2
+			set the searchrectangle to [pos1, pos2]
+			put readtext(pos1,pos2,DPI:144) into TimeofFault
+			If TimeofFault is ""
+				put readtext(pos1,pos2,searchrectangle:[pos1,pos2],contrast:on) into TimeofFault
+			end if
+		if TimeofFault contains "o" then 
+			replace "o" with "0" in TimeofFault
+			
+	end if
+	if TimeofFault contains "O" then 
+		replace "O" with "0" in TimeofFault
+		
+	end if
+	if TimeofFault contains "Q" then 
+		replace "Q" with "0" in TimeofFault
+		
+end if
+Delete " " from TimeofFault
+Put " " after character 10 of TimeofFault
+If character 14 of TimeofFault is not ":"
+	Put ":" after character 13 of TimeofFault
+End If
+put  " " after  character 16 of TimeofFault
+IF TimeofFault is ""
+	LogError "TimeofFault Value is not fetched from the dashboard"
+END IF
+
+put "TimeofFault "&trim(TimeofFault) into sDatafieldRowValue
+else if UPPERCASE(DatafieldColumnName) is "SOURCEADDRESS"
+"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "VEHICLE"
+"Utilities/CommonActions".scrollCursorRightHorizontally_WithReferenceText "Source Address", "FD_HorizontalScrollRight"
+			put imagelocation(text:"Source Address") into expectearea
+			
+			put it into referencearea
+			put referencearea.y into posy
+			put expectearea.x into posx
+			
+			put [posx,posy] into imageloc
+			
+			put imageloc +[-50,-20] into pos1
+			put imageloc +[120,30] into pos2
+			set the searchrectangle to [pos1, pos2]
+			put readtext(pos1,pos2,DPI:144) into sValue
+			If sValue is ""
+				put readtext(pos1,pos2,contrast:on,DPI:144) into sValue
+			end if
+			If sValue is ""
+				LogError "Source address is not fetched fromthe dashboard"
+				
+			end if
+			put "SourceAddress "&trim(sValue) into sDatafieldRowValue
+			ResetScrollPosition "FD_LeftScrollbar","FaultDashboard"
+			
+			else if UPPERCASE(DatafieldColumnName) is "CUSTOMERNAME"
+			"ApexPages/FaultDashboardSearchCriteria".getSearchAreaofDashboard "VEHICLE"
+			"Utilities/CommonActions".scrollCursorRightHorizontally_WithReferenceText "Customer name", "FD_HorizontalScrollRight"
+			put imagelocation(text:"Customer name") into expectearea
+			
+			put it into referencearea
+			put referencearea.y into posy
+			put expectearea.x into posx
+			
+			put [posx,posy] into imageloc
+			
+			put imageloc +[-50,-20] into pos1
+			put imageloc +[120,30] into pos2
+			set the searchrectangle to [pos1, pos2]
+			put readtext(pos1,pos2,searchrectangle:[pos1,pos2]) into CustName
+			If CustName is ""
+				put readtext(pos1,pos2,searchrectangle:[pos1,pos2],contrast:on) into CustName
+			end if
+			If CustName is ""
+				LogError "Customer name is not fetched from the dashboard"
+			End If
+			
+			
+			put "CustomerName "&trim(CustName) into sDatafieldRowValue
+			ResetScrollPosition "FD_LeftScrollbar","FaultDashboard"
+			Else
+			Logerror "Handler to be updated for the given datafield column "&DatafieldColumnNames
+			
+			
+		end if
+		--put DashboardOutputfilelist&sDatafieldRowValue&"##" into DashboardOutputfilelist
+		insert sDatafieldRowValue after DashboardOutputfilelist
+	end repeat
+	
+	
+	put newDashboardOutputfilelist&DashboardOutputfilelist&"::" into newDashboardOutputfilelist
+	--Insert DashboardOutputfilelist after newDashboardOutputfilelist
+	set DashboardOutputfilelist to ""
+	set sDatafieldRowValue to ""
+	
+	
+	
+	
+end repeat
+split newDashboardOutputfilelist by "::"  
+log newDashboardOutputfilelist
+
+Log "Ending the handler FetchUIDashboardDataForSpecificField"
+return newDashboardOutputfilelist
+End FetchUIDashboardDataForSpecificField

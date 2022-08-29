@@ -1,0 +1,42 @@
+{
+	"lastmodifieddate": 1647927557.569,
+	"ocrcapturestring": "11 12 6 7 •0 802/",
+	"originalcapturelocation": [
+		833,
+		484,
+		237,
+		141
+	],
+	"createddate": 1647440405.6459999,
+	"testlocationdata": [
+		{
+				"connectionportnum": 3389,
+				"deleted": true,
+				"properties": {
+					"CropRectangle": "[0,0,0,0]",
+					"Rotate": 0,
+					"Scale": "    1",
+					"HotSpot": "[118,70]",
+					"Tolerance": "_45",
+					"Discrepancy": "_0",
+					"SearchType": "Tolerant of Background"
+				},
+				"sutinfo": {
+					"type": "Unknown RDP"
+				},
+				"name": "image0001/image0001.png",
+				"connectionname": "RDP_License_Server",
+				"type": 1,
+				"connectionserverid": "ec2-54-210-217-115.compute-1.amazonaws.com",
+				"capturerect": [
+					833,
+					484,
+					237,
+					141
+				],
+				"connectiontype": "RDP",
+				"capturedocrtext": "o"
+			}
+	],
+	"name": "image0001"
+}

@@ -1,0 +1,79 @@
+﻿
+--set Characters to 0..9 &&& dash &&& "Chapters" // Puts all numbers, -, and the letters in "Chapters" into a variable as a list
+
+--put the readTextSettings into RTS // Stores the current readTextSettings in a variable
+
+--set the readTextSettings to {validCharacters:Characters} // Sets the readTextSettings based on the list of validCharacters stored in Characters. Using the readTextSettings is appropriate when executing multiple readText or readTable functions that require the same set of readTextSettings
+
+--put [2,4,7] into Weeks // Stores a list of the row identifiers of interest into a variable
+set the SearchRectangle to ScreenPart("FaultDashboard")
+Global Iteration,ConfigValues
+
+--Set StatusRectangles to EveryImageRectangle(text:datafieldValue) 
+Set DatafieldArea to EveryImageLocation(text:"8001") 
+
+put imageRectangle(text:"Vehicle Name") into WeekHeader // Stores the rectangle for the found image "WeekHeader"
+
+put imageRectangle(text:"SPN") into ReadingHeader // Stores the rectangle for the found image "ReadingAssignmentHeader"
+
+repeat with  DatafieldArea // Repeats once for each row identifier in Weeks
+
+	put [WeekHeader.BottomLeft, [WeekHeader.Right, remoteScreenSize().y]] into WeekColumn // Creates a rectangle based on location of the Weeks column in the table
+
+	--put imageRectangle(text:"8001", searchRectangle:WeekColumn) into RowNum // Stores the rectangle for the row identifer into a variable
+	--put imageRectangle(text:readtext(it), searchRectangle:WeekColumn) into RowNum 
+	put imageRectangle(text:readtext(it), searchRectangle:WeekColumn) into RowNum 
+	put readText(ReadingHeader.Left, RowNum.Top-4, ReadingHeader.Right+30, RowNum.Bottom+4) into Reading // Reads a rectangle based on the row position and the column position
+	
+	If Reading is not empty then // Checks whether the return of the readText function is empty
+		
+		Log Reading
+		
+	else
+		
+		Log "No chapter."
+		
+	end if
+	
+end repeat
+
+
+
+set the SearchRectangle to ScreenPart("FaultDashboard")
+Global Iteration,ConfigValues
+
+--Set StatusRectangles to EveryImageRectangle(text:datafieldValue) 
+Set DatafieldArea to EveryImageLocation(text:"VIN") 
+
+
+repeat with DatafieldArea
+	put it into referencearea
+	put imagelocation(text:"VIN") into expectearea
+	
+	put referencearea.y into posy
+	put expectearea.x into posx
+	
+	log	readtext(posx,posy)
+end repeat
+
+(*
+
+Put my name
+
+
+getval("VIN")
+
+//to execute the script for the given iteration of test data
+to handle getval excelName, excelSheetName, columnNames
+	Global iIteration
+	set myExcelDB to {type: "excel", file: excelName,name:excelSheetName}
+	set excelData to the records of myExcelDB
+	put item iIteration of excelData into rowvalue
+	
+	Log column
+	
+	put rowvalue.(column) into val
+	Log val
+	return val
+end ApexreadTestDataFrom
+*)
