@@ -13,7 +13,7 @@ Log "#######################################################"
 "CCSS_Pages/BasePage".OpenApplication
 "CCSS_Pages/BasePage".Login
 
-"CCSS_Pages/CCSSConfiguration".IsBusDisplayedAndVerifyIncomingQueue 
+--"CCSS_Pages/CCSSConfiguration".IsBusDisplayedAndVerifyIncomingQueue 
 
 
 Log "#############  Finished execution of Test Case--> TOUC_3301 ############"
